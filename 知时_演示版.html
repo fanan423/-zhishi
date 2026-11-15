@@ -158,44 +158,48 @@
     border-radius:12px;padding:10px 20px;font-size:18px}
   .green-badge b{font-size:25px;color:var(--gold)}
 
-  /* ---------- 屏 5：AI 举证 ---------- */
+  /* ---------- 屏 5：AI 举证（紧凑排版，确保 720 画布内不溢出）---------- */
+  .screen.ai{padding:26px 60px 76px}
+  .screen.ai .eyebrow{margin-bottom:8px}
+  .screen.ai h2.st{font-size:34px}
   .ai-head{display:flex;justify-content:space-between;align-items:flex-start}
   .offline-badge{background:var(--gold-soft);border:1px solid rgba(229,162,27,.5);
-    color:var(--gold-ink);border-radius:12px;padding:9px 16px;font-size:15px;
-    text-align:right;line-height:1.5;flex:0 0 auto}
-  .offline-badge b{font-size:19px;color:var(--alert-ink)}
-  .sample-tabs{display:flex;gap:10px;margin:12px 0 10px;min-height:36px;align-items:center}
-  .sample-tabs button{font-size:15px;padding:6px 16px;border-radius:999px;border:1px solid var(--line);
+    color:var(--gold-ink);border-radius:12px;padding:8px 14px;font-size:14px;
+    text-align:right;line-height:1.45;flex:0 0 auto}
+  .offline-badge b{font-size:18px;color:var(--alert-ink)}
+  .sample-tabs{display:flex;gap:10px;margin:8px 0 6px;min-height:30px;align-items:center}
+  .sample-tabs button{font-size:14px;padding:5px 14px;border-radius:999px;border:1px solid var(--line);
     background:#fff;color:var(--txt-2);cursor:pointer}
   .sample-tabs button.on{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:700}
   .sample-tabs .mini{margin-top:0}
-  .ai-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .ai-left,.ai-right{padding:14px 18px}
-  .ai-lab{font-size:14px;color:var(--brand);font-weight:700;letter-spacing:.5px;margin-bottom:8px}
-  .ai-title{font-size:19px;font-weight:700;line-height:1.4}
-  .ai-meta{font-size:14px;color:var(--txt-3);margin-top:4px}
-  .ai-raw{margin-top:10px;background:var(--card-2);border-radius:10px;padding:11px 13px;
-    font-size:16px;line-height:1.65;color:var(--txt-2);max-height:146px;overflow:hidden}
+  .ai-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .ai-left,.ai-right{padding:10px 14px}
+  .ai-lab{font-size:13px;color:var(--brand);font-weight:700;letter-spacing:.5px;margin-bottom:5px}
+  .ai-title{font-size:18px;font-weight:700;line-height:1.35}
+  .ai-meta{font-size:13px;color:var(--txt-3);margin-top:3px}
+  .ai-raw{margin-top:7px;background:var(--card-2);border-radius:9px;padding:8px 10px;
+    font-size:15px;line-height:1.5;color:var(--txt-2);max-height:96px;overflow:hidden}
   .ai-raw mark{background:var(--gold-soft);color:var(--gold-ink);border-radius:3px;
     padding:1px 2px;font-weight:700}
-  .ai-url{margin-top:9px;font-size:12px;color:var(--txt-3);word-break:break-all;
+  .ai-url{margin-top:6px;font-size:11px;color:var(--txt-3);word-break:break-all;
     font-family:Consolas,Monaco,monospace}
-  .fields{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-  .fcard{background:var(--card-2);border-radius:9px;padding:7px 9px;min-height:58px}
+  .fields{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+  .fcard{background:var(--card-2);border-radius:8px;padding:5px 7px;min-height:44px}
   .fcard.wide{grid-column:1/-1}
-  .fcard span{display:block;font-size:12px;color:var(--txt-3)}
-  .fcard b{display:block;font-size:15px;font-weight:600;line-height:1.45;margin-top:3px;color:var(--txt)}
-  .quote-row{margin-top:12px;background:var(--brand-soft);border-left:5px solid var(--brand);
-    border-radius:0 12px 12px 0;padding:10px 16px}
-  .quote-txt{font-size:16px;line-height:1.6;color:var(--txt)}
+  .fcard span{display:block;font-size:11px;color:var(--txt-3)}
+  .fcard b{display:block;font-size:14px;font-weight:600;line-height:1.4;margin-top:2px;color:var(--txt)}
+  .quote-row{margin-top:8px;background:var(--brand-soft);border-left:5px solid var(--brand);
+    border-radius:0 12px 12px 0;padding:8px 12px}
+  .quote-txt{font-size:15px;line-height:1.5;color:var(--txt)}
   .quote-txt span{color:var(--brand);font-weight:600}
-  .quote-badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
-  .quote-badges span{font-size:13px;background:#fff;border:1px solid var(--line);
-    border-radius:999px;padding:3px 10px;color:var(--txt-2)}
+  .quote-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+  .quote-badges span{font-size:12px;background:#fff;border:1px solid var(--line);
+    border-radius:999px;padding:2px 9px;color:var(--txt-2)}
   .quote-badges span.full{color:var(--brand);border-color:rgba(10,107,75,.4);
     background:var(--brand-soft);font-weight:700}
   .none{background:var(--card);border:1px dashed var(--line);border-radius:14px;
     padding:56px;text-align:center;font-size:23px;color:var(--txt-3)}
+  .screen.ai .foot-note{font-size:13px;padding-top:8px}
 
   /* ---------- 屏 6：现场演示 ---------- */
   .demo-row{display:grid;grid-template-columns:.9fr 1.1fr;gap:22px;margin-top:20px;
@@ -214,15 +218,15 @@
   #appFrame{width:100%;height:100%;border:0;display:block;background:#fff}
 
   /* ---------- 屏 7：边界与诚实 ---------- */
-  .bound-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  .bound-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
   .bound{background:var(--card);border:1px solid var(--line-soft);border-radius:14px;
-    padding:14px 17px;border-left:5px solid var(--gold)}
+    padding:11px 15px;border-left:5px solid var(--gold)}
   .bound.wide{grid-column:1/-1}
   .bno{font-size:13px;color:var(--gold-ink);font-weight:800;letter-spacing:1px}
-  .bound b{display:block;font-size:20px;margin:3px 0 5px}
-  .bound p{font-size:16px;color:var(--txt-2);line-height:1.6}
-  .honest-line{margin-top:14px;font-size:21px;font-weight:700;color:var(--brand);
-    text-align:center;background:var(--brand-soft);border-radius:12px;padding:11px}
+  .bound b{display:block;font-size:19px;margin:2px 0 4px}
+  .bound p{font-size:16px;color:var(--txt-2);line-height:1.5}
+  .honest-line{margin-top:10px;font-size:20px;font-weight:700;color:var(--brand);
+    text-align:center;background:var(--brand-soft);border-radius:12px;padding:9px}
 
   /* ---------- 屏 8：交付清单 ---------- */
   .checklist{display:grid;grid-template-columns:1fr 1fr;gap:9px 18px;margin-top:16px}
@@ -251,11 +255,13 @@
     display:flex;align-items:center;justify-content:space-between;padding:0 60px;
     background:linear-gradient(to top,rgba(247,248,247,.98),rgba(247,248,247,.72));
     border-top:1px solid var(--line)}
+  .ctrl-hint{font-size:14px;color:var(--txt-3);letter-spacing:.3px}
+  .ctrl-right{display:flex;align-items:center;gap:12px}
   #ctrl button{font-family:inherit;font-size:16px;padding:9px 18px;border-radius:10px;
     border:1px solid var(--line);background:#fff;color:var(--txt-2);cursor:pointer}
   #ctrl button:hover{border-color:var(--brand);color:var(--brand)}
   #pg{font-size:16px;color:var(--txt-2);font-variant-numeric:tabular-nums;
-    min-width:90px;text-align:center}
+    min-width:80px;text-align:right}
   #pg b{color:var(--brand);font-size:21px}
   #stage.dark #ctrl{background:linear-gradient(to top,rgba(6,48,35,.96),rgba(6,48,35,.5));
     border-top-color:rgba(255,255,255,.15)}
@@ -264,6 +270,7 @@
   #stage.dark #ctrl button:hover{background:rgba(255,255,255,.2)}
   #stage.dark #pg{color:rgba(255,255,255,.85)}
   #stage.dark #pg b{color:var(--gold)}
+  #stage.dark .ctrl-hint{color:rgba(255,255,255,.65)}
   #stage.dark .hz{color:rgba(255,255,255,.5)}
 </style>
 </head>
@@ -385,16 +392,16 @@
         <tr><th>提示词编写</th><td><code>tools/agent/prompt.js</code> 与小程序端逐字同源、带版本号，针对实测问题迭代加固</td></tr>
         <tr><th>知识库构建</th><td>结构化通知池 + 溯源引文锚点；<b>不用向量库</b>——要的是「查得到」而非「语义相似」，零外部依赖</td></tr>
         <tr><th>工作流编排</th><td>采集 → 时效 / 价值两道入库闸门 → 构建期离线预计算 → 产物注入数据源 → 端上只读</td></tr>
-        <tr><th>插件 / 工具集成</th><td>10 项自研工具 + 20 个校验脚本，每一样都指向仓库真实文件与可复跑脚本</td></tr>
+        <tr><th>插件 / 工具集成</th><td>工具链集中在 <code>tools/</code>；校验脚本由 <code>tools/checks/run_all.js</code> 统一纳管，每一样都指向仓库真实文件</td></tr>
         <tr><th>智能体功能完整性</th><td>采集 / 理解 / 匹配 / 提醒 / 问答 / 日历 / 订阅 闭环，页面与说明文档同口径</td></tr>
       </tbody></table>
     </div>
-    <div class="green-badge">全量自检 <b>24 / 24</b> 全绿　·　链路校验 check_llm_pipeline 24 项通过</div>
-    <div class="foot-note">对位表让评审在 3 秒内找到每个评分点的落点；「24 / 24」为本项目自检记录，非实时在线检测</div>
+    <div class="green-badge">全量自检 <b>全绿</b>　·　链路校验 <code>check_llm_pipeline</code> 24 项通过</div>
+    <div class="foot-note">对位表让评审在 3 秒内找到每个评分点的落点；自检数量随守卫脚本增加而变化，<b>不在此写死</b>，以仓库 <code>node tools/checks/run_all.js</code> 实际输出为准（本项目自检记录，非实时在线检测）</div>
   </section>
 
   <!-- ===================== 屏 5 · AI 理解层现场举证 ===================== -->
-  <section class="screen" data-i="5">
+  <section class="screen ai" data-i="5">
     <div class="ai-head">
       <div>
         <span class="eyebrow">05 · AI 理解层现场举证　重点屏</span>
@@ -404,7 +411,7 @@
     </div>
     <div class="sample-tabs" id="sampleTabs"></div>
     <div id="aiBody"></div>
-    <div class="foot-note">产物由 Node 端智能体在构建期离线跑完并注入数据源，页面只读产物，<b>不是在线实时调用</b>。历史产物提示词版本不可考，如实标 <code>unknown</code>；若数据源中无任何 llm 条目，本屏将如实显示「暂无可举证产物」，绝不编造。</div>
+    <div class="foot-note">产物为构建期离线预计算并注入数据源，页面只读、<b>非实时调用</b>；模型 / 提示词版本 / 引文定位等级均如实标注。无 llm 条目时本屏如实显示「暂无可举证产物」。</div>
   </section>
 
   <!-- ===================== 屏 6 · 现场演示 ===================== -->
@@ -413,13 +420,13 @@
     <h2 class="st">现在就打开它</h2>
     <div class="demo-row">
       <div class="demo-left">
-        <a class="big-btn" href="知时.html" target="_blank" rel="noopener">打开可用版应用（新窗口）↗</a>
+        <a class="big-btn" href="知时_可用版.html" target="_blank" rel="noopener">打开可用版应用（新窗口）↗</a>
         <ul class="demo-points">
           <li><b>双击即用</b>　单个 HTML 文件，无需服务器、无需安装</li>
           <li><b>断网可演</b>　CSS / JS / 数据全内联，不加载任何外部资源</li>
           <li><b>每条可溯源</b>　点开任意通知可回到官网原文与出处</li>
         </ul>
-        <p class="mini">右侧为同目录 <code>知时.html</code> 的内嵌预览；<b>file:// 下若预览被浏览器拦截，请用左侧按钮新窗口打开</b>（兜底，不影响演示）。</p>
+        <p class="mini">右侧为同目录 <code>知时_可用版.html</code> 的内嵌预览；<b>file:// 下若预览被浏览器拦截，请用左侧按钮新窗口打开</b>（兜底，不影响演示）。</p>
       </div>
       <div class="demo-frame-wrap">
         <iframe id="appFrame" title="知时可用版应用预览" loading="lazy"></iframe>
@@ -475,16 +482,19 @@
   <div class="hz l">‹</div>
   <div class="hz r">›</div>
   <div id="ctrl">
-    <button type="button" id="btnPrev">← 上一屏</button>
-    <div id="pg"><b>1</b> / 10</div>
-    <button type="button" id="btnNext">下一屏 →</button>
+    <span class="ctrl-hint">知时 · 安农校园信息雷达　|　← → / 空格 翻页　·　#N 直达</span>
+    <div class="ctrl-right">
+      <button type="button" id="btnPrev">← 上一屏</button>
+      <button type="button" id="btnNext">下一屏 →</button>
+      <div id="pg"><b>1</b> / 10</div>
+    </div>
   </div>
 </div>
 
 <script>
 /* 由 tools/build_presentation.js 在构建时内联，页面运行时只读这两个常量 */
 const DEMO_STAT = {"real":124,"total":130,"demo":6,"units":11,"linked":124,"deepLink":123,"withDeadline":33,"notExpired":3,"expired":30,"aiCount":40,"aiCountAll":46,"events":9,"yearSpan":"2025-2026","baseDate":"2026-11-15","eventDist":[{"k":"讲座培训","v":43},{"k":"学工事务","v":21},{"k":"奖助学金","v":13},{"k":"图书资源","v":11},{"k":"校内通知","v":11},{"k":"学科竞赛","v":11},{"k":"考试安排","v":8},{"k":"选课","v":3},{"k":"转专业","v":3}]};
-const DEMO_AI_SAMPLE = [{"id":"t2026-1026-001","title":"关于报送2026-2027学年本科生转专业工作领导小组名单及选录细则的通知","source":"本科生院","publish":"2026-10-26","url":"https://jwc.ahau.edu.cn/info/1881/36671.htm","raw":"专业学生的辅导员）和终审人员名单、转入学院初审和终审人员名单（具体格式见附件3）。各学院于11月3日前报送工作领导小组名单和转出转入初审终审人员名单，11月6日前报送选录细则。纸质版签字盖章报至本科生院学籍管理部门（勤政楼127室），电子版发送至邮箱XueJiKe@ahau.edu.cn，同时将选录细则录入新教务系统转专业模块中（具体录入时间另行通知，线上录入操作手册见附件4）。联系人：赵老师、胡","rawStart":178,"llm":{"offline":true,"model":"auto","at":"2026-11-08T06:30:31.135Z","promptVersion":"unknown","quoteMatch":"full","quoteIndex":218,"fields":{"event_type":"转专业","who":"各学院（部）","what":"成立转专业工作领导小组并报送名单、初审终审人员名单及选录细则","where":"纸质版报至本科生院学籍管理部门（勤政楼127室），电子版发送至XueJiKe@ahau.edu.cn","deadline":"2026-11-06","materials":"工作领导小组名单、转出转入初审终审人员名单、选录细则（纸质版签字盖章）","summary":"各学院需为2026-2027学年本科生转专业工作成立领导小组、确定初审终审人员并拟定选录细则。名单须于11月3日前报送，选录细则于11月6日前报送，纸质版签字盖章交至勤政楼127室，电子版发送指定邮箱。转专业工作将采用新本科教务系统线上申请、审核、录取方式进行。","source_quote":"各学院于11月3日前报送工作领导小组名单和转出转入初审终审人员名单，11月6日前报送选录细则。纸质版签字盖章报至本科生院学籍管理部门（勤政楼127室），电子版发送至邮箱XueJiKe@ahau.edu.cn"}}},{"id":"real-031","title":"关于新疆维吾尔自治区2026年下半年公开招聘事业单位工作人员笔试考务培训的通知","source":"本科生院（教务处）","publish":"2026-10-15","url":"https://jwc.ahau.edu.cn/info/1881/36641.htm","raw":"附件《线上培训考核系统操作手册》 注意事项：注册时所属机构选择安徽省—安徽农业大学 二、考务培训 培训对象：监考（流动监考）工作人员、考务工作人员 培训时间：2026年10月16 日（星期五）下午1 6：30 培训地点：图书馆第二报告厅 三、注意事项 1.请监考（流动监考）、考务工作人员务必准时参加培训，现场扫码签到 并签订《考务人员保密安全","rawStart":128,"llm":{"offline":true,"model":"auto","at":"2026-11-15T13:00:55.052Z","promptVersion":"1.1.0","quoteMatch":"full","quoteIndex":168,"fields":{"event_type":"讲座培训","who":"监考（流动监考）工作人员、考务工作人员","what":"参加考务培训并完成线上培训考核平台学习答题","where":"图书馆第二报告厅；线上培训考核平台","deadline":"2026-10-16","materials":"注册时所属机构选择安徽省—安徽农业大学；现场扫码签到并签订《考务人员保密安全","summary":"新疆维吾尔自治区2026年下半年公开招聘事业单位工作人员笔试考务培训安排。考务人员需登录线上培训考核平台学习并答题，并参加线下培训。线下培训时间为2026年10月16日下午16:30，地点在图书馆第二报告厅。","source_quote":"培训对象：监考（流动监考）工作人员、考务工作人员 培训时间：2026年10月16 日（星期五）下午1 6：30 培训地点：图书馆第二报告厅"}}}];
+const DEMO_AI_SAMPLE = [{"id":"t2026-1026-001","title":"关于报送2026-2027学年本科生转专业工作领导小组名单及选录细则的通知","source":"本科生院","publish":"2026-10-26","url":"https://jwc.ahau.edu.cn/info/1881/36671.htm","raw":"终审人员名单（具体格式见附件3）。各学院于11月3日前报送工作领导小组名单和转出转入初审终审人员名单，11月6日前报送选录细则。纸质版签字盖章报至本科生院学籍管理部门（勤政楼127室），电子版发送至邮箱XueJiKe@ahau.edu.cn，同时将选录细则录入新教务系统转专业模块中（具体录入时间另行通知，线上录入操作手册见附件4）。联系人：赵老师、胡老师；联系电话：0551-65786163。本科","rawStart":202,"llm":{"offline":true,"model":"auto","at":"2026-11-08T06:30:31.135Z","promptVersion":"unknown","quoteMatch":"full","quoteIndex":218,"fields":{"event_type":"转专业","who":"各学院（部）","what":"成立转专业工作领导小组并报送名单、初审终审人员名单及选录细则","where":"纸质版报至本科生院学籍管理部门（勤政楼127室），电子版发送至XueJiKe@ahau.edu.cn","deadline":"2026-11-06","materials":"工作领导小组名单、转出转入初审终审人员名单、选录细则（纸质版签字盖章）","summary":"各学院需为2026-2027学年本科生转专业工作成立领导小组、确定初审终审人员并拟定选录细则。名单须于11月3日前报送，选录细则于11月6日前报送，纸质版签字盖章交至勤政楼127室，电子版发送指定邮箱。转专业工作将采用新本科教务系统线上申请、审核、录取方式进行。","source_quote":"各学院于11月3日前报送工作领导小组名单和转出转入初审终审人员名单，11月6日前报送选录细则。纸质版签字盖章报至本科生院学籍管理部门（勤政楼127室），电子版发送至邮箱XueJiKe@ahau.edu.cn"}}},{"id":"real-031","title":"关于新疆维吾尔自治区2026年下半年公开招聘事业单位工作人员笔试考务培训的通知","source":"本科生院（教务处）","publish":"2026-10-15","url":"https://jwc.ahau.edu.cn/info/1881/36641.htm","raw":"时所属机构选择安徽省—安徽农业大学 二、考务培训 培训对象：监考（流动监考）工作人员、考务工作人员 培训时间：2026年10月16 日（星期五）下午1 6：30 培训地点：图书馆第二报告厅 三、注意事项 1.请监考（流动监考）、考务工作人员务必准时参加培训，现场扫码签到 并签订《考务人员保密安全","rawStart":152,"llm":{"offline":true,"model":"auto","at":"2026-11-15T13:00:55.052Z","promptVersion":"1.1.0","quoteMatch":"full","quoteIndex":168,"fields":{"event_type":"讲座培训","who":"监考（流动监考）工作人员、考务工作人员","what":"参加考务培训并完成线上培训考核平台学习答题","where":"图书馆第二报告厅；线上培训考核平台","deadline":"2026-10-16","materials":"注册时所属机构选择安徽省—安徽农业大学；现场扫码签到并签订《考务人员保密安全","summary":"新疆维吾尔自治区2026年下半年公开招聘事业单位工作人员笔试考务培训安排。考务人员需登录线上培训考核平台学习并答题，并参加线下培训。线下培训时间为2026年10月16日下午16:30，地点在图书馆第二报告厅。","source_quote":"培训对象：监考（流动监考）工作人员、考务工作人员 培训时间：2026年10月16 日（星期五）下午1 6：30 培训地点：图书馆第二报告厅"}}}];
 
 (function(){
   var stage = document.getElementById('stage');
@@ -643,7 +653,7 @@ const DEMO_AI_SAMPLE = [{"id":"t2026-1026-001","title":"关于报送2026-2027学
     /* 首次进入现场演示屏才加载 iframe，避免开场就加载大文件 */
     if (i === 6 && !frameLoaded && frame){
       frameLoaded = true;
-      frame.src = '知时.html';
+      frame.src = '知时_可用版.html';
     }
     try { history.replaceState(null, '', '#' + (i+1)); } catch(e){}
   }

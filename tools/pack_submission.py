@@ -94,7 +94,10 @@ TOOL_ITEMS = [
     "tools/install_agent_task.ps1",
     "tools/sync_promo_kpi.js",
     "tools/build_presentation.js",
-    "tools/README.md",
+    "tools/build_usable.js",
+    "tools/build_two_versions.js",     # 两版通用命名 zip 打包器
+    "tools/lib",                       # zip_writer.js（纯 Node 零依赖 ZIP 写入器）
+    "tools/checks",                    # 全量自检 + 两版 zip 交叉守卫（可复跑举证）
     "config/cloud.example.json",       # 只带模板，不带 cloud.local.json
     "data",
 ]
@@ -110,8 +113,11 @@ EXCLUDE_NAMES = {
     # 本地诊断/评估留痕，不进提交包
     "_probe.js", "_probe2.js", "_probe3.js", "_probe4.js", "_probe5.js",
     "_probe6.js", "_probe7.js", "_diag.js",
+    # 本地自检留痕日志（.log 已由 EXCLUDE_SUFFIX 排除，此处再明确一次）
+    "_接管_checks.log", "_checks_final.log", "_checks_v5.log",
     # 内部评估材料（含未对外表述的风险判断）
     "项目评估报告_2026-11-15.md",
+    "扣分点优化复核_2026-11-15.md",
 }
 
 
