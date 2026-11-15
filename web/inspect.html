@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>知时 · 安农校园信息雷达 | Demo 入口</title>
+<style>
+  :root{--bg:#0f1115;--panel:#171a21;--panel2:#1e222b;--line:#2a2f3a;
+    --text:#e8eaed;--sub:#9aa4b2;--accent:#4dd6a8;--accent2:#5b9cf8;--radius:16px;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(1200px 600px at 20% -10%,#1a2432 0%,var(--bg) 55%);
+    color:var(--text);font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    min-height:100vh;padding:48px 20px;line-height:1.7}
+  .wrap{max-width:900px;margin:0 auto}
+  .hero{text-align:center;margin-bottom:38px}
+  .logo{width:64px;height:64px;border-radius:18px;margin:0 auto 16px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;
+    color:#08120e;box-shadow:0 8px 28px rgba(77,214,168,.3)}
+  h1{font-size:26px;letter-spacing:.5px}
+  .hero p{font-size:14px;color:var(--sub);margin-top:8px}
+  .claim{margin-top:18px;font-size:14.5px;color:#c8d0db;max-width:640px;margin-left:auto;margin-right:auto;
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 20px;text-align:left}
+  .claim b{color:var(--accent)}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:30px}
+  .cards.three{grid-template-columns:repeat(3,1fr)}
+  .sec{margin-top:34px;font-size:12px;color:var(--sub);letter-spacing:2px;
+    border-bottom:1px solid var(--line);padding-bottom:8px}
+  a.card{display:block;text-decoration:none;color:inherit;background:var(--panel);
+    border:1px solid var(--line);border-radius:var(--radius);padding:22px;transition:.25s;position:relative}
+  a.card:hover{border-color:var(--accent);transform:translateY(-3px);
+    box-shadow:0 12px 30px rgba(0,0,0,.35)}
+  a.card .n{font-size:11px;color:var(--sub);letter-spacing:1px}
+  a.card h3{font-size:17px;margin:6px 0 8px}
+  a.card p{font-size:13px;color:var(--sub)}
+  a.card .go{position:absolute;right:20px;bottom:18px;color:var(--accent);font-size:13px;font-weight:600}
+  .foot{margin-top:34px;font-size:12px;color:var(--sub);text-align:center;line-height:1.9}
+  .foot b{color:var(--accent)}
+  @media(max-width:700px){.cards{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="logo">知</div>
+    <h1>知时 · 安农校园信息雷达</h1>
+    <p>校园公开信息的智能聚合与个性化提醒智能体 · Demo</p>
+    <p style="margin-top:12px;font-size:12.5px;color:#9aa4b2">
+      推荐顺序：<b style="color:#4dd6a8">主链路</b> → <b style="color:#4dd6a8">浓缩溯源</b> → 数据源 → 小程序
+    </p>
+    <div class="claim">
+      学生错失机会，从来不是因为"查不到"，而是因为<b>根本不知道有这回事</b>。<br>
+      知时把分散在教务处、学院、学工、图书馆的公开通知，聚合成一张张
+      <b>"谁能报 · 剩几天 · 怎么办"</b>的提醒卡片，主动送到你面前。
+    </div>
+    <div style="margin-top:16px">
+      <a href="overview.html" style="display:inline-block;font-size:13px;color:#4dd6a8;
+        text-decoration:none;border:1px solid rgba(77,214,168,.4);border-radius:9px;
+        padding:8px 20px;font-weight:600">← 回项目总览（含答辩路线 / 评分对位）</a>
+    </div>
+  </div>
+
+  <div class="sec">核心能力 · 先看这三页</div>
+  <div class="cards three">
+    <a class="card" href="index.html">
+      <div class="n">DEMO 01</div>
+      <h3>主链路演示</h3>
+      <p>采集 → 理解 → 匹配 → 提醒，一条完整链路跑通。看一条通知如何变成一张倒计时卡片。</p>
+      <div class="go">进入 →</div>
+    </a>
+    <a class="card" href="digest.html">
+      <div class="n">DEMO 02 · 核心</div>
+      <h3>浓缩 + 溯源</h3>
+      <p>把 800 字通知压成 3 句人话，每个结论都挂原文出处，点一下就能核对。可信的智能。</p>
+      <div class="go">进入 →</div>
+    </a>
+    <a class="card" href="understand.html">
+      <div class="n">DEMO 03</div>
+      <h3>理解层拆解</h3>
+      <p>答辩主打页。看 AI 如何把一段非结构化通知文本，逐要素抽成结构化字段。</p>
+      <div class="go">进入 →</div>
+    </a>
+  </div>
+
+  <div class="sec">落地面 · 回答"你们凭什么能落地"</div>
+  <div class="cards three">
+    <a class="card" href="pipeline.html">
+      <div class="n">DEMO 04 · 必问两题</div>
+      <h3>数据从哪来 · 跑在哪</h3>
+      <p>正面回答评委必问的两个问题：数据源是什么（不是爬，是聚合）、运行在什么平台（小程序 + 网页版 + 学校云资源）。</p>
+      <div class="go">进入 →</div>
+    </a>
+    <a class="card" href="sources.html">
+      <div class="n">DEMO 05</div>
+      <h3>数据源接入状态 · 边界感</h3>
+      <p>七条链路的真实接入状态：哪条已跑通、哪条需授权、哪条是永不碰的红线。讲边界，比讲功能更让评委放心。</p>
+      <div class="go">进入 →</div>
+    </a>
+    <a class="card" href="rawdata.html">
+      <div class="n">DEMO 06 · 可当场核对</div>
+      <h3>原始数据 · 真实抓取原文</h3>
+      <p>采集器从官网公开页抓到的 7 条通知原文，逐条带来源 URL、抓取时间、字数。不是截图，是能去官网核对的东西。</p>
+      <div class="go">进入 →</div>
+    </a>
+    <a class="card" href="mobile.html">
+      <div class="n">DEMO 07</div>
+      <h3>小程序形态预览</h3>
+      <p>提醒列表 / 详情溯源 / 订阅设置三个真实界面。回答"学生到底在哪看到它"。</p>
+      <div class="go">进入 →</div>
+    </a>
+  </div>
+
+  <div class="foot">
+    <b>合规：</b>仅采集公网公开通知页面，不涉及教务系统后台与任何私域/敏感数据。<br>
+    数据为演示用示例，已标注来源页面；本项目为「农芯智」AI 智能体创新大赛参赛作品。
+  </div>
+</div>
+</body>
+</html>

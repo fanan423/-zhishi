@@ -1,0 +1,19 @@
+{
+  "name": "zhishi-campus-radar",
+  "version": "1.0.0",
+  "private": true,
+  "description": "知时 · 安农校园信息雷达 —— 原创代码类参赛作品（自检与智能体运行器共用依赖）",
+  "dependencies": {
+    "@tencent-ai/workbuddy-cloud-sdk": "^0.1.4-dev.ca27990.202610161713"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0"
+  },
+  "scripts": {
+    "checks": "node tools/checks/run_all.js",
+    "agent": "node tools/agent.js",
+    "agent:llm": "node tools/agent.js --llm",
+    "agent:watch": "node tools/agent.js --llm --limit 12 --every 60",
+    "agent:task": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/install_agent_task.ps1"
+  }
+}

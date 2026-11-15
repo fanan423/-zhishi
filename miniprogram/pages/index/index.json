@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "知时 · 今日提醒",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {}
+}

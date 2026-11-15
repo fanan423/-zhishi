@@ -1,0 +1,9 @@
+{
+  "name": "zhishi-anau-miniprogram",
+  "version": "1.0.0",
+  "description": "知时 · 安农校园信息雷达 —— 微信原生小程序（云服务接入）",
+  "private": true,
+  "dependencies": {
+    "@tencent-ai/workbuddy-cloud-sdk": "^0.1.4-dev.ca27990.202610161713"
+  }
+}

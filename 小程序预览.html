@@ -1,0 +1,2658 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>知时 · 小程序预览（数字安农风 · 双主题）</title>
+<style>
+/* ============================================================
+   知时 · 小程序预览
+   配色严格取自安徽农业大学视觉识别标准色：
+     安农绿 #00653E（PANTONE 7484C）
+     麦穗金 #F3AE00（PANTONE 1235C）
+     朝阳橙红 #E77844（PANTONE 1505C）
+   ============================================================ */
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  /* 页面外壳（不变的深色工作台） */
+  --shell-bg:#0d1412;
+  --shell-panel:#141d1a;
+  --shell-line:#233029;
+  --shell-text:#e2ebe6;
+  --shell-sub:#8fa196;
+}
+
+body{
+  background:radial-gradient(1200px 620px at 10% -8%, #12301f 0%, var(--shell-bg) 60%);
+  color:var(--shell-text);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.6;padding:30px 18px 64px;
+}
+.wrap{max-width:1340px;margin:0 auto}
+
+/* ---------- 顶部标题 ---------- */
+.hd{text-align:center;margin-bottom:6px}
+/* 校徽：双圆形（外圈橄榄绿细环 + 内圆）—— 依《安徽农业大学章程》第 75 条
+   整体双圆、橄榄绿为主色；内为 AAU 展开书页 + 山川田野 + 建校 1928。 */
+.hd .crest{
+  width:64px;height:64px;border-radius:50%;margin:0 auto 14px;position:relative;
+  background:linear-gradient(135deg,#0a7a4c,#00653E);overflow:hidden;
+  box-shadow:0 10px 26px rgba(0,101,62,.42);
+}
+.hd .crest::before{ /* 双圆形内环：外圈细白环 + 内留白，勾出"双圆形"庄重感 */
+  content:'';position:absolute;inset:4px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.5);z-index:2;pointer-events:none;
+}
+.hd .crest::after{ /* 下方山川田野横纹（扎根大地 / 脚踏实地） */
+  content:'';position:absolute;left:0;right:0;bottom:0;height:20px;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.24) 0 5px,transparent 5px 10px);
+  border-top:2px solid rgba(255,255,255,.34);
+}
+.hd .crest .sun{position:absolute;top:9px;right:11px;width:11px;height:11px;
+  border-radius:50%;background:#F3AE00;box-shadow:0 0 13px rgba(243,174,0,.8)}
+.hd .crest .aa{position:absolute;left:0;right:0;top:11px;z-index:1;font-size:19px;
+  font-weight:800;color:#fff;letter-spacing:.5px;text-align:center}
+.hd .crest .book{ /* AAU 之下：展开的书籍书脊（用知识迎接未来） */
+  position:absolute;left:50%;top:32px;transform:translateX(-50%);width:26px;height:2.5px;
+  border-radius:0 0 3px 3px;background:rgba(255,255,255,.5);z-index:2}
+.hd .crest .y{ /* 建校年号 1928（章程载明） */
+  position:absolute;left:0;right:0;top:35px;z-index:3;text-align:center;
+  font-size:8px;font-weight:700;color:rgba(255,255,255,.82);letter-spacing:1px}
+.hd h1{font-size:26px;letter-spacing:.5px}
+.hd .sub{color:var(--shell-sub);font-size:14px;margin-top:8px}
+
+/* ---------- 工具条 ---------- */
+.bar{margin:30px auto 0;max-width:980px;background:var(--shell-panel);
+  border:1px solid var(--shell-line);border-radius:14px;padding:14px 20px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center}
+.bar .lb{font-size:13px;color:var(--shell-sub)}
+.sw{display:flex;background:#0e1714;border:1px solid var(--shell-line);border-radius:10px;padding:3px}
+.sw button{background:none;border:0;color:var(--shell-sub);font-size:13px;cursor:pointer;
+  padding:7px 16px;border-radius:8px;font-family:inherit;transition:.18s}
+.sw button.on{background:#00653E;color:#fff;font-weight:600}
+.sw button.on.dark-on{background:#2FBF82;color:#042015}
+.bar .vi{display:inline-flex;gap:14px;flex-wrap:wrap;justify-content:center;
+  padding-left:16px;border-left:1px solid var(--shell-line)}
+.bar .vi span{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--shell-sub)}
+.bar .vi i{width:12px;height:12px;border-radius:4px;display:inline-block}
+.sync{font-size:12.5px;color:#5d7268;flex-basis:100%;text-align:center;margin-top:4px}
+
+/* ---------- 手机网格（全部展开模式才显示，定义见下方 .grid.on） ---------- */
+.col{width:100%;max-width:368px}
+.col-h{font-size:13px;color:var(--shell-sub);margin:0 2px 12px;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  border-bottom:1px solid var(--shell-line);padding-bottom:9px}
+.col-h b{color:#EAF6EF;letter-spacing:.2px;font-size:15px;font-weight:700;
+  display:inline-flex;align-items:center;gap:8px}
+.col-h b::before{content:'';width:3px;height:15px;border-radius:2px;
+  background:linear-gradient(180deg,#F3AE00,#2FBF82)}
+.col-h .route{font-size:11.5px;color:#7E968A;background:#16241E;
+  border:1px solid var(--shell-line);border-radius:20px;padding:2px 10px;white-space:nowrap}
+
+/* ---------- 手机壳 ---------- */
+.phone{border-radius:22px;overflow:hidden;max-height:860px;display:flex;flex-direction:column;
+  box-shadow:0 20px 54px rgba(0,0,0,.5);border:1px solid var(--shell-line)}
+.phone.light{background:#F4F7F4;color:#1B2A22}
+.phone.dark{background:#0C1A14;color:#E8F1EC}
+
+/* 状态栏 */
+.pbar{padding:11px 15px 9px;display:flex;align-items:center;justify-content:space-between;
+  font-size:12.5px}
+.phone.light .pbar{background:#00653E;color:#fff}
+.phone.dark .pbar{background:#0E211A;color:#E8F1EC;border-bottom:1px solid #23473A}
+.pbar .t{opacity:.86}
+.pbar .ti{font-weight:600;font-size:13px}
+.pbar .d{opacity:.6;font-size:11px}
+
+/* 页面副标 */
+.psub{padding:7px 15px;font-size:12.5px}
+.phone.light .psub{background:#EDF3EE;color:#5C6B62;border-bottom:1px solid #DCE5DC}
+.phone.dark .psub{background:#122A20;color:#A7BCB1;border-bottom:1px solid #23473A}
+
+.pbody{padding:16px 15px 20px;overflow-y:auto;flex:1}
+.pbody::-webkit-scrollbar{width:5px}
+.phone.light .pbody::-webkit-scrollbar-thumb{background:#DCE5DC;border-radius:3px}
+.phone.dark .pbody::-webkit-scrollbar-thumb{background:#23473A;border-radius:3px}
+
+/* 底部 tabBar */
+.tabbar{display:flex;border-top:1px solid;padding:8px 0 10px}
+.phone.light .tabbar{background:#fff;border-color:#DCE5DC}
+.phone.dark .tabbar{background:#122A20;border-color:#23473A}
+.tabbar .tb{flex:1;text-align:center;font-size:11.5px}
+.tabbar .tb .i{font-size:16px;display:block;margin-bottom:2px;opacity:.45}
+.phone.light .tabbar .tb.on{color:#00653E;font-weight:600}
+.phone.dark .tabbar .tb.on{color:#2FBF82;font-weight:600}
+.phone.light .tabbar .tb{color:#93A096}
+.phone.dark .tabbar .tb{color:#7E968A}
+.tabbar .tb.on .i{opacity:1}
+
+/* ============================================================
+   主题变量 —— 与 miniprogram/app.wxss 完全一致
+   ============================================================ */
+.phone.light{
+  --bg:#F4F7F4; --surface:#FFFFFF; --panel:#FFFFFF; --border:#DCE5DC;
+  --brand:#00653E; --brand-2:#0A7A4C; --brand-soft:rgba(0,101,62,.10);
+  --gold:#F3AE00; --gold-ink:#8A6000; --gold-soft:rgba(243,174,0,.16);
+  --alert:#E77844; --alert-soft:rgba(231,120,68,.13); --alert-ink:#B04A1C;
+  --track:#E6EDE6;
+  --txt:#1B2A22; --txt-2:#5C6B62; --txt-3:#93A096;
+  --on-brand:#FFFFFF; --shadow:0 2px 10px rgba(0,101,62,.07);
+}
+.phone.dark{
+  --bg:#0C1A14; --surface:#122A20; --panel:#122A20; --border:#23473A;
+  --brand:#2FBF82; --brand-2:#23A06B; --brand-soft:rgba(47,191,130,.12);
+  --gold:#F3B51E; --gold-ink:#F3C95A; --gold-soft:rgba(243,181,30,.14);
+  --alert:#F0854F; --alert-soft:rgba(240,133,79,.14); --alert-ink:#F6A87C;
+  --track:#1E4033;
+  --txt:#E8F1EC; --txt-2:#A7BCB1; --txt-3:#7E968A;
+  --on-brand:#042015; --shadow:0 2px 12px rgba(0,0,0,.3);
+}
+
+/* ============================================================
+   通用组件（全部走变量，两主题自动适配）
+   ============================================================ */
+
+/* 页头 */
+.mhead{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.mhead .lg{width:52px;height:52px;border-radius:50%;flex:0 0 52px;position:relative;
+  overflow:hidden;background:linear-gradient(135deg,var(--brand-2),var(--brand))}
+.mhead .lg::before{content:'';position:absolute;inset:3px;border-radius:50%;
+  border:1.2px solid rgba(255,255,255,.48);z-index:2;pointer-events:none}
+.mhead .lg::after{content:'';position:absolute;left:0;right:0;bottom:0;height:14px;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.22) 0 3px,transparent 3px 7px);
+  border-top:2px solid rgba(255,255,255,.30)}
+.mhead .lg .sun{position:absolute;top:8px;right:9px;width:9px;height:9px;border-radius:50%;
+  background:var(--gold)}
+.mhead .lg .aa{position:absolute;left:0;right:0;top:8px;z-index:1;text-align:center;
+  font-size:16px;font-weight:800;color:#fff}
+.mhead .lg .book{position:absolute;left:50%;top:25px;transform:translateX(-50%);
+  width:22px;height:2px;border-radius:0 0 2px 2px;background:rgba(255,255,255,.5);z-index:2}
+.mhead .lg .y{position:absolute;left:0;right:0;top:28px;z-index:3;text-align:center;
+  font-size:7px;font-weight:700;color:rgba(255,255,255,.82);letter-spacing:.6px}
+.mhead .tt{flex:1;min-width:0}
+.mhead .tt .n{font-size:14.5px;font-weight:700;letter-spacing:.2px}
+.mhead .tt .s{font-size:12.5px;color:var(--txt-2);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbtn{font-size:12px;padding:5px 10px;border-radius:20px;white-space:nowrap;
+  background:var(--brand-soft);color:var(--brand);font-weight:600;border:1px solid transparent}
+.phone.light .tbtn{border-color:rgba(0,101,62,.2)}
+.phone.dark .tbtn{border-color:rgba(47,191,130,.28)}
+
+/* 区块标题 */
+.sec{font-size:12.5px;color:var(--txt-2);letter-spacing:.8px;margin:16px 0 9px;
+  padding-left:11px;position:relative;display:flex;justify-content:space-between;align-items:center}
+.sec::before{content:'';position:absolute;left:0;top:2px;bottom:2px;width:3px;border-radius:2px;
+  background:linear-gradient(180deg,var(--gold),var(--brand))}
+.sec:first-child{margin-top:0}
+.sec .cnt{font-size:11.5px;color:var(--txt-3);letter-spacing:0;font-weight:400}
+
+/* 概览统计卡 */
+.stat{display:flex;background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:13px 6px;margin-bottom:10px;box-shadow:var(--shadow)}
+.stat .it{flex:1;text-align:center;position:relative}
+.stat .it+.it::before{content:'';position:absolute;left:0;top:5px;bottom:5px;width:1px;
+  background:var(--border)}
+.stat .n{font-size:20px;font-weight:800;letter-spacing:-.5px;color:var(--brand);line-height:1.2}
+.stat .n.red{color:var(--alert)}
+.stat .n.gold{color:var(--gold-ink)}
+.stat .l{font-size:11.5px;color:var(--txt-3);margin-top:3px}
+
+/* 通知卡 */
+.ncard{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:14px 15px;margin-bottom:12px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.ncard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--border)}
+.ncard.hi::before{background:var(--alert)}
+.ncard.md::before{background:var(--gold)}
+.ncard.lo::before{background:var(--brand)}
+.ncard .t{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:6px}
+.ncard .one{font-size:12.5px;color:var(--txt-2);line-height:1.65;margin-bottom:8px}
+.ncard .f{display:flex;justify-content:space-between;align-items:center;
+  font-size:11.5px;color:var(--txt-3)}
+.ncard .f .cd{font-weight:700}
+.ncard .f .cd.hi{color:var(--alert)} .ncard .f .cd.md{color:var(--gold-ink)}
+.ncard .f .cd.lo{color:var(--brand)}
+.tag{display:inline-block;font-size:11px;padding:1.5px 7px;border-radius:6px;
+  background:var(--brand-soft);color:var(--brand);font-weight:600;margin-bottom:6px}
+.tag.real{background:var(--gold-soft);color:var(--gold-ink)}
+
+/* 分区标题（关注流三档） */
+.fsec{display:flex;align-items:center;gap:8px;margin:14px 0 9px;font-size:13px;font-weight:700}
+.fsec:first-child{margin-top:0}
+.fsec .dot{width:8px;height:8px;border-radius:50%}
+.fsec .dot.hi{background:var(--alert);box-shadow:0 0 0 3px var(--alert-soft)}
+.fsec .dot.md{background:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+.fsec .dot.lo{background:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.fsec .n{color:var(--txt-3);font-weight:400;font-size:12px;margin-left:auto}
+
+/* 视图切换 */
+.viewsw{display:flex;background:var(--surface);border:1px solid var(--border);
+  border-radius:11px;padding:3px;margin-bottom:16px}
+.viewsw .v{flex:1;text-align:center;font-size:12.5px;padding:7px 0;border-radius:8px;
+  color:var(--txt-2);transition:.18s}
+.viewsw .v.on{background:var(--brand);color:var(--on-brand);font-weight:600}
+
+/* 标签分组 */
+.grp{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  margin-bottom:9px;overflow:hidden;box-shadow:var(--shadow)}
+.grp.hi{border-color:var(--alert)}
+.grp-h{display:flex;align-items:center;gap:8px;padding:11px 12px;font-size:13.5px}
+.grp-h .i{font-size:15px}
+.grp-h .k{font-weight:700;flex:1}
+.grp-h .c{font-size:12px;color:var(--txt-3)}
+.grp-h .bd{font-size:9.5px;font-weight:700;padding:1.5px 6px;border-radius:5px;
+  background:var(--alert-soft);color:var(--alert)}
+.grp-h .ar{color:var(--txt-3);font-size:12px}
+.grp-d{font-size:11.5px;color:var(--txt-3);padding:0 12px 10px}
+.grp .inner{padding:0 10px 10px}
+.grp .inner .ncard{margin-bottom:7px;box-shadow:none}
+.grp .inner .ncard:last-child{margin-bottom:0}
+
+/* 搜索 */
+.sbar{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:10px 13px;display:flex;align-items:center;gap:9px;font-size:14px;box-shadow:var(--shadow)}
+.sbar .ic{font-size:13.5px;color:var(--txt-2)}
+.sbar .q{flex:1;color:var(--txt)}
+.sbar .cl{color:var(--txt-3);font-size:12.5px}
+.hot{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:11px 0 3px}
+.hot .lb{font-size:11.5px;color:var(--txt-3)}
+.hot .w{background:var(--brand-soft);color:var(--brand);border-radius:8px;
+  padding:3px 9px;font-size:11.5px;font-weight:500}
+
+.scard{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:12px;margin-bottom:9px;box-shadow:var(--shadow)}
+.scard .t{font-size:13.5px;font-weight:600;margin-bottom:6px;line-height:1.5}
+.scard .t mark{background:var(--gold-soft);color:var(--gold-ink);border-radius:3px;padding:0 2px}
+.scard .why{font-size:11.5px;color:var(--brand);margin-bottom:5px}
+.scard .sn{font-size:12.5px;color:var(--txt-2);line-height:1.7;margin-bottom:5px}
+.scard .sn mark{background:var(--gold-soft);color:var(--gold-ink);border-radius:3px;padding:0 2px}
+.scard .f{font-size:11.5px;color:var(--txt-3)}
+.whybox{background:var(--brand-soft);border-left:3px solid var(--brand);border-radius:0 9px 9px 0;
+  padding:9px 12px;font-size:12.5px;color:var(--txt-2);margin:10px 0}
+.whybox b{color:var(--brand)}
+
+/* 详情 */
+.dhead{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:13px;box-shadow:var(--shadow)}
+.dhead .t{font-size:14px;font-weight:700;line-height:1.55;margin-bottom:8px}
+.dhead .m{display:flex;gap:11px;flex-wrap:wrap;font-size:11.5px;color:var(--txt-3);
+  margin-bottom:8px}
+.dhead .m .cd{font-weight:700}
+.dhead .m .cd.hi{color:var(--alert)}
+.dhead .fl{display:flex;gap:7px;flex-wrap:wrap}
+.dhead .fl span{font-size:11.5px;padding:2px 8px;border-radius:6px;
+  background:var(--brand-soft);color:var(--brand);font-weight:600}
+.dhead .fl span.real{background:var(--brand-soft);color:var(--brand)}
+
+/* 原文出处行（可核对） */
+.srcline{margin:11px 0;font-size:11.5px;color:var(--brand);
+  background:var(--brand-soft);border:1px solid rgba(0,101,62,.24);
+  border-radius:11px;padding:11px 13px;line-height:1.6;word-break:break-all}
+.srcline .scopy{color:var(--alert);font-weight:700;margin-left:6px;white-space:nowrap}
+
+/* 关键信息卡 */
+.kcard{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:4px 13px;margin:11px 0;box-shadow:var(--shadow)}
+.krow{display:flex;gap:11px;padding:10px 0;border-bottom:1px solid var(--border)}
+.krow:last-child{border-bottom:0}
+.krow .kk{flex:0 0 58px;font-size:12px;color:var(--brand);font-weight:600}
+.krow .kv{flex:1;font-size:12.5px;color:var(--txt);line-height:1.6}
+
+/* ===== 和我有关吗 ===== */
+.relcard{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:13px 14px;margin:11px 0;box-shadow:var(--shadow);border-left:5px solid var(--brand)}
+.relcard.rel-ok{border-left-color:var(--brand)}
+.relcard.rel-warn{border-left-color:var(--gold)}
+.relcard.rel-no{border-left-color:var(--alert)}
+.relcard.rel-open{border-left-color:var(--brand-2)}
+.relh{display:flex;align-items:center;justify-content:space-between}
+.rell{display:flex;align-items:center;gap:8px}
+.reldot{width:8px;height:8px;border-radius:50%;background:var(--brand)}
+.rel-warn .reldot{background:var(--gold)}
+.rel-no .reldot{background:var(--alert)}
+.rel-open .reldot{background:var(--brand-2)}
+.relt{font-size:13px;font-weight:700;color:var(--txt)}
+.relbadge{font-size:11px;padding:2px 8px;border-radius:999px;
+  background:var(--brand-soft);color:var(--brand);font-weight:700}
+.rel-warn .relbadge{background:var(--gold-soft);color:var(--gold-ink)}
+.rel-no .relbadge{background:var(--alert-soft);color:var(--alert-ink)}
+.relline{font-size:12px;color:var(--txt-2);line-height:1.7;margin:8px 0 4px}
+.relrow{display:flex;gap:9px;padding:8px 0;border-top:1px solid var(--border)}
+.relst{flex:0 0 14px;font-size:12.5px;font-weight:700;line-height:1.4}
+.relst-ok{color:var(--brand)}.relst-warn{color:var(--gold-ink)}.relst-no{color:var(--alert)}
+.relbx{flex:1}
+.relrk{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.relk{font-size:11.5px;color:var(--txt-3)}
+.relmine{font-size:11.5px;font-weight:700;color:var(--brand);background:var(--brand-soft);
+  padding:1px 6px;border-radius:5px}
+.rel-warn .relmine{color:var(--gold-ink);background:var(--gold-soft)}
+.relarrow{font-size:11px;color:var(--txt-3)}
+.relneed{font-size:11.5px;color:var(--txt-2)}
+.relnote{font-size:11.5px;color:var(--txt-3);margin-top:4px;line-height:1.6}
+.relhint{font-size:11.5px;color:var(--txt-3);line-height:1.6;margin-top:9px;
+  padding-top:9px;border-top:1px dashed var(--border)}
+.rellink{color:var(--brand);font-weight:700}
+
+/* ===== 要办什么（清单） ===== */
+.stepcard{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:13px 14px;margin:11px 0;box-shadow:var(--shadow)}
+.steph{display:flex;align-items:center;justify-content:space-between}
+.stepl{display:flex;align-items:baseline;gap:8px}
+.stept{font-size:13px;font-weight:700;color:var(--txt)}
+.stepc{font-size:12px;color:var(--txt-2)}
+.stepall{font-size:12px;color:var(--brand);font-weight:700}
+.stepreset{font-size:12px;color:var(--txt-3)}
+.stepbar{height:4px;border-radius:999px;background:var(--track);margin:9px 0 4px;overflow:hidden}
+.stepfill{height:100%;border-radius:999px;
+  background:linear-gradient(90deg,var(--brand-2),var(--gold))}
+.stepitem{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--border)}
+.stepbox{flex:0 0 18px;font-size:12.5px;color:var(--brand);line-height:1.45}
+.steptx{flex:1;font-size:12px;color:var(--txt);line-height:1.65}
+.stepitem.done .steptx{color:var(--txt-3);text-decoration:line-through}
+.stepitem.done .stepbox{color:var(--txt-3)}
+.stepcopy{font-size:11.5px;color:var(--brand);text-align:center;margin-top:8px;
+  padding-top:8px;border-top:1px dashed var(--border);font-weight:600}
+
+/* 一句话看懂 */
+.onebox{background:linear-gradient(180deg,var(--brand-soft),transparent);
+  border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-top:11px}
+.onebox .lb{font-size:11px;color:var(--brand);letter-spacing:1.2px;font-weight:700;margin-bottom:6px}
+.onebox .tx{font-size:13px;line-height:1.8;color:var(--txt)}
+
+/* 要点 */
+.pt{background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:11px 12px;margin-bottom:8px;box-shadow:var(--shadow)}
+.pt.on{border-color:var(--gold)}
+.pt .t{font-size:12.5px;line-height:1.7;margin-bottom:7px}
+.pt .q{display:flex;gap:9px;align-items:center;font-size:11px;margin-bottom:5px}
+.pt .q .lb{color:var(--txt-3)}
+.pt .q .ok{color:var(--brand);font-weight:600}
+.pt .qt{font-size:12px;color:var(--txt-2);background:var(--brand-soft);border-radius:8px;
+  padding:7px 10px;font-style:italic;line-height:1.7}
+
+/* 原文 */
+.rawbox{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:13px;font-size:12.5px;line-height:2;color:var(--txt-2);box-shadow:var(--shadow)}
+.rawbox .hl{background:var(--gold-soft);color:var(--gold-ink);border-radius:3px;
+  padding:1px 3px;font-weight:600;cursor:pointer;border-bottom:1px dashed var(--gold)}
+
+/* 收藏行（升级：紧急度色阶 + 办事进度） */
+.frow{display:flex;align-items:flex-start;gap:10px;background:var(--surface);
+  border:1px solid var(--border);border-left:4px solid var(--brand);border-radius:11px;
+  padding:10px 12px;margin-bottom:7px}
+.frow.lv-hot{border-left-color:var(--alert)}
+.frow.lv-now{border-left-color:var(--alert)}
+.frow.lv-soon{border-left-color:var(--gold)}
+.frow.lv-exp{border-left-color:var(--txt-3)}
+.frow.lv-far{border-left-color:var(--brand)}
+.frow .fmid{flex:1;min-width:0}
+.frow .ft{font-size:12.5px;line-height:1.5;font-weight:600;
+  overflow:hidden;text-overflow:ellipsis;display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical}
+.frow .fs{font-size:9.5px;color:var(--txt-3);margin-top:3px}
+.frow .fdd{font-size:11px;font-weight:700;flex:0 0 auto;
+  padding:2px 8px;border-radius:7px;color:var(--alert-ink);background:var(--alert-soft)}
+.frow .fdd.lv-soon{color:var(--gold-ink);background:var(--gold-soft)}
+.frow .fdd.lv-exp{color:var(--txt-3);background:rgba(147,160,150,.13)}
+.frow .fdd.lv-far{color:var(--brand);background:var(--brand-soft)}
+.frow .fdd.lv-now{color:var(--alert-ink);background:var(--alert-soft)}
+.frow .fprog{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.frow .fpi{font-size:9.5px;color:var(--txt-2)}
+.frow .fpi.ok{color:var(--brand);font-weight:700}
+.frow .fplink{font-size:9.5px;color:var(--brand);font-weight:700}
+.frow .star{font-size:14px;color:var(--gold)}
+
+.secwarn{font-size:9.5px;color:var(--alert-ink);font-weight:700;
+  background:var(--alert-soft);padding:1px 8px;border-radius:999px;margin-left:7px}
+
+/* ===== 数据自查屏（⑩）===== */
+.verdict{border-radius:14px;padding:15px 16px;margin-bottom:6px;
+  box-shadow:0 6px 16px rgba(0,101,62,.18)}
+.verdict.ok{background:linear-gradient(160deg,var(--brand-2),var(--brand))}
+.verdict.bad{background:linear-gradient(160deg,#F08A4B,var(--alert));
+  box-shadow:0 6px 16px rgba(231,120,68,.24)}
+.verdict .vh{display:flex;align-items:center;gap:8px}
+.verdict .vicon{width:24px;height:24px;border-radius:50%;text-align:center;
+  line-height:24px;font-size:14px;font-weight:700;color:var(--brand);
+  background:#fff;flex:0 0 auto}
+.verdict.bad .vicon{color:var(--alert)}
+.verdict .vt{font-size:15px;font-weight:700;color:#fff;letter-spacing:.4px}
+.verdict .vs{font-size:12px;color:rgba(255,255,255,.9);line-height:1.6;margin-top:7px}
+.verdict .vmeta{font-size:9.5px;color:rgba(255,255,255,.72);margin-top:9px;
+  padding-top:8px;border-top:1px solid rgba(255,255,255,.22)}
+
+.rulecard{display:flex;gap:9px;background:var(--surface);border:1px solid var(--border);
+  border-radius:11px;padding:11px 12px;margin-bottom:7px}
+.rulecard .rtag{flex:0 0 auto;width:30px;height:30px;border-radius:8px;text-align:center;
+  line-height:30px;font-size:12.5px;font-weight:700;color:#fff;
+  background:linear-gradient(135deg,var(--brand-2),var(--brand))}
+.rulecard .rt{font-size:12.5px;font-weight:600;margin-bottom:2px}
+.rulecard .rd{font-size:11.5px;color:var(--txt-2);line-height:1.55}
+
+.sbox{background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:10px 12px;margin-bottom:8px}
+.sbox .arl{font-size:12px;color:var(--txt-2);line-height:1.6;padding:5px 0;
+  border-bottom:1px solid var(--border-soft)}
+.sbox .arl:last-of-type{border-bottom:none}
+.sbox .arl.warn{color:var(--alert-ink);background:var(--alert-soft);
+  border-radius:7px;padding:6px 9px;margin-bottom:5px;border-bottom:none}
+.sbox .arnote{font-size:11.5px;color:var(--txt-3);line-height:1.6;margin-top:6px;
+  padding-top:7px;border-top:1px dashed var(--border)}
+.sbox .dnone{font-size:11.5px;color:var(--txt-3);line-height:1.6;padding:5px 0}
+
+.vcard{padding:9px 0;border-bottom:1px solid var(--border-soft)}
+.vcard:last-child{border-bottom:none}
+.vcard .vt1{font-size:12.5px;font-weight:600;line-height:1.5}
+.vcard .vsr{font-size:9.5px;color:var(--txt-3);margin-top:4px}
+.vcard .vu{font-size:11px;color:var(--brand);background:var(--brand-soft);
+  border-radius:6px;padding:4px 8px;margin-top:6px;line-height:1.4;word-break:break-all}
+.vcard .vgo{font-size:9.5px;color:var(--brand);font-weight:700;margin-top:6px}
+
+.hrow{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+  padding:7px 0;border-bottom:1px solid var(--border-soft)}
+.hrow:last-child{border-bottom:none}
+.hrow .ht{font-size:11.5px;color:var(--txt-3);flex:0 0 auto}
+.hrow .hx{font-size:11.5px;color:var(--txt-2);text-align:right}
+
+/* ============ 主动推送 ============ */
+.sumcard{border-radius:14px;padding:16px;background:linear-gradient(160deg,var(--brand-2),var(--brand));
+  box-shadow:0 5px 14px rgba(0,101,62,.22);margin-bottom:6px}
+.sumcard .sumlb{font-size:12.5px;color:rgba(255,255,255,.82)}
+.sumcard .sumtx{font-size:14px;font-weight:600;color:#fff;line-height:1.55;margin-top:7px}
+.sumcard .sumidx{display:flex;align-items:baseline;gap:7px;margin-top:10px;padding-top:9px;
+  border-top:1px solid rgba(255,255,255,.22);flex-wrap:wrap}
+.sumcard .sin{font-size:11.5px;color:rgba(255,255,255,.8)}
+.sumcard .siv{font-size:20px;font-weight:800;color:#fff}
+.sumcard .sil{font-size:11px;color:rgba(255,255,255,.86)}
+
+.trow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;
+  border-bottom:1px solid var(--border-soft)}
+.trow:last-child{border-bottom:none}
+.trow .tl{flex:1;min-width:0}
+.trow .tt{font-size:13.5px;color:var(--txt);font-weight:500}
+.trow .td{font-size:11.5px;color:var(--txt-3);line-height:1.5;margin-top:3px}
+.sw{width:44px;height:25px;border-radius:14px;background:var(--border);position:relative;
+  flex:0 0 44px}
+.sw.on{background:var(--brand)}
+.sw .swd{position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw.on .swd{left:22px}
+
+.whybox .whyt{font-size:12.5px;font-weight:700;color:var(--brand);margin-bottom:4px}
+.whybox .whyd{font-size:12px;color:var(--txt-2);line-height:1.7}
+
+.daemon{background:var(--brand-soft);border-radius:9px;padding:10px 12px;margin-top:7px}
+.daemon .dh{font-size:12.5px;font-weight:700;color:var(--brand);margin-bottom:5px}
+.daemon .dl{font-size:12px;color:var(--txt-2);line-height:1.8}
+.daemon .dc{font-weight:700;color:var(--brand)}
+
+.kvrow{display:flex;justify-content:space-between;align-items:center;padding:8px 0;
+  border-bottom:1px solid var(--border-soft)}
+.kvrow:last-of-type{border-bottom:none}
+.kvrow .kk{font-size:12.5px;color:var(--txt-2)}
+.kvrow .vv{font-size:13px;color:var(--txt);font-weight:600}
+
+.pc{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:12px 13px;margin-bottom:8px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.pc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--brand)}
+.pc.lv-now::before,.pc.lv-hot::before{background:var(--alert)}
+.pc.lv-soon::before{background:var(--gold)}
+.pc.lv-plan::before{background:var(--brand)}
+.pc.lv-far::before{background:var(--border)}
+.pc .prow{display:flex;align-items:center;gap:6px}
+.pc .plv{font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px}
+.pc .plv.now,.pc .plv.hot{color:#fff;background:var(--alert)}
+.pc .plv.soon{color:var(--gold-ink);background:var(--gold-soft)}
+.pc .plv.plan{color:var(--brand);background:var(--brand-soft)}
+.pc .plv.far{color:var(--txt-2);background:var(--border-soft)}
+.pc .pnew{font-size:9.5px;font-weight:700;color:#fff;background:var(--brand);
+  padding:2px 6px;border-radius:5px}
+.pc .prank{margin-left:auto;font-size:11px;color:var(--txt-3);font-weight:600}
+.pc .ptitle{font-size:13.5px;font-weight:600;color:var(--txt);line-height:1.45;margin-top:7px}
+.pc .pmeta{font-size:11.5px;color:var(--txt-3);margin-top:6px;line-height:1.5}
+.pc .ptags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.pc .tg{font-size:9.5px;padding:2px 7px;border-radius:5px;color:var(--brand);background:var(--brand-soft)}
+.pc .tg.g{color:var(--brand);background:var(--brand-soft)}
+.pc .tg.o{color:var(--gold-ink);background:var(--gold-soft)}
+.pc .tg.s{color:var(--txt-3);background:var(--border-soft)}
+
+.sec .secwarn{font-size:11px;font-weight:700;color:#fff;background:var(--alert);
+  padding:1px 6px;border-radius:5px;margin-left:6px}
+
+/* 订阅勾选行 */
+.subrow{display:flex;align-items:center;gap:10px;background:var(--surface);
+  border:1px solid var(--border);border-radius:11px;padding:10px 12px;margin-bottom:7px}
+.subrow.on{border-color:var(--brand);background:var(--brand-soft)}
+.subrow .ck{width:17px;height:17px;border-radius:6px;border:1.5px solid var(--border);
+  flex:0 0 17px;display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:transparent}
+.subrow.on .ck{background:var(--brand);border-color:var(--brand);color:var(--on-brand);font-weight:800}
+.subrow .ic{font-size:14px}
+.subrow .k{flex:1;font-size:13px;font-weight:500}
+.subrow .c{font-size:11.5px;color:var(--txt-3)}
+
+/* 信息条 */
+.infobox{background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:10px 13px;font-size:12px;color:var(--txt-2);margin-top:10px;
+  display:flex;flex-direction:column;gap:5px}
+.reach{background:linear-gradient(180deg,var(--brand-soft),transparent);
+  border:1px solid var(--border);border-radius:11px;padding:11px 13px;
+  font-size:12.5px;color:var(--txt-2);margin-top:10px}
+.reach b{color:var(--brand);font-size:17px;font-weight:800}
+
+/* 变化表 */
+.chg{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.chg td{border-bottom:1px solid var(--border);padding:7px 8px;color:var(--txt-2)}
+.chg tr:last-child td{border-bottom:0}
+.chg td:first-child{color:var(--txt-3)}
+.chg .up{color:var(--brand);font-weight:700}
+
+/* 我的关键词（自定义订阅） */
+.kwin{display:flex;align-items:center;gap:9px;margin-top:9px}
+.kwinbox{flex:1;height:34px;display:flex;align-items:center;padding:0 13px;
+  font-size:12px;color:var(--txt-3);background:var(--bg);border:1px solid var(--border);border-radius:17px}
+.kwadd{flex:0 0 auto;font-size:12.5px;font-weight:700;color:#fff;
+  background:linear-gradient(135deg,var(--brand-2),var(--brand));padding:8px 18px;border-radius:17px}
+.kwchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.kwchip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 6px 5px 12px;
+  border-radius:18px;background:var(--brand-soft);border:1px solid var(--brand);color:var(--brand)}
+.kwchip.empty{background:var(--surface);border-color:var(--border);color:var(--txt-3)}
+.kwchip .kwt{font-weight:700}
+.kwchip .kwn{font-size:11px;opacity:.72}
+.kwchip .kwhot{font-size:11px;background:var(--alert);color:#fff;padding:1px 6px;border-radius:9px}
+.kwchip .kwx{font-size:15px;line-height:1;opacity:.55;padding:0 6px 0 2px}
+.kwsug{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:9px}
+.kwsug-l{font-size:11.5px;color:var(--txt-3)}
+.kwsug-w{font-size:12px;color:var(--brand);background:var(--brand-soft);padding:4px 11px;border-radius:14px}
+.srow-hint{font-size:11.5px;color:var(--txt-3);line-height:1.6;margin-top:9px}
+
+/* ---------- 知时指数卡（时间轴 / 简报共用） ---------- */
+.idxcard{background:linear-gradient(160deg,var(--brand-2),var(--brand));
+  border-radius:16px;padding:16px 17px 14px;margin-bottom:14px;
+  box-shadow:0 8px 22px rgba(0,101,62,.26)}
+.idxcard.lv-high{background:linear-gradient(160deg,#F08A4B,var(--alert));
+  box-shadow:0 8px 22px rgba(231,120,68,.28)}
+.idxcard.lv-mid{background:linear-gradient(160deg,#E8A317,var(--gold));
+  box-shadow:0 8px 22px rgba(243,174,0,.26)}
+.idxr1{display:flex;align-items:baseline;justify-content:space-between}
+.idxl{font-size:12.5px;color:rgba(255,255,255,.82);letter-spacing:.8px}
+.idxs{font-size:38px;font-weight:800;color:#fff;line-height:1;letter-spacing:-1.5px}
+.idxmsg{font-size:12.5px;color:rgba(255,255,255,.92);margin-top:6px}
+.idxmets{display:flex;margin-top:13px;padding-top:11px;
+  border-top:1px solid rgba(255,255,255,.22)}
+.idxmets .im{flex:1;text-align:center}
+.idxmets .imn{display:block;font-size:17px;font-weight:800;color:#fff;line-height:1.2}
+.idxmets .iml{display:block;font-size:11px;color:rgba(255,255,255,.78);margin-top:2px}
+
+/* ---------- 时间轴分箱 ---------- */
+.bk{margin-bottom:5px}
+.bhd{display:flex;align-items:center;background:var(--surface);
+  border:1px solid var(--border);border-radius:14px;padding:11px 13px;
+  margin-bottom:8px;box-shadow:var(--shadow)}
+.bhd .bdot{width:8px;height:8px;border-radius:50%;background:var(--brand);
+  margin-right:9px;flex:0 0 8px}
+.bhd.now .bdot{background:var(--alert);box-shadow:0 0 0 3px var(--alert-soft)}
+.bhd.hot .bdot{background:var(--alert);box-shadow:0 0 0 3px var(--alert-soft)}
+.bhd.soon .bdot{background:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+.bhd.plan .bdot{background:var(--brand-2)}
+.bhd.far .bdot{background:var(--txt-3)}
+.bhd .bmid{flex:1;min-width:0}
+.bhd .bname{font-size:13.5px;font-weight:700;color:var(--txt)}
+.bhd .bnum{font-size:11px;color:var(--txt-3);margin-top:1px}
+.bhd .barrow{font-size:12px;color:var(--txt-3);flex-shrink:0}
+
+/* 时间轴主体：左侧竖线 + 节点圆点 */
+.tl{position:relative;padding-left:18px;margin-bottom:8px}
+.tline{position:absolute;left:5px;top:8px;bottom:8px;width:1px;background:var(--border)}
+.titem{position:relative;margin-bottom:8px}
+.tnode{position:absolute;left:-17px;top:14px;width:8px;height:8px;border-radius:50%;
+  background:var(--brand);border:2px solid var(--surface);box-sizing:content-box}
+.tnode.hi{background:var(--alert)} .tnode.md{background:var(--gold)}
+.tcard{background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:10px 12px;box-shadow:var(--shadow)}
+.tcard.hi{border-left:3px solid var(--alert)}
+.tcard.md{border-left:3px solid var(--gold)}
+.tcard.lo{border-left:3px solid var(--brand)}
+.tcard .tr1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.tcard .tt{flex:1;font-size:13px;font-weight:600;line-height:1.5;color:var(--txt)}
+.tcard .dd{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:6px;
+  white-space:nowrap;flex-shrink:0;color:var(--brand);background:var(--brand-soft)}
+.tcard .dd.hi{color:#fff;background:var(--alert)}
+.tcard .dd.md{color:var(--gold-ink);background:var(--gold-soft)}
+.tcard .sr{font-size:11.5px;color:var(--txt-3);margin-top:5px}
+.tcard .d1{font-size:12.5px;color:var(--txt-2);line-height:1.6;margin-top:6px}
+.tcard .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.tcard .tg{font-size:11px;padding:1.5px 7px;border-radius:5px;color:var(--txt-3);
+  background:var(--surface-2);border:1px solid var(--border)}
+.tcard .tg.g{color:var(--brand);background:var(--brand-soft);border-color:transparent}
+.tcard .tg.o{color:var(--gold-ink);background:var(--gold-soft);border-color:transparent}
+
+/* ---------- 简报 ---------- */
+.bhead{display:flex;align-items:center;gap:10px;padding-bottom:12px;
+  border-bottom:1px solid var(--border);margin-bottom:14px}
+.bhead .lg{width:44px;height:44px;border-radius:50%;flex:0 0 44px;position:relative;
+  overflow:hidden;background:linear-gradient(135deg,var(--brand-2),var(--brand))}
+.bhead .lg::before{content:'';position:absolute;inset:3px;border-radius:50%;
+  border:1.1px solid rgba(255,255,255,.48);z-index:2;pointer-events:none}
+.bhead .lg::after{content:'';position:absolute;left:0;right:0;bottom:0;height:12px;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.22) 0 3px,transparent 3px 7px);
+  border-top:1.5px solid rgba(255,255,255,.30)}
+.bhead .lg .sun{position:absolute;top:7px;right:8px;width:8px;height:8px;
+  border-radius:50%;background:var(--gold)}
+.bhead .lg .aa{position:absolute;left:0;right:0;top:6px;text-align:center;z-index:1;
+  font-size:13px;font-weight:800;color:#fff}
+.bhead .lg .book{position:absolute;left:50%;top:22px;transform:translateX(-50%);
+  width:19px;height:2px;border-radius:0 0 2px 2px;background:rgba(255,255,255,.5);z-index:2}
+.bhead .lg .y{position:absolute;left:0;right:0;top:25px;z-index:3;text-align:center;
+  font-size:6px;font-weight:700;color:rgba(255,255,255,.82);letter-spacing:.5px}
+.bhead .bx{flex:1;min-width:0}
+.bhead .t1{font-size:15px;font-weight:700;color:var(--txt)}
+.bhead .t2{font-size:11.5px;color:var(--txt-2);margin-top:2px}
+
+.sumcard{background:linear-gradient(160deg,var(--brand-2),var(--brand));
+  border-radius:16px;padding:16px 17px;margin-bottom:6px;
+  box-shadow:0 8px 22px rgba(0,101,62,.24)}
+.sumcard.lv-high{background:linear-gradient(160deg,#F08A4B,var(--alert))}
+.sumcard.lv-mid{background:linear-gradient(160deg,#E8A317,var(--gold))}
+.sumlb{font-size:11.5px;color:rgba(255,255,255,.78);letter-spacing:.8px;margin-bottom:8px}
+.sumtx{font-size:14px;color:#fff;line-height:1.65;font-weight:500;margin-bottom:6px}
+.sumtx:last-of-type{margin-bottom:0}
+.sumidx{display:flex;align-items:baseline;gap:8px;margin-top:13px;padding-top:11px;
+  border-top:1px solid rgba(255,255,255,.22)}
+.sumidx .sin{font-size:11.5px;color:rgba(255,255,255,.78)}
+.sumidx .siv{font-size:22px;font-weight:800;color:#fff;line-height:1}
+.sumidx .sil{font-size:12px;color:rgba(255,255,255,.9)}
+
+.icard{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:12px 13px;margin-bottom:9px;box-shadow:var(--shadow)}
+.icard.now{border-left:3px solid var(--alert);background:var(--alert-soft)}
+.icard.hi{border-left:3px solid var(--alert)}
+.icard .ir1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.icard .it{flex:1;font-size:13px;font-weight:600;line-height:1.5;color:var(--txt)}
+.icard .idd{font-size:11.5px;font-weight:700;padding:2.5px 9px;border-radius:6px;
+  white-space:nowrap;flex-shrink:0;color:#fff;background:var(--alert)}
+.icard .isr{font-size:11.5px;color:var(--txt-3);margin-top:5px}
+.icard .ione{font-size:12.5px;color:var(--txt-2);line-height:1.6;margin-top:7px}
+.icard .ientry{font-size:12px;color:var(--brand);background:var(--brand-soft);
+  border-radius:7px;padding:6px 9px;margin-top:8px;line-height:1.5}
+
+.wcard{background:var(--surface);border:1px solid var(--border);
+  border-left:3px solid var(--gold);border-radius:11px;padding:10px 12px;
+  margin-bottom:7px;box-shadow:var(--shadow)}
+.wcard .wr1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.wcard .wt{flex:1;font-size:12.5px;font-weight:500;line-height:1.5;color:var(--txt)}
+.wcard .wdd{font-size:11.5px;font-weight:700;color:var(--gold-ink);
+  background:var(--gold-soft);border-radius:6px;padding:2px 8px;white-space:nowrap;flex-shrink:0}
+.wcard .wsr{font-size:11.5px;color:var(--txt-3);margin-top:5px}
+
+/* 可信度条 */
+.trust{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:13px;margin-bottom:10px;box-shadow:var(--shadow)}
+.trust .tr1{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.trust .trl{font-size:12.5px;color:var(--txt);font-weight:500}
+.trust .trv{font-size:13.5px;font-weight:800}
+.trust-high .trv{color:var(--brand)} .trust-mid .trv{color:var(--gold-ink)}
+.trust-low .trv{color:var(--txt-2)}
+.trbar{height:7px;border-radius:4px;background:var(--border-soft);overflow:hidden}
+.trfill{height:100%;border-radius:4px;
+  background:linear-gradient(90deg,var(--gold),var(--brand))}
+.trust-high .trfill{background:linear-gradient(90deg,var(--brand-2),var(--brand))}
+.trust-low .trfill{background:var(--txt-3)}
+.trust .trmsg{font-size:12.5px;color:var(--txt-2);margin-top:8px}
+.trust .trsub{font-size:11.5px;color:var(--txt-3);margin-top:5px;line-height:1.6}
+.trust .trnote{margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);font-size:9.5px}
+
+/* 快捷入口 */
+.quick{display:flex;gap:8px;margin:12px 0 6px}
+.quick .qb{flex:1;text-align:center;background:var(--surface);
+  border:1px solid var(--border);border-radius:11px;padding:10px 4px;box-shadow:var(--shadow)}
+.quick .qbi{display:block;font-size:15px}
+.quick .qbt{display:block;font-size:12.5px;font-weight:600;color:var(--txt);margin-top:4px}
+.quick .qbs{display:block;font-size:9.5px;color:var(--txt-3);margin-top:2px}
+
+/* 首页的指数条（窄版） */
+.idxstrip{display:flex;align-items:center;gap:11px;
+  background:linear-gradient(135deg,var(--brand-2),var(--brand));
+  border-radius:14px;padding:11px 13px;margin-bottom:10px;
+  box-shadow:0 6px 16px rgba(0,101,62,.22)}
+.idxstrip.lv-high{background:linear-gradient(135deg,#F08A4B,var(--alert))}
+.idxstrip.lv-mid{background:linear-gradient(135deg,#E8A317,var(--gold))}
+.idxstrip .isl{flex:1;min-width:0}
+.idxstrip .is1{font-size:11.5px;color:rgba(255,255,255,.80);letter-spacing:.6px}
+.idxstrip .is2{font-size:12.5px;color:#fff;line-height:1.5;margin-top:3px}
+.idxstrip .isr{text-align:center;flex-shrink:0}
+.idxstrip .isn{font-size:24px;font-weight:800;color:#fff;line-height:1}
+.idxstrip .isg{font-size:9.5px;color:rgba(255,255,255,.82);margin-top:3px}
+
+/* ===== 问知时（⑫）===== */
+.hcard{background:linear-gradient(160deg,var(--brand-2),var(--brand));border-radius:14px;
+  padding:14px 15px;box-shadow:0 5px 16px rgba(0,101,62,.22);margin-bottom:10px}
+.hcard.tone-alert{background:linear-gradient(160deg,#E77844,#B04A1C)}
+.hcard.tone-warn{background:linear-gradient(160deg,var(--gold),#B07900)}
+.hcard .hq{display:flex;align-items:center;gap:7px}
+.hcard .hqi{font-size:14px}
+.hcard .hqt{font-size:12.5px;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.3px}
+.hcard .ha{font-size:14px;font-weight:600;color:#fff;line-height:1.6;margin-top:8px}
+.hcard .hm{font-size:11.5px;color:rgba(255,255,255,.82);margin-top:9px;padding-top:8px;
+  border-top:1px solid rgba(255,255,255,.22)}
+
+.askstat{display:flex;background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:11px 6px;margin-bottom:10px;box-shadow:var(--shadow)}
+.askstat .sti{flex:1;text-align:center;position:relative}
+.askstat .sti+.sti::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:1px;
+  background:var(--border)}
+.askstat .stn{font-size:17px;font-weight:800;color:var(--brand);line-height:1.3}
+.askstat .stl{font-size:9.5px;color:var(--txt-3);margin-top:1px}
+
+.acard{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--brand);
+  border-radius:14px;padding:12px 13px;margin-bottom:11px;box-shadow:var(--shadow)}
+.acard.tone-alert{border-left-color:var(--alert)}
+.acard.tone-warn{border-left-color:var(--gold)}
+.acard.tone-busy{border-left-color:var(--brand-2)}
+.acard.tone-calm{border-left-color:var(--txt-3)}
+.acard.tone-new,.acard.tone-ok{border-left-color:var(--brand)}
+.acard .aq{font-size:12.5px;font-weight:700;color:var(--brand);line-height:1.5}
+.acard .aa{font-size:13px;color:var(--txt);line-height:1.75;margin-top:7px}
+.acard .abasis{display:flex;gap:8px;background:var(--brand-soft);border-radius:8px;
+  padding:8px 10px;margin-top:9px}
+.acard .abl{flex:0 0 auto;font-size:11px;font-weight:700;color:var(--brand)}
+.acard .abt{font-size:11.5px;color:var(--txt-2);line-height:1.7}
+
+.acard .mlist{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border)}
+.acard .mt{font-size:11.5px;font-weight:700;color:var(--txt-2);margin-bottom:7px}
+.acard .mrow{display:flex;gap:8px;padding:5px 0}
+.acard .mdot{flex:0 0 8px;font-size:12.5px;color:var(--brand);line-height:1.5}
+.acard .mbody{flex:1;min-width:0}
+.acard .mname{font-size:12px;color:var(--txt);line-height:1.6}
+.acard .mfrom{font-size:9.5px;color:var(--txt-3);line-height:1.6;margin-top:2px}
+.acard .more{font-size:11px;color:var(--brand);font-weight:600;text-align:center;
+  margin-top:7px;padding-top:7px;border-top:1px dashed var(--border)}
+
+.acard .ilist{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border)}
+.acard .it{font-size:11.5px;font-weight:700;color:var(--txt-2);margin-bottom:6px}
+.acard .irow{display:flex;align-items:flex-start;gap:9px;padding:7px 0;
+  border-top:1px solid var(--border-soft)}
+.acard .irow:first-of-type{border-top:none}
+.acard .imid{flex:1;min-width:0}
+.acard .ititle{font-size:12px;color:var(--txt);line-height:1.55;font-weight:500;
+  overflow:hidden;text-overflow:ellipsis;display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical}
+.acard .imeta{font-size:9.5px;color:var(--txt-3);margin-top:3px}
+.acard .idd{flex:0 0 auto;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:7px;
+  color:var(--txt-2);background:var(--border-soft)}
+.acard .idd.lv-lv-now{color:var(--alert-ink);background:var(--alert-soft)}
+.acard .idd.lv-lv-hot{color:var(--alert-ink);background:var(--alert-soft)}
+.acard .idd.lv-lv-soon{color:var(--gold-ink);background:var(--gold-soft)}
+.acard .idd.lv-lv-plan,.acard .idd.lv-lv-far{color:var(--brand);background:var(--brand-soft)}
+.acard .iempty{font-size:11.5px;color:var(--txt-3);text-align:center;margin-top:9px;
+  padding-top:9px;border-top:1px dashed var(--border)}
+
+.qgroup{margin-bottom:12px}
+.qgroup .ghead{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.qgroup .gi{font-size:13.5px}
+.qgroup .gl{font-size:12.5px;font-weight:700;color:var(--txt-2);letter-spacing:.5px}
+.qlist{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;box-shadow:var(--shadow)}
+.qrow{display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border-top:1px solid var(--border-soft)}
+.qrow:first-child{border-top:none}
+.qrow.on{background:var(--brand-soft)}
+.qrow .qbody{flex:1;min-width:0}
+.qrow .qq{font-size:12.5px;color:var(--txt);font-weight:500;line-height:1.5}
+.qrow .qh{font-size:9.5px;color:var(--txt-3);line-height:1.5;margin-top:2px}
+.qrow .qa{flex:0 0 auto;font-size:11.5px;font-weight:700;color:var(--brand)}
+.qrow.on .qa{color:var(--brand)}
+
+.acts{display:flex;gap:9px;margin-top:14px}
+.acts .ab{flex:1;text-align:center;font-size:12.5px;padding:11px 0;border-radius:11px;
+  background:var(--surface);border:1px solid var(--border);color:var(--txt-2);font-weight:600}
+.acts .ab.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+
+/* ===== 办事日历（⑬）===== */
+.mbar{display:flex;align-items:center;justify-content:space-between;background:var(--surface);
+  border:1px solid var(--border);border-radius:12px;padding:9px 11px;margin-bottom:9px;
+  box-shadow:var(--shadow)}
+.mbar .mnav{font-size:17px;color:var(--brand);font-weight:700;width:26px;text-align:center;line-height:1}
+.mbar .mlab{text-align:center}
+.mbar .ml{font-size:13px;font-weight:700;color:var(--txt)}
+.mbar .mtoday{font-size:9.5px;color:var(--brand);font-weight:600;margin-top:2px}
+
+.calbox{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:10px 9px 12px;box-shadow:var(--shadow)}
+.calbox .wkrow{display:flex;margin-bottom:5px}
+.calbox .wk{flex:1;text-align:center;font-size:9.5px;color:var(--txt-3);font-weight:600}
+.calbox .wk.wkend{color:var(--gold-ink)}
+.calbox .crow{display:flex}
+.calbox .cell{flex:1;height:40px;position:relative;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;border-radius:8px;margin:1px}
+.calbox .cell.blank{visibility:hidden}
+.calbox .cell .cd{font-size:12px;color:var(--txt);line-height:1.2}
+.calbox .cell.past .cd{color:var(--txt-3)}
+.calbox .cell.wkend .cd{color:var(--gold-ink)}
+.calbox .cell.has{background:var(--brand-soft)}
+.calbox .cell.has.lv-now,.calbox .cell.has.lv-hot{background:var(--alert-soft)}
+.calbox .cell.has.lv-soon{background:var(--gold-soft)}
+.calbox .cell.has .cd{font-weight:700;color:var(--txt)}
+.calbox .cell.has.lv-now .cd,.calbox .cell.has.lv-hot .cd{color:var(--alert-ink)}
+.calbox .cell.has.lv-soon .cd{color:var(--gold-ink)}
+.calbox .cell.today{outline:2px solid var(--brand);outline-offset:-2px}
+.calbox .cell.sel{box-shadow:0 0 0 2px var(--brand) inset,0 0 0 2px var(--brand)}
+.calbox .cdot{width:4px;height:4px;border-radius:50%;background:var(--brand);margin-top:2px}
+.calbox .cell.lv-now .cdot,.calbox .cell.lv-hot .cdot{background:var(--alert)}
+.calbox .cell.lv-soon .cdot{background:var(--gold)}
+.calbox .ccnt{position:absolute;top:2px;right:3px;font-size:8px;font-weight:700;
+  color:#fff;background:var(--alert);border-radius:6px;padding:0 3px;line-height:1.4}
+
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:9px;padding:0 2px}
+.legend .lg{display:flex;align-items:center;gap:5px;font-size:9.5px;color:var(--txt-2)}
+.legend .dot{width:8px;height:8px;border-radius:2px;display:inline-block}
+.legend .dot.now{background:var(--alert)}
+.legend .dot.hot{background:var(--alert)}
+.legend .dot.soon{background:var(--gold)}
+.legend .dot.plan{background:var(--brand)}
+
+.sumline{font-size:12px;color:var(--txt-2);line-height:1.7;margin-top:9px;
+  background:var(--brand-soft);border-radius:9px;padding:9px 11px}
+
+.ibox{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;box-shadow:var(--shadow)}
+.ibox .irow{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;
+  border-top:1px solid var(--border-soft);border-left:4px solid var(--brand)}
+.ibox .irow:first-child{border-top:none}
+.ibox .irow.lv-now{border-left-color:var(--alert)}
+.ibox .irow.lv-hot{border-left-color:var(--alert)}
+.ibox .irow.lv-soon{border-left-color:var(--gold)}
+.ibox .irow.lv-plan{border-left-color:var(--brand)}
+.ibox .imid{flex:1;min-width:0}
+.ibox .ititle{font-size:12.5px;color:var(--txt);line-height:1.55;font-weight:500;
+  overflow:hidden;text-overflow:ellipsis;display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical}
+.ibox .imeta{font-size:9.5px;color:var(--txt-3);margin-top:3px}
+.ibox .idd{flex:0 0 auto;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:7px;
+  color:var(--alert-ink);background:var(--alert-soft)}
+.ibox .irow.lv-soon .idd{color:var(--gold-ink);background:var(--gold-soft)}
+.ibox .irow.lv-plan .idd{color:var(--brand);background:var(--brand-soft)}
+.empty{font-size:12px;color:var(--txt-3);text-align:center;padding:16px 0;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px}
+
+/* ============================================================
+   一句话卡片墙（默认视图）
+   —— 十三屏平铺会挤在一起；默认只给"一句话 + 序号 + 页路径"，
+   点开某张才展开那屏的全文（手机模拟）。
+   ============================================================ */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+  gap:16px;margin-top:30px}
+.pcard{background:var(--shell-panel);border:1px solid var(--shell-line);
+  border-radius:16px;padding:18px 18px 16px;cursor:pointer;position:relative;
+  transition:.18s;overflow:hidden}
+.pcard:hover{border-color:#2FBF82;transform:translateY(-2px);
+  box-shadow:0 12px 30px rgba(0,0,0,.4)}
+.pcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,#F3AE00,#2FBF82)}
+.pcard .pc-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pcard .pc-no{font-size:20px;font-weight:800;color:#2FBF82;letter-spacing:-.5px;
+  flex:0 0 auto;line-height:1}
+.pcard .pc-nm{font-size:15px;font-weight:700;color:#EAF6EF;flex:1;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pcard .pc-rt{font-size:11.5px;color:#7E968A;background:#16241E;
+  border:1px solid var(--shell-line);border-radius:20px;padding:2px 10px;white-space:nowrap}
+.pcard .pc-one{font-size:13.5px;color:#B9CBC0;line-height:1.7;
+  margin-bottom:12px;min-height:46px}
+.pcard .pc-go{font-size:12.5px;color:#2FBF82;font-weight:600;
+  display:flex;align-items:center;gap:5px}
+.pcard .pc-go .ar{transition:.18s}
+.pcard:hover .pc-go .ar{transform:translateX(3px)}
+.pcard.open{border-color:#2FBF82;background:#16241E}
+
+/* 展开后的手机区：独占整行 */
+.stage{display:none;margin-top:26px}
+.stage.on{display:block}
+.stage-hd{display:flex;align-items:center;gap:12px;margin-bottom:14px;
+  padding-bottom:12px;border-bottom:1px solid var(--shell-line)}
+.stage-hd .sh-no{font-size:22px;font-weight:800;color:#2FBF82}
+.stage-hd .sh-nm{font-size:16px;font-weight:700;color:#EAF6EF;flex:1}
+.stage-hd .sh-close{font-size:12.5px;color:var(--shell-sub);cursor:pointer;
+  background:#16241E;border:1px solid var(--shell-line);border-radius:20px;
+  padding:5px 14px;font-family:inherit;transition:.18s}
+.stage-hd .sh-close:hover{color:#fff;border-color:#2FBF82}
+.stage-body{display:flex;justify-content:center;gap:30px;flex-wrap:wrap}
+.stage-body .col{max-width:400px;width:100%}
+.stage-body .col-h{margin-bottom:14px}
+.stage-body .phone{max-height:none}
+
+.modebar{display:flex;justify-content:center;gap:10px;margin-top:20px}
+.modebar button{background:var(--shell-panel);border:1px solid var(--shell-line);
+  color:var(--shell-sub);font-size:12.5px;font-family:inherit;cursor:pointer;
+  padding:8px 18px;border-radius:20px;transition:.18s}
+.modebar button:hover{color:#fff;border-color:#2FBF82}
+.modebar button.on{background:#00653E;color:#fff;font-weight:600;border-color:#00653E}
+
+/* 全部展开模式：沿用原有网格 */
+.grid{display:none;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+  gap:30px;margin-top:30px;justify-items:center}
+.grid.on{display:grid}
+
+/* ---------- 页脚 ---------- */
+.foot{margin-top:44px;text-align:center;font-size:12.5px;color:#5d7268;line-height:2}
+.foot b{color:#2FBF82}
+.foot .line{margin-top:12px;padding-top:14px;border-top:1px solid var(--shell-line);
+  font-size:12px;color:#4d6157}
+
+@media(max-width:720px){
+  body{padding:22px 12px 50px}
+  .grid{gap:18px}
+  .cards{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hd">
+    <div class="crest"><span class="sun"></span><span class="aa">AAU</span><span class="book"></span><span class="y">1928</span></div>
+    <h1>知时 · 数字安农信息雷达</h1>
+    <div class="sub">安徽农业大学校园信息雷达 · 小程序界面预览 · 校徽为双圆形意象</div>
+  </div>
+
+  <div class="bar">
+    <span class="lb">主题</span>
+    <div class="sw">
+      <button id="btnLight" class="on" onclick="setTheme('light')">☀️ 浅色（数字安农）</button>
+      <button id="btnDark" onclick="setTheme('dark')">🌙 深色（夜间）</button>
+    </div>
+    <div class="vi">
+      <span><i style="background:#00653E"></i>安农绿</span>
+      <span><i style="background:#F3AE00"></i>麦穗金</span>
+      <span><i style="background:#E77844"></i>朝阳橙红</span>
+    </div>
+    <span class="sync">十三屏联动 · 四 tab 一致 · 校徽双圆形意象（AAU 书页 + 田野 + 1928）· 配色取自安农 VI 标准色</span>
+  </div>
+
+  <!-- ========== 一句话卡片墙（默认视图） ========== -->
+  <div class="cards" id="cards">
+    <div class="pcard" data-no="1" data-nm="首页 · 关注流" data-rt="pages/index">
+      <div class="pc-top"><span class="pc-no">01</span><span class="pc-nm">首页 · 关注流</span><span class="pc-rt">pages/index</span></div>
+      <div class="pc-one">今天有什么要办的，一屏看完——三天内的自动顶到最前。</div>
+      <div class="pc-go">点开看全文 <span class="ar">›</span></div>
+    </div>
+    <div class="pcard" data-no="2" data-nm="按标签推送" data-rt="pages/index · 按标签">
+      <div class="pc-top"><span class="pc-no">02</span><span class="pc-nm">按标签推送</span><span class="pc-rt">pages/index</span></div>
+      <div class="pc-one">9 个标签，勾了才推；没勾的绝不打扰你。</div>
+      <div class="pc-go">点开看全文 <span class="ar">›</span></div>
+    </div>
+    <div class="pcard" data-no="3" data-nm="详情 · 浓缩溯源" data-rt="pages/detail">
+      <div class="pc-top"><span class="pc-no">03</span><span class="pc-nm">详情 · 浓缩溯源</span><span class="pc-rt">pages/detail</span></div>
+      <div class="pc-one">一句话看懂，每条要点都挂着原文出处，可逐条核对。</div>
+      <div class="pc-go">点开看全文 <span class="ar">›</span></div>
+    </div>
+    <div class="pcard" data-no="4" data-nm="主动搜索" data-rt="pages/search">
+      <div class="pc-top"><span class="pc-no">04</span><span class="pc-nm">主动搜索</span><span class="pc-rt">pages/search</span></div>
+      <div class="pc-one">命中高亮，还明说「为什么搜到这条」。</div>
+      <div class="pc-go">点开看全文 <span class="ar">›</span></div>
+    </div>
+    <div class="pcard" data-no="5" data-nm="我的订阅" data-rt="pages/me">
+      <div class="pc-top"><span class="pc-no">05</span><span class="pc-nm">我的订阅</span><span class="pc-rt">pages/me</span></div>
+      <div class="pc-one">勾选标签 + 输入关键词，命中就推给你，实时看到能收到几条。</div>
+      <div class="pc-go">点开看全文 <span class="ar">›</span></div>
+    </div>
+    <div class="pcard" data-no="6" data-nm="时间轴" data-rt="pages/timeline">
+      <div class="pc-top"><span class="pc-no">06</span><span class="pc-nm">时间轴</span><span class="pc-rt">pages/timeline</span></div>
+      <div class="pc-one">按截止日排开，五档分组，一眼看清轻重缓急。</div>
+      <div class="pc-go">点开看全文 <span class="ar">›</span></div>
+    </div>
+    <div class="pcard" data-no="7" data-nm="今日简报" data-rt="pages/digest">
+      <div class="pc-top"><span class="pc-no">07</span><span class="pc-nm">今日简报</span><span class="pc-rt">pages/digest</span></div>
+      <div class="pc-one">一句话读完今天，该办的排在前面。</div>
+      <div class="pc-go">点开看全文 <span class="ar">›</span></div>
+    </div>
+    <div class="pcard" data-no="8" data-nm="详情 · 和我有关吗 + 办理清单" data-rt="pages/detail">
+      <div class="pc-top"><span class="pc-no">08</span><span class="pc-nm">和我有关吗 + 办理清单</span><span class="pc-rt">pages/detail</span></div>
+      <div class="pc-one">真实出处可核对，官方措辞翻成「和我有没有关系」。</div>
+      <div class="pc-go">点开看全文 <span class="ar">›</span></div>
+    </div>
+    <div class="pcard" data-no="9" data-nm="我的收藏 · 紧急自动顶上" data-rt="pages/me">
+      <div class="pc-top"><span class="pc-no">09</span><span class="pc-nm">我的收藏</span><span class="pc-rt">pages/me</span></div>
+      <div class="pc-one">收藏了 ≠ 忘了办，紧急的自动顶上并显示办事进度。</div>
+      <div class="pc-go">点开看全文 <span class="ar">›</span></div>
+    </div>
+    <div class="pcard" data-no="10" data-nm="数据自查（自查自纠）" data-rt="pages/selfcheck">
+      <div class="pc-top"><span class="pc-no">10</span><span class="pc-nm">数据自查</span><span class="pc-rt">pages/selfcheck</span></div>
+      <div class="pc-one">我们凭什么让你信——每次展示前，先自己查一遍。</div>
+      <div class="pc-go">点开看全文 <span class="ar">›</span></div>
+    </div>
+    <div class="pcard" data-no="11" data-nm="推送设置（主动推送引擎）" data-rt="pages/push">
+      <div class="pc-top"><span class="pc-no">11</span><span class="pc-nm">推送设置</span><span class="pc-rt">pages/push</span></div>
+      <div class="pc-one">凭什么推给你、什么程度才配打扰你，都摆给你看。</div>
+      <div class="pc-go">点开看全文 <span class="ar">›</span></div>
+    </div>
+    <div class="pcard" data-no="12" data-nm="问知时（自问自答）" data-rt="pages/ask">
+      <div class="pc-top"><span class="pc-no">12</span><span class="pc-nm">问知时</span><span class="pc-rt">pages/ask</span></div>
+      <div class="pc-one">有问题直接问，每个答案都附一行「依据」，算不出就不编。</div>
+      <div class="pc-go">点开看全文 <span class="ar">›</span></div>
+    </div>
+    <div class="pcard" data-no="13" data-nm="办事日历（哪天忙 / 哪天空）" data-rt="pages/calendar">
+      <div class="pc-top"><span class="pc-no">13</span><span class="pc-nm">办事日历</span><span class="pc-rt">pages/calendar</span></div>
+      <div class="pc-one">具体哪天忙、哪天能空出来，一眼看清整月节奏。</div>
+      <div class="pc-go">点开看全文 <span class="ar">›</span></div>
+    </div>
+  </div>
+
+  <!-- ========== 展开舞台（点卡片后在此贴全文） ========== -->
+  <div class="stage" id="stage">
+    <div class="stage-hd">
+      <span class="sh-no" id="stageNo">01</span>
+      <span class="sh-nm" id="stageNm">首页 · 关注流</span>
+      <span class="sh-close" id="stageClose">收起 ×</span>
+    </div>
+    <div class="stage-body" id="stageBody"></div>
+  </div>
+
+  <!-- ========== 视图切换 ========== -->
+  <div class="modebar">
+    <button id="btnCards" class="on" onclick="setMode('cards')">一句话总览</button>
+    <button id="btnAll" onclick="setMode('all')">全部展开（十三屏平铺）</button>
+  </div>
+
+  <div class="grid" id="grid">
+
+    <!-- ========== ① 首页 · 关注流 ========== -->
+    <div class="col" data-no="1">
+      <div class="col-h"><span><b>① 首页 · 关注流</b></span><span class="route">pages/index</span></div>
+      <div class="phone light" id="p1">
+        <div class="pbar"><span class="t">15:32</span><span class="ti">知时 · 数字安农信息雷达</span><span class="d">••• ⊙</span></div>
+        <div class="psub">今天有什么要办的，一屏看完</div>
+        <div class="pbody">
+
+          <div class="mhead">
+            <div class="lg"><span class="sun"></span><span class="aa">AAU</span><span class="book"></span><span class="y">1928</span></div>
+            <div class="tt">
+              <div class="n">知时 · 数字安农信息雷达</div>
+              <div class="s">2025级 · 大一 · 信息与人工智能学院</div>
+            </div>
+            <div class="tbtn">☀️ 浅色</div>
+          </div>
+
+          <div class="stat">
+            <div class="it"><div class="n red">2</div><div class="l">三天内要办</div></div>
+            <div class="it"><div class="n">10</div><div class="l">我的关注</div></div>
+            <div class="it"><div class="n gold">41</div><div class="l">通知总量</div></div>
+          </div>
+
+          <!-- 知时指数条（点进简报） -->
+          <div class="idxstrip lv-mid">
+            <div class="isl">
+              <div class="is1">今日知时指数</div>
+              <div class="is2">今天起 2 条在三天内截止；另有 3 条本周到期</div>
+            </div>
+            <div class="isr">
+              <div class="isn">52</div>
+              <div class="isg">看简报 ›</div>
+            </div>
+          </div>
+
+          <!-- 快捷入口 -->
+          <div class="quick">
+            <div class="qb"><span class="qbi">🕒</span><span class="qbt">时间轴</span><span class="qbs">5 件待办</span></div>
+            <div class="qb"><span class="qbi">📋</span><span class="qbt">今日简报</span><span class="qbs">一句话读完</span></div>
+            <div class="qb"><span class="qbi">🔍</span><span class="qbt">搜通知</span><span class="qbs">一搜就到</span></div>
+          </div>
+
+          <div class="viewsw">
+            <div class="v on">关注流</div>
+            <div class="v">按标签</div>
+          </div>
+
+          <div class="fsec"><span class="dot hi"></span>紧急 · 三天内<span class="n">2 条</span></div>
+
+          <div class="ncard hi">
+            <div class="tag">🔀 转专业</div>
+            <div class="t">关于2025-2026学年本科生转专业工作安排的通知</div>
+            <div class="one">这学期转专业开始了，想转的同学 11月18日前必须提交申请，只给9天。</div>
+            <div class="f"><span>教务处 · 2026-11-01</span><span class="cd hi">⏰ 剩 2 天</span></div>
+          </div>
+
+          <div class="ncard hi">
+            <div class="tag">📝 考试安排</div>
+            <div class="t">关于2026-2027学年第一学期期中考试安排的通知</div>
+            <div class="one">期中考试本周五开考，考场座位号已发布，务必带齐学生证与身份证。</div>
+            <div class="f"><span>教务处 · 2026-11-05</span><span class="cd hi">⏰ 剩 3 天</span></div>
+          </div>
+
+          <div class="fsec"><span class="dot md"></span>留意 · 一周内<span class="n">1 条</span></div>
+
+          <div class="ncard md">
+            <div class="tag real">🏆 学科竞赛</div>
+            <div class="t">关于举办2026年“农芯智”AI智能体创新大赛的通知</div>
+            <div class="one">学校办了个 AI 智能体比赛，12月3日前报名并交作品，赢了有奖金还能上学校平台。</div>
+            <div class="f"><span>数据管理处 · 2026-11-03</span><span class="cd md">⏰ 剩 6 天</span></div>
+          </div>
+
+          <div class="fsec"><span class="dot lo"></span>长期有效<span class="n">7 条</span></div>
+
+          <div class="ncard lo">
+            <div class="tag real">💰 奖助学金</div>
+            <div class="t">关于开展2025-2026学年国家励志奖学金评审工作的通知</div>
+            <div class="one">国家励志奖学金开始评审了，家庭经济困难的成绩优秀同学 11月20日前交材料。</div>
+            <div class="f"><span>学生工作部 · 2026-11-02</span><span class="cd lo">⏰ 剩 14 天</span></div>
+          </div>
+
+          <div class="ncard lo">
+            <div class="tag real">🎓 讲座培训</div>
+            <div class="t">关于举办“大模型与智能体开发”专题讲座的通知</div>
+            <div class="one">11月中旬有场大模型开发讲座，讲智能体搭建，报名就送算力额度。</div>
+            <div class="f"><span>数据管理处 · 2026-11-04</span><span class="cd lo">长期有效</span></div>
+          </div>
+
+        </div>
+        <div class="tabbar">
+          <div class="tb on"><span class="i">📡</span>雷达</div>
+          <div class="tb"><span class="i">🕒</span>时间轴</div>
+          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">⭐</span>订阅</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ② 按标签推送 ========== -->
+    <div class="col" data-no="2">
+      <div class="col-h"><span><b>② 按标签推送</b></span><span class="route">pages/index · 按标签</span></div>
+      <div class="phone light" id="p2">
+        <div class="pbar"><span class="t">15:32</span><span class="ti">知时 · 数字安农信息雷达</span><span class="d">••• ⊙</span></div>
+        <div class="psub">9 个标签，勾了才推，不打扰</div>
+        <div class="pbody">
+
+          <div class="viewsw">
+            <div class="v">关注流</div>
+            <div class="v on">按标签</div>
+          </div>
+
+          <div class="grp hi">
+            <div class="grp-h">
+              <span class="i">🔀</span><span class="k">转专业</span>
+              <span class="c">1 条</span><span class="bd">紧急</span><span class="ar">▾</span>
+            </div>
+            <div class="grp-d">转专业 / 专业分流</div>
+            <div class="inner">
+              <div class="ncard hi">
+                <div class="t">关于2025-2026学年本科生转专业工作安排的通知</div>
+                <div class="one">这学期转专业开始了，想转的同学 11月18日前必须提交申请，只给9天。</div>
+                <div class="f"><span>教务处 · 2026-11-01</span><span class="cd hi">⏰ 剩 2 天</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grp hi">
+            <div class="grp-h">
+              <span class="i">🏆</span><span class="k">学科竞赛</span>
+              <span class="c">4 条</span><span class="bd">紧急</span><span class="ar">▾</span>
+            </div>
+            <div class="grp-d">各类竞赛报名与提交</div>
+            <div class="inner">
+              <div class="ncard md">
+                <div class="tag real">✓ 可核对原文</div>
+                <div class="t">关于举办2026年“农芯智”AI智能体创新大赛的通知</div>
+                <div class="f"><span>数据管理处 · 2026-11-03</span><span class="cd md">⏰ 剩 6 天</span></div>
+              </div>
+              <div class="ncard md">
+                <div class="t">关于组织参加2026年安徽省大学生服务外包创新创业大赛的通知</div>
+                <div class="f"><span>创新创业学院 · 2026-11-02</span><span class="cd md">⏰ 剩 5 天</span></div>
+              </div>
+              <div class="ncard lo">
+                <div class="t">关于举办2026年“挑战杯”大学生课外学术科技作品竞赛校内选拔的通知</div>
+                <div class="f"><span>校团委 · 2026-10-29</span><span class="cd lo">⏰ 剩 22 天</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grp hi">
+            <div class="grp-h">
+              <span class="i">💰</span><span class="k">奖助学金</span>
+              <span class="c">2 条</span><span class="bd">紧急</span><span class="ar">▸</span>
+            </div>
+            <div class="grp-d">奖学金 / 助学金 / 评优</div>
+          </div>
+
+          <div class="grp">
+            <div class="grp-h">
+              <span class="i">📝</span><span class="k">考试安排</span>
+              <span class="c">3 条</span><span class="ar">▸</span>
+            </div>
+            <div class="grp-d">考试时间地点 / 补考缓考</div>
+          </div>
+
+        </div>
+        <div class="tabbar">
+          <div class="tb on"><span class="i">📡</span>雷达</div>
+          <div class="tb"><span class="i">🕒</span>时间轴</div>
+          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">⭐</span>订阅</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ③ 详情 · 浓缩+溯源 ========== -->
+    <div class="col" data-no="3">
+      <div class="col-h"><span><b>③ 详情 · 浓缩溯源</b></span><span class="route">pages/detail</span></div>
+      <div class="phone light" id="p3">
+        <div class="pbar"><span class="t">15:32</span><span class="ti">知时 · 数字安农信息雷达</span><span class="d">••• ⊙</span></div>
+        <div class="psub">一句话看懂 + 每条要点挂原文出处</div>
+        <div class="pbody">
+
+          <div class="dhead">
+            <div class="t">关于举办2026年“农芯智”AI智能体创新大赛的通知</div>
+            <div class="m">
+              <span>数据管理处</span><span>2026-11-03</span><span class="cd hi">剩 6 天</span>
+            </div>
+            <div class="fl">
+              <span>⭐ 已收藏</span>
+              <span class="real">真实公开源</span>
+            </div>
+          </div>
+
+          <div class="kcard">
+            <div class="krow"><span class="kk">截止</span><span class="kv">2026-12-03（剩 6 天）</span></div>
+            <div class="krow"><span class="kk">谁该看</span><span class="kv">在校学生 / 在职教职工（1-3人团队）</span></div>
+            <div class="krow"><span class="kk">要交什么</span><span class="kv">项目成果（作品说明+可运行智能体）/ 5分钟演示视频 / 答辩PPT</span></div>
+            <div class="krow"><span class="kk">去哪办</span><span class="kv">赛事QQ群 934927951（报名与提交合并）</span></div>
+          </div>
+
+          <!-- 和我有关吗 -->
+          <div class="relcard rel-open">
+            <div class="relh">
+              <div class="rell"><span class="reldot"></span><span class="relt">和我有关吗</span></div>
+              <span class="relbadge">没写限制</span>
+            </div>
+            <div class="relline">原文没有限定人群，一般在校生都可以参加。</div>
+            <div class="relhint">
+              判定依据：你填的身份 + 原文写明的条件。
+              <span class="rellink">身份填错了？去改 ›</span>
+            </div>
+          </div>
+
+          <!-- 要办什么 -->
+          <div class="stepcard">
+            <div class="steph">
+              <div class="stepl"><span class="stept">要办什么</span><span class="stepc">2 / 7</span></div>
+              <span class="stepreset">重置</span>
+            </div>
+            <div class="stepbar"><div class="stepfill" style="width:28.6%"></div></div>
+
+            <div class="stepitem done mat">
+              <span class="stepbox">☑</span><span class="steptx">准备：项目成果（作品说明+可运行智能体）</span>
+            </div>
+            <div class="stepitem done mat">
+              <span class="stepbox">☑</span><span class="steptx">准备：5分钟演示视频</span>
+            </div>
+            <div class="stepitem mat">
+              <span class="stepbox">☐</span><span class="steptx">准备：答辩PPT</span>
+            </div>
+            <div class="stepitem entry">
+              <span class="stepbox">☐</span><span class="steptx">提交入口：赛事QQ群 934927951（报名与提交合并）</span>
+            </div>
+            <div class="stepitem time">
+              <span class="stepbox">☐</span><span class="steptx">时间：还剩 6 天（截止 2026-12-03）</span>
+            </div>
+            <div class="stepitem point">
+              <span class="stepbox">☐</span><span class="steptx">要点：算力不用自己买，在学校平台申请就行（搜“token鲨”）。</span>
+            </div>
+            <div class="stepitem point">
+              <span class="stepbox">☐</span><span class="steptx">要点：11月中旬有官方培训，建议去。</span>
+            </div>
+
+            <div class="stepcopy">复制清单发给同学 ›</div>
+          </div>
+
+          <div class="sec">浓缩要点 · 每条挂原文出处<span class="cnt">5 条</span></div>
+
+          <div class="pt on">
+            <div class="t">1. 报名和交作品是一起做的，截止 12月3日，交到赛事QQ群 934927951。</div>
+            <div class="q"><span class="lb">原文出处</span><span class="ok">✔ 第 188 字符处可定位</span></div>
+            <div class="qt">「报名与作品提交合并进行，于2026年12月3日前将项目成果提交至赛事指定渠道（赛事QQ群：934927951）」</div>
+          </div>
+
+          <div class="pt">
+            <div class="t">2. 可以一个人报，也可以组队，一队最多3人；每人只能进一个队，每队只能交1个作品。</div>
+            <div class="q"><span class="lb">原文出处</span><span class="ok">✔ 第 114 字符处可定位</span></div>
+            <div class="qt">「可以个人或团队形式参加，每人只能参加一个团队。团队可跨学院（部门）、跨学科组队，每支队伍限1—3人，每个团队仅允许提交1个作品」</div>
+          </div>
+
+          <div class="pt">
+            <div class="t">3. 评分主要看四点：创新、实用、技术、体验，创新占大头（30%）。</div>
+            <div class="q"><span class="lb">原文出处</span><span class="ok">✔ 第 247 字符处可定位</span></div>
+            <div class="qt">「评选规则：创新性30%、实用性25%、技术实现25%、用户体验20%」</div>
+          </div>
+
+          <div class="pt">
+            <div class="t">4. 算力不用自己买，在学校平台申请就行（搜“token鲨”）。</div>
+            <div class="q"><span class="lb">原文出处</span><span class="ok">✔ 第 297 字符处可定位</span></div>
+            <div class="qt">「在“数智安农”平台搜索“大模型公共服务（token鲨）”提交算力申请」</div>
+          </div>
+
+          <div class="pt">
+            <div class="t">5. 11月中旬有官方培训，建议去。</div>
+            <div class="q"><span class="lb">原文出处</span><span class="ok">✔ 第 340 字符处可定位</span></div>
+            <div class="qt">「预计11月中旬开展大模型及智能体开发相关讲座与培训」</div>
+          </div>
+
+        </div>
+        <div class="tabbar">
+          <div class="tb on"><span class="i">📡</span>雷达</div>
+          <div class="tb"><span class="i">🕒</span>时间轴</div>
+          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">⭐</span>订阅</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ④ 搜索 ========== -->
+    <div class="col" data-no="4">
+      <div class="col-h"><span><b>④ 主动搜索</b></span><span class="route">pages/search</span></div>
+      <div class="phone light" id="p4">
+        <div class="pbar"><span class="t">15:32</span><span class="ti">知时 · 数字安农信息雷达</span><span class="d">••• ⊙</span></div>
+        <div class="psub">命中高亮 · 明说“为什么搜到”</div>
+        <div class="pbody">
+
+          <div class="sbar"><span class="ic">🔍</span><span class="q">转专业</span><span class="cl">✕</span></div>
+
+          <div class="hot">
+            <span class="lb">热搜</span>
+            <span class="w">转专业</span><span class="w">奖学金</span><span class="w">竞赛</span>
+            <span class="w">考试安排</span><span class="w">讲座</span><span class="w">选课</span><span class="w">图书馆</span>
+          </div>
+
+          <div class="sec">命中 1 条<span class="cnt">按相关度排序</span></div>
+
+          <div class="scard">
+            <div class="t">🔀 关于2026-2027学年第一学期<mark>转专业</mark>工作的通知</div>
+            <div class="why">命中：标题 / 标签 / 浓缩 / 原文</div>
+            <div class="sn">…各学院、各位同学：根据《安徽农业大学本科生<mark>转专业</mark>管理办法》文件精神，现将2026-2027学年第一学期<mark>转专业</mark>工作有关事项通知如下…</div>
+            <div class="f">教务处 · 2026-11-01</div>
+          </div>
+
+          <div class="sec">换个词：搜「竞赛」<span class="cnt">4 条</span></div>
+
+          <div class="whybox">
+            其中 <b>4</b> 条标题里没有「竞赛」二字，命中来自<b>标签</b>——页面会明说「为什么搜到」，不让人困惑。
+          </div>
+
+          <div class="sec">点标签浏览：「学科竞赛」<span class="cnt">4 条</span></div>
+
+        </div>
+        <div class="tabbar">
+          <div class="tb"><span class="i">📡</span>雷达</div>
+          <div class="tb"><span class="i">🕒</span>时间轴</div>
+          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">⭐</span>订阅</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ⑤ 我的订阅 ========== -->
+    <div class="col" data-no="5">
+      <div class="col-h"><span><b>⑤ 我的订阅</b></span><span class="route">pages/me</span></div>
+      <div class="phone light" id="p5">
+        <div class="pbar"><span class="t">15:32</span><span class="ti">知时 · 数字安农信息雷达</span><span class="d">••• ⊙</span></div>
+        <div class="psub">勾选标签 + 输入关键词即订阅 · 实时看能收到几条</div>
+        <div class="pbody">
+
+          <div class="mhead">
+            <div class="lg"><span class="sun"></span><span class="aa">AAU</span><span class="book"></span><span class="y">1928</span></div>
+            <div class="tt">
+              <div class="n">2025级 · 大一</div>
+              <div class="s">信息与人工智能学院 · 长江西路校区</div>
+            </div>
+            <div class="tbtn">☀️ 浅色</div>
+          </div>
+
+          <div class="stat">
+            <div class="it"><div class="n">4</div><div class="l">已订阅标签</div></div>
+            <div class="it"><div class="n red">10</div><div class="l">可触达通知</div></div>
+            <div class="it"><div class="n gold">2</div><div class="l">已收藏</div></div>
+          </div>
+
+          <div class="quick">
+            <div class="qb"><span class="qbi">🕒</span><span class="qbt">看时间轴</span><span class="qbs">5 件待办</span></div>
+            <div class="qb"><span class="qbi">📋</span><span class="qbt">今日简报</span><span class="qbs">一句话读完</span></div>
+          </div>
+
+          <div class="sec">关注事项（9 个标签，勾选即订阅）</div>
+
+          <div class="subrow on"><span class="ck">✔</span><span class="ic">🔀</span><span class="k">转专业</span><span class="c">该类 1 条</span></div>
+          <div class="subrow on"><span class="ck">✔</span><span class="ic">🏆</span><span class="k">学科竞赛</span><span class="c">该类 4 条</span></div>
+          <div class="subrow on"><span class="ck">✔</span><span class="ic">💰</span><span class="k">奖助学金</span><span class="c">该类 2 条</span></div>
+          <div class="subrow on"><span class="ck">✔</span><span class="ic">📝</span><span class="k">考试安排</span><span class="c">该类 3 条</span></div>
+          <div class="subrow"><span class="ck">✔</span><span class="ic">📚</span><span class="k">选课</span><span class="c">该类 2 条</span></div>
+          <div class="subrow"><span class="ck">✔</span><span class="ic">🎓</span><span class="k">讲座培训</span><span class="c">该类 16 条</span></div>
+          <div class="subrow"><span class="ck">✔</span><span class="ic">📖</span><span class="k">图书资源</span><span class="c">该类 5 条</span></div>
+          <div class="subrow"><span class="ck">✔</span><span class="ic">🧾</span><span class="k">学工事务</span><span class="c">该类 2 条</span></div>
+          <div class="subrow"><span class="ck">✔</span><span class="ic">📢</span><span class="k">校内通知</span><span class="c">该类 6 条</span></div>
+
+          <div class="infobox">
+            <div>提醒时机：截止前 7 天 / 3 天 / 1 天</div>
+            <div>推送渠道：小程序服务通知 + 群内播报</div>
+          </div>
+
+          <div class="reach">⚡ 当前订阅能收到：<b>10</b> 条</div>
+
+          <div class="sec">我的关键词（输入具体名词，命中就推给你）</div>
+
+          <div class="kwin">
+            <span class="kwinbox">如：正大杯 / 挑战杯 / 数学建模</span>
+            <span class="kwadd">添加</span>
+          </div>
+
+          <div class="kwchips">
+            <span class="kwchip"><span class="kwt">正大杯</span><span class="kwn">1 条</span><span class="kwhot">1 紧急</span><span class="kwx">×</span></span>
+            <span class="kwchip"><span class="kwt">数学建模</span><span class="kwn">2 条</span><span class="kwx">×</span></span>
+            <span class="kwchip empty"><span class="kwt">交换生</span><span class="kwn empty">暂无命中</span><span class="kwx">×</span></span>
+          </div>
+
+          <div class="kwsug"><span class="kwsug-l">你可能还关心：</span>
+            <span class="kwsug-w">+ 挑战杯</span><span class="kwsug-w">+ 四六级</span><span class="kwsug-w">+ 招聘会</span>
+          </div>
+
+          <div class="srow-hint">标签是"我们替你分好的类"；关键词是"你自己敲进去的词"——订了「正大杯」，凡是有它出现的通知都会主动推给你。</div>
+
+          <div class="sec">我的收藏<span class="cnt">2 条</span></div>
+
+          <div class="frow">
+            <span class="star">⭐</span>
+            <div style="flex:1;min-width:0">
+              <div class="ft">关于举办2026年“农芯智”AI智能体创新大赛的通知</div>
+              <div class="fs">学科竞赛 · 2026-11-03</div>
+            </div>
+            <span class="fdd">剩6天</span>
+          </div>
+
+          <div class="frow">
+            <span class="star">⭐</span>
+            <div style="flex:1;min-width:0">
+              <div class="ft">关于2025-2026学年本科生转专业工作安排的通知</div>
+              <div class="fs">转专业 · 2026-11-01</div>
+            </div>
+            <span class="fdd">剩2天</span>
+          </div>
+
+          <div class="sec">改订阅，实时看收益变化</div>
+
+          <table class="chg">
+            <tr><td>勾上「讲座培训」</td><td>订阅 5 项</td><td class="up">可触达 26 条（+16）</td></tr>
+            <tr><td>取消「讲座培训」</td><td>订阅 4 项</td><td>可触达 10 条</td></tr>
+            <tr><td>点「全选」</td><td>订阅 9 项</td><td>可触达 41 条</td></tr>
+            <tr><td>点「恢复默认」</td><td>订阅 4 项</td><td>可触达 10 条</td></tr>
+            <tr><td>点「保存」</td><td colspan="2" class="up">已写入本地存储 ✔</td></tr>
+          </table>
+
+        </div>
+        <div class="tabbar">
+          <div class="tb"><span class="i">📡</span>雷达</div>
+          <div class="tb"><span class="i">🕒</span>时间轴</div>
+          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb on"><span class="i">⭐</span>订阅</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ⑥ 时间轴 ========== -->
+    <div class="col" data-no="6">
+      <div class="col-h"><span><b>⑥ 时间轴</b></span><span class="route">pages/timeline</span></div>
+      <div class="phone light" id="p6">
+        <div class="pbar"><span class="t">15:32</span><span class="ti">知时 · 数字安农信息雷达</span><span class="d">••• ⊙</span></div>
+        <div class="psub">按截止日排开 · 五档分组，一眼看清轻重缓急</div>
+        <div class="pbody">
+
+          <!-- 知时指数卡 -->
+          <div class="idxcard lv-mid">
+            <div class="idxr1">
+              <span class="idxl">今日知时指数</span>
+              <span class="idxs">52</span>
+            </div>
+            <div class="idxmsg">有几件要留意 · 今天事不算多，但别漏了转专业</div>
+            <div class="idxmets">
+              <div class="im"><span class="imn">1</span><span class="iml">今天到期</span></div>
+              <div class="im"><span class="imn">2</span><span class="iml">三天内</span></div>
+              <div class="im"><span class="imn">3</span><span class="iml">一周内</span></div>
+            </div>
+          </div>
+
+          <!-- 档① 今天到期 -->
+          <div class="bk">
+            <div class="bhd now"><span class="bdot"></span>
+              <div class="bmid"><div class="bname">今天到期</div><div class="bnum">1 件 · 今天就截止</div></div>
+              <span class="barrow">收起 ▲</span></div>
+            <div class="tl">
+              <div class="tline"></div>
+              <div class="titem"><span class="tnode hi"></span>
+                <div class="tcard hi">
+                  <div class="tr1"><div class="tt">第一学期转专业报名（网上提交）</div><span class="dd hi">今天</span></div>
+                  <div class="sr">教务处 · 截止 2026-11-05 17:00</div>
+                  <div class="d1">系统今天下午 5 点关闭，报名表需学院盖章后上传。</div>
+                  <div class="tags"><span class="tg g">转专业</span><span class="tg">教务处</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 档② 三天内 -->
+          <div class="bk">
+            <div class="bhd hot"><span class="bdot"></span>
+              <div class="bmid"><div class="bname">三天内</div><div class="bnum">2 件 · 3 天内截止</div></div>
+              <span class="barrow">收起 ▲</span></div>
+            <div class="tl">
+              <div class="tline"></div>
+              <div class="titem"><span class="tnode hi"></span>
+                <div class="tcard hi">
+                  <div class="tr1"><div class="tt">关于2025-2026学年本科生转专业工作安排的通知</div><span class="dd hi">剩2天</span></div>
+                  <div class="sr">教务处 · 2026-11-01 · 截止 11-07</div>
+                  <div class="d1">含专业目录、可接收名额与考核方式，需先看本学院细则。</div>
+                  <div class="tags"><span class="tg g">转专业</span><span class="tg o">急</span></div>
+                </div>
+              </div>
+              <div class="titem"><span class="tnode hi"></span>
+                <div class="tcard hi">
+                  <div class="tr1"><div class="tt">关于开展2025-2026学年国家助学金评审的通知</div><span class="dd hi">剩3天</span></div>
+                  <div class="sr">学生资助管理中心 · 2026-10-30 · 截止 11-08</div>
+                  <div class="d1">需提交家庭经济情况认定材料，请先在学工系统完成认定。</div>
+                  <div class="tags"><span class="tg g">奖助学金</span><span class="tg">学工事务</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 档③ 一周内 -->
+          <div class="bk">
+            <div class="bhd soon"><span class="bdot"></span>
+              <div class="bmid"><div class="bname">一周内</div><div class="bnum">3 件 · 7 天内截止</div></div>
+              <span class="barrow">收起 ▲</span></div>
+            <div class="tl">
+              <div class="tline"></div>
+              <div class="titem"><span class="tnode md"></span>
+                <div class="tcard md">
+                  <div class="tr1"><div class="tt">关于举办2026年“农芯智”AI智能体创新大赛的通知</div><span class="dd md">剩6天</span></div>
+                  <div class="sr">创新创业学院 · 2026-11-03 · 截止 11-11</div>
+                  <div class="d1">初赛提交方案书即可，决赛在 12 月初线下答辩。</div>
+                  <div class="tags"><span class="tg g">学科竞赛</span><span class="tg o">已收藏</span></div>
+                </div>
+              </div>
+              <div class="titem"><span class="tnode md"></span>
+                <div class="tcard md">
+                  <div class="tr1"><div class="tt">关于2026年下半年全国大学英语四六级报名的通知</div><span class="dd md">剩7天</span></div>
+                  <div class="sr">教务处 · 2026-10-28 · 截止 11-12</div>
+                  <div class="d1">报名费在线缴纳，缴费成功才算报名完成。</div>
+                  <div class="tags"><span class="tg g">考试安排</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 档④ 本月内 -->
+          <div class="bk">
+            <div class="bhd plan"><span class="bdot"></span>
+              <div class="bmid"><div class="bname">本月内</div><div class="bnum">2 件 · 30 天内截止</div></div>
+              <span class="barrow">展开 ▼</span></div>
+          </div>
+
+          <!-- 档⑤ 更远 / 长期有效 -->
+          <div class="bk">
+            <div class="bhd far"><span class="bdot"></span>
+              <div class="bmid"><div class="bname">更远 / 长期有效</div><div class="bnum">32 件 · 无明确截止或已长期有效</div></div>
+              <span class="barrow">展开 ▼</span></div>
+          </div>
+
+          <div class="whybox">
+            五档归集规则与小程序一致：<b>今天到期 0 天</b> / <b>三天内 ≤3</b> / <b>一周内 ≤7</b> /
+            <b>本月内 ≤30</b> / <b>更远或长期有效</b>；档内按截止时间升序。默认自动展开前两个「有内容」的档。
+          </div>
+
+        </div>
+        <div class="tabbar">
+          <div class="tb"><span class="i">📡</span>雷达</div>
+          <div class="tb on"><span class="i">🕒</span>时间轴</div>
+          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">⭐</span>订阅</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ⑦ 今日简报 ========== -->
+    <div class="col" data-no="7">
+      <div class="col-h"><span><b>⑦ 今日简报</b></span><span class="route">pages/digest</span></div>
+      <div class="phone light" id="p7">
+        <div class="pbar"><span class="t">15:32</span><span class="ti">知时 · 数字安农信息雷达</span><span class="d">••• ⊙</span></div>
+        <div class="psub">一句话读完今天 · 该办的排在前面</div>
+        <div class="pbody">
+
+          <!-- 简报头 -->
+          <div class="bhead">
+            <div class="lg"><span class="sun"></span><span class="aa">AAU</span><span class="book"></span><span class="y">1928</span></div>
+            <div class="bx">
+              <div class="t1">今日简报</div>
+              <div class="t2">2025级 · 大一 · 信息与人工智能学院 · 2026-11-05 15:32</div>
+            </div>
+          </div>
+
+          <!-- 一句话总结 -->
+          <div class="sumcard lv-mid">
+            <div class="sumlb">一句话总结</div>
+            <div class="sumtx">今天起 3 条在三天内截止。</div>
+            <div class="sumtx">另有 3 条本周到期。</div>
+            <div class="sumtx">你关注的 4 类共命中 10 条。</div>
+            <div class="sumidx"><span class="sin">知时指数</span><span class="siv">52</span><span class="sil">有几件要留意</span></div>
+          </div>
+
+          <!-- 三天内要办 -->
+          <div class="sec">⏰ 三天内要办<span class="cnt">3 件</span></div>
+
+          <div class="icard now">
+            <div class="ir1"><div class="it">第一学期转专业报名（网上提交）</div><span class="idd">今天</span></div>
+            <div class="isr">教务处 · 截止 2026-11-05 17:00 · 剩0天</div>
+            <div class="ione">系统今天下午 5 点关闭，报名表需学院盖章后上传。</div>
+            <div class="ientry">入口：教务系统 → 学籍管理 → 转专业报名</div>
+          </div>
+
+          <div class="icard hi">
+            <div class="ir1"><div class="it">关于2025-2026学年本科生转专业工作安排的通知</div><span class="idd">剩2天</span></div>
+            <div class="isr">教务处 · 2026-11-01 · 截止 11-07</div>
+            <div class="ione">含专业目录、可接收名额与考核方式，需先看本学院细则。</div>
+          </div>
+
+          <div class="icard hi">
+            <div class="ir1"><div class="it">关于开展2025-2026学年国家助学金评审的通知</div><span class="idd">剩3天</span></div>
+            <div class="isr">学生资助管理中心 · 2026-10-30 · 截止 11-08</div>
+            <div class="ione">需提交家庭经济情况认定材料，请先在学工系统完成认定。</div>
+          </div>
+
+          <!-- 本周留意 -->
+          <div class="sec">📅 本周留意<span class="cnt">3 件</span></div>
+
+          <div class="wcard">
+            <div class="wr1"><div class="wt">关于举办2026年“农芯智”AI智能体创新大赛的通知</div><span class="wdd">剩6天</span></div>
+            <div class="wsr">创新创业学院 · 截止 11-11 · 学科竞赛</div>
+          </div>
+
+          <div class="wcard">
+            <div class="wr1"><div class="wt">关于2026年下半年全国大学英语四六级报名的通知</div><span class="wdd">剩7天</span></div>
+            <div class="wsr">教务处 · 截止 11-12 · 考试安排</div>
+          </div>
+
+          <div class="wcard">
+            <div class="wr1"><div class="wt">2026年秋季学期图书馆数据库使用培训安排</div><span class="wdd">剩7天</span></div>
+            <div class="wsr">图书馆 · 截止 11-13 · 讲座培训</div>
+          </div>
+
+          <!-- 可信度 -->
+          <div class="trust trust-high">
+            <div class="tr1"><span class="trl">数据可信度</span><span class="trv">高</span></div>
+            <div class="trbar"><span class="trfill" style="width:82%"></span></div>
+            <div class="trmsg">绝大多数来自安农官网公开页</div>
+            <div class="trsub">本页 42 条通知中 36 条为真实采集、6 条为演示样例。<b>其中 3 条带可核对原文链接</b>（另有真采集条目未留存链接，已如实标注）。仅聚合公开信息，不涉及教务后台、课表、成绩、学籍。</div>
+            <div class="trsub trnote">没链接的标为「演示样例 / 未留存链接」，不当真实通知使用；带链接的可在详情页复制原文地址逐字比对。</div>
+          </div>
+
+          <!-- 快捷入口 -->
+          <div class="quick">
+            <div class="qb"><span class="qbi">🕒</span><span class="qbt">看时间轴</span><span class="qbs">5 件待办</span></div>
+            <div class="qb"><span class="qbi">⭐</span><span class="qbt">我的收藏</span><span class="qbs">2 条</span></div>
+            <div class="qb"><span class="qbi">🔍</span><span class="qbt">搜通知</span><span class="qbs">一搜就到</span></div>
+          </div>
+
+          <div class="whybox">
+            简报全部由当前数据<b>当场派生</b>：份数、命中数、可信度比例都随订阅变化实时重算，<b>不是写死的文案</b>。
+            点右上「复制简报」可把这几行文字贴到班群。
+          </div>
+
+        </div>
+        <div class="tabbar">
+          <div class="tb"><span class="i">📡</span>雷达</div>
+          <div class="tb"><span class="i">🕒</span>时间轴</div>
+          <div class="tb on"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">⭐</span>订阅</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ⑧ 详情：和我有关吗 + 办理清单 ========== -->
+    <div class="col" data-no="8">
+      <div class="col-h"><span><b>⑧ 详情：和我有关吗 + 办理清单</b></span><span class="route">pages/detail（新增）</span></div>
+      <div class="phone light" id="p8">
+        <div class="pbar"><span class="t">15:32</span><span class="ti">转专业 · 详情</span><span class="d">••• ⊙</span></div>
+        <div class="psub">真实出处可核对 · 官方措辞翻成「和我有没有关系」</div>
+        <div class="pbody">
+
+          <div class="dhead">
+            <div class="t">关于报送2026-2027学年本科生转专业工作领导小组名单及选录细则的通知</div>
+            <div class="m">
+              <span>本科生院</span><span>jwc.ahau.edu.cn</span><span>2026-10-26</span><span class="cd hi">今天截止</span>
+            </div>
+            <div class="fl">
+              <span>☆ 收藏</span>
+              <span class="real">✓ 真实公开源 · 可核对</span>
+            </div>
+          </div>
+
+          <!-- 原文出处（可逐字核对） -->
+          <div class="srcline">
+            🔗 原文出处（jwc.ahau.edu.cn）：https://jwc.ahau.edu.cn/info/1881/36671.htm
+            <span class="scopy">点击复制 ›</span>
+          </div>
+
+          <!-- 和我有关吗：三条条件逐条对照 -->
+          <div class="relcard rel-warn">
+            <div class="relh">
+              <div class="rell"><span class="reldot"></span><span class="relt">和我有关吗</span></div>
+              <span class="relbadge">要看细则</span>
+            </div>
+            <div class="relline">原文有几项限定，需要你自己核对一下——已在下面对照列出。</div>
+
+            <div class="relrow">
+              <span class="relst relst-ok">✓</span>
+              <div class="relbx">
+                <div class="relrk">
+                  <span class="relk">年级</span>
+                  <span class="relmine">2025级</span>
+                  <span class="relarrow">↔</span>
+                  <span class="relneed">2025级</span>
+                </div>
+                <div class="relnote">你就是这一级</div>
+              </div>
+            </div>
+
+            <div class="relrow">
+              <span class="relst relst-ok">✓</span>
+              <div class="relbx">
+                <div class="relrk">
+                  <span class="relk">身份</span>
+                  <span class="relmine">本科生</span>
+                  <span class="relarrow">↔</span>
+                  <span class="relneed">本科生</span>
+                </div>
+                <div class="relnote">你是本科生</div>
+              </div>
+            </div>
+
+            <div class="relrow">
+              <span class="relst relst-warn">?</span>
+              <div class="relbx">
+                <div class="relrk">
+                  <span class="relk">纪律</span>
+                  <span class="relmine">自查</span>
+                  <span class="relarrow">↔</span>
+                  <span class="relneed">无违纪处分</span>
+                </div>
+                <div class="relnote">需无处分记录，自己核实一下</div>
+              </div>
+            </div>
+
+            <div class="relhint">
+              判定依据：你填的身份（年级/学院）+ 原文写明的条件。
+              <span class="rellink">身份填错了？去改 ›</span>
+            </div>
+          </div>
+
+          <!-- 要办什么：可勾选清单 -->
+          <div class="stepcard">
+            <div class="steph">
+              <div class="stepl"><span class="stept">要办什么</span><span class="stepc">1 / 7</span></div>
+              <span class="stepreset">重置</span>
+            </div>
+            <div class="stepbar"><div class="stepfill" style="width:14.3%"></div></div>
+
+            <div class="stepitem done mat">
+              <span class="stepbox">☑</span><span class="steptx">准备：在线申请表</span>
+            </div>
+            <div class="stepitem mat">
+              <span class="stepbox">☐</span><span class="steptx">准备：纸质表</span>
+            </div>
+            <div class="stepitem mat">
+              <span class="stepbox">☐</span><span class="steptx">准备：成绩单(绩点≥2.5)</span>
+            </div>
+            <div class="stepitem entry">
+              <span class="stepbox">☐</span><span class="steptx">提交入口：教务管理系统→转专业申请模块</span>
+            </div>
+            <div class="stepitem time">
+              <span class="stepbox">☐</span><span class="steptx">时间：还剩 15 天（截止 2026-11-18）</span>
+            </div>
+            <div class="stepitem point">
+              <span class="stepbox">☐</span><span class="steptx">要点：限报一个专业，逾期不再受理。</span>
+            </div>
+            <div class="stepitem point">
+              <span class="stepbox">☐</span><span class="steptx">要点：转入学院考核在 11/25–11/28。</span>
+            </div>
+
+            <div class="stepcopy">复制清单发给同学 ›</div>
+          </div>
+
+          <div class="whybox">
+            两个能力都<b>不新增任何内容</b>：<b>「和我有关吗」</b>把你填的身份和原文写明的条件逐条对照，
+            判不出就如实标「?」，不假装知道；<b>「要办什么」</b>从材料/入口/截止已抽出的字段拆成清单，
+            打勾后本地记住，退出再进来还在——材料里的日期斜杠不会被误当分隔符劈成两半。
+          </div>
+
+        </div>
+        <div class="tabbar">
+          <div class="tb on"><span class="i">📡</span>雷达</div>
+          <div class="tb"><span class="i">🕒</span>时间轴</div>
+          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">⭐</span>订阅</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ⑨ 收藏：按截止日排 + 办事进度 ========== -->
+    <div class="col" data-no="9">
+      <div class="col-h"><span><b>⑨ 我的收藏：按还剩几天排 + 办事进度</b></span><span class="route">pages/me（升级）</span></div>
+      <div class="phone light" id="p9">
+        <div class="pbar"><span class="t">15:32</span><span class="ti">知时 · 数字安农信息雷达</span><span class="d">••• ⊙</span></div>
+        <div class="psub">收藏了 ≠ 忘了办 · 紧急的自动顶上</div>
+        <div class="pbody">
+
+          <div class="sec">我的收藏<span class="cnt">5 条</span><span class="secwarn">3 条要抓紧</span></div>
+
+          <div class="box">
+            <div class="frow lv-hot">
+              <div class="fmid">
+                <div class="ft">关于2025-2026学年本科生转专业工作安排的通知</div>
+                <div class="fs">教务处 · 发布于 2026-11-01 · 截止 2026-11-18</div>
+                <div class="fprog">
+                  <span class="fpi">☐ 已办 1/7 步</span>
+                  <span class="fplink">继续办 ›</span>
+                </div>
+              </div>
+              <span class="fdd lv-hot">还剩 15 天</span>
+            </div>
+
+            <div class="frow lv-hot">
+              <div class="fmid">
+                <div class="ft">关于2025-2026学年国家励志奖学金评审的通知</div>
+                <div class="fs">学生资助管理中心 · 发布于 2026-10-28 · 截止 2026-11-08</div>
+                <div class="fprog">
+                  <span class="fpi">☐ 已办 0/5 步</span>
+                  <span class="fplink">继续办 ›</span>
+                </div>
+              </div>
+              <span class="fdd lv-hot">还剩 2 天</span>
+            </div>
+
+            <div class="frow lv-soon">
+              <div class="fmid">
+                <div class="ft">关于举办2026年“农芯智”AI智能体创新大赛的通知</div>
+                <div class="fs">数据管理处 · 发布于 2026-11-03 · 截止 2026-12-03</div>
+                <div class="fprog">
+                  <span class="fpi ok">☑ 全部办完</span>
+                  <span class="fplink">继续办 ›</span>
+                </div>
+              </div>
+              <span class="fdd lv-soon">还剩 30 天</span>
+            </div>
+
+            <div class="frow lv-exp">
+              <div class="fmid">
+                <div class="ft">2026年秋季学期选课调整通知</div>
+                <div class="fs">教务处 · 发布于 2026-10-20 · 截止 2026-11-04</div>
+              </div>
+              <span class="fdd lv-exp">已过期</span>
+            </div>
+          </div>
+
+          <div class="whybox">
+            收藏会一直留着，并按「还剩几天」重新排——<b>过期的、今天到期的、三天内的自动顶到最前</b>，
+            不会被新收藏挤下去。每条还显示你自己的办事进度。
+          </div>
+
+        </div>
+        <div class="tabbar">
+          <div class="tb"><span class="i">📡</span>雷达</div>
+          <div class="tb"><span class="i">🕒</span>时间轴</div>
+          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb on"><span class="i">⭐</span>订阅</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ⑩ 数据自查（自查自纠系统） ========== -->
+    <div class="col" data-no="10">
+      <div class="col-h"><span><b>⑩ 数据自查（自查自纠）</b></span><span class="route">pages/selfcheck（新增）</span></div>
+      <div class="phone light" id="p10">
+        <div class="pbar"><span class="t">15:34</span><span class="ti">数据自查</span><span class="d">••• ⊙</span></div>
+        <div class="psub">我们凭什么让你信 · 每次展示前先自己查一遍</div>
+        <div class="pbody">
+
+          <div class="verdict ok">
+            <div class="vh"><span class="vicon">✓</span><span class="vt">本次自查通过</span></div>
+            <div class="vs">没有条目因触犯三条铁律被剔除。可疑处已如实标注在下方，供你自行判断。</div>
+            <div class="vmeta">自查时间 2026-11-03 15:34</div>
+          </div>
+
+          <div class="stat">
+            <div class="it"><div class="n">42</div><div class="l">审计条目</div></div>
+            <div class="it"><div class="n">42</div><div class="l">放行</div></div>
+            <div class="it"><div class="n">0</div><div class="l">剔除</div></div>
+            <div class="it"><div class="n">3</div><div class="l">可举证原文</div></div>
+          </div>
+
+          <div class="sec">三条铁律 <span class="secsub">· 触犯即剔除</span></div>
+          <div class="rulecard">
+            <div class="rtag">R1</div>
+            <div class="rbody">
+              <div class="rt">出处可举证</div>
+              <div class="rd">标为真实公开数据的，必须带 ahau.edu.cn 官网链接；域名不在白名单的，直接剔除。</div>
+            </div>
+          </div>
+          <div class="rulecard">
+            <div class="rtag">R2</div>
+            <div class="rbody">
+              <div class="rt">链接不伪造</div>
+              <div class="rd">演示样例绝不允许带出处链接。宁可标成「演示样例」，也不假装有原文。</div>
+            </div>
+          </div>
+          <div class="rulecard">
+            <div class="rtag">R3</div>
+            <div class="rbody">
+              <div class="rt">引文可定位</div>
+              <div class="rd">每条浓缩要点都必须在原文里原样找到；全对不上的条目会被剔除。</div>
+            </div>
+          </div>
+
+          <div class="sec">自动纠正 <span class="secsub">· 不是删掉就算了</span></div>
+          <div class="sbox">
+            <div class="arl">· 倒计时已按今天刷新（非错误）：20 条</div>
+            <div class="arnote">
+              倒计时按今天实时重算（数据是编制时刻写的定值，日子在前行），不报警、只刷新；
+              原文过短的条目会提示你去看官网原文，不硬凑结论。
+            </div>
+          </div>
+
+          <div class="sec">查出的疑点 <span class="secsub">· 已如实标注，未删改</span></div>
+          <div class="sbox">
+            <div class="arl warn">· 真实采集但未留存原文链接：33 条</div>
+            <div class="arnote">
+              「未留存原文链接」是如实标注，不是失败——它只说明这条我们没存住官网地址，
+              所以它不会被当成「可核对原文」推给你。诚实比好看重要。
+            </div>
+          </div>
+
+          <div class="sec">被剔除的条目 <span class="secsub">· 宁缺毋滥</span></div>
+          <div class="sbox">
+            <div class="dnone">本次自查未剔除任何条目 —— 所有展示内容都过了三条铁律。</div>
+          </div>
+
+          <div class="sec">可举证原文清单 <span class="secsub">· 3 条，点标题复制官网链接</span></div>
+          <div class="sbox">
+            <div class="vcard">
+              <div class="vt1">关于报送2026-2027学年本科生转专业工作领导小组名单及选录细则的通知</div>
+              <div class="vsr">本科生院 · jwc.ahau.edu.cn · 发布于 2026-10-26</div>
+              <div class="vu">🔗 https://jwc.ahau.edu.cn/info/1881/36671.htm</div>
+              <div class="vgo">查看详情与原文比对 ›</div>
+            </div>
+            <div class="vcard">
+              <div class="vt1">关于2025-2026学年本科生转专业工作安排的通知</div>
+              <div class="vsr">本科生院 · jwc.ahau.edu.cn · 发布于 2025-12-04</div>
+              <div class="vu">🔗 https://jwc.ahau.edu.cn/info/1881/35131.htm</div>
+              <div class="vgo">查看详情与原文比对 ›</div>
+            </div>
+            <div class="vcard">
+              <div class="vt1">关于举办2026年“农芯智”AI智能体创新大赛的通知</div>
+              <div class="vsr">数据管理处 · xxb.ahau.edu.cn · 发布于 2026-11-03</div>
+              <div class="vu">🔗 https://xxb.ahau.edu.cn/</div>
+              <div class="vgo">查看详情与原文比对 ›</div>
+            </div>
+          </div>
+
+          <div class="sec">审计留痕 <span class="secsub">· 最近 3 次</span></div>
+          <div class="sbox">
+            <div class="hrow"><span class="ht">11-03 15:34</span><span class="hx">放行 42/42 · 剔除 0 · 可举证 3</span></div>
+            <div class="hrow"><span class="ht">11-03 15:20</span><span class="hx">放行 42/42 · 剔除 0 · 可举证 3</span></div>
+            <div class="hrow"><span class="ht">11-03 11:08</span><span class="hx">放行 42/42 · 剔除 0 · 可举证 3</span></div>
+          </div>
+
+          <div class="whybox">
+            这一页不是给我们看的，是给你看的：<b>哪条不可靠，我们不是偷偷删掉，而是把「扔掉了什么、为什么」摊开</b>。
+            你能量、能追问、能复核——这正是「可信」和「看起来可信」的区别。
+          </div>
+
+        </div>
+        <div class="tabbar">
+          <div class="tb"><span class="i">📡</span>雷达</div>
+          <div class="tb"><span class="i">🕒</span>时间轴</div>
+          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">⭐</span>订阅</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ⑪ 推送设置（主动推送引擎） ========== -->
+    <div class="col" data-no="11">
+      <div class="col-h"><span><b>⑪ 推送设置（主动推送引擎）</b></span><span class="route">pages/push（新增）</span></div>
+      <div class="phone light" id="p11">
+        <div class="pbar"><span class="t">15:36</span><span class="ti">推送设置</span><span class="d">••• ⊙</span></div>
+        <div class="psub">凭什么推给你 · 什么程度才配打扰你</div>
+        <div class="pbody">
+
+          <div class="sumcard">
+            <div class="sumlb">🔔 主动推送引擎</div>
+            <div class="sumtx">有 3 条三天内要办，共 9 条与你有关（含 9 条新收录）</div>
+            <div class="sumidx">
+              <span class="sin">覆盖率</span><span class="siv">21%</span>
+              <span class="sil">全池 42 条 → 推 9 条 · 打扰 3 条</span>
+            </div>
+          </div>
+
+          <div class="sec">应用内推送 <span class="secsub">· 打开小程序时生效</span></div>
+          <div class="box">
+            <div class="trow">
+              <div class="tl">
+                <div class="tt">推送总开关</div>
+                <div class="td">已开启 —— 进入即自动按档案排好推送流</div>
+              </div>
+              <div class="sw on"><div class="swd"></div></div>
+            </div>
+            <div class="trow">
+              <div class="tl">
+                <div class="tt">新收录提醒</div>
+                <div class="td">有新增条目时标记并排到最前</div>
+              </div>
+              <div class="sw on"><div class="swd"></div></div>
+            </div>
+            <div class="trow">
+              <div class="tl">
+                <div class="tt">计分排序</div>
+                <div class="td">按可解释分数排（紧急 + 身份契合 + 新收录）</div>
+              </div>
+              <div class="sw on"><div class="swd"></div></div>
+            </div>
+          </div>
+
+          <div class="sec">打扰策略 <span class="secsub">· 什么程度才配打断你</span></div>
+          <div class="box">
+            <div class="row">
+              <div class="rk">打扰级别</div>
+              <div class="rv">只打扰三天内（推荐）<span class="arrow">›</span></div>
+            </div>
+            <div class="whybox">
+              <div class="whyt">为什么默认只打扰三天内</div>
+              <div class="whyd">通知权限是最贵的资源。每次有新条目都弹一下，用户一周内就会关掉通知——那时再紧急的事也提醒不到了。宁可少打扰九次，也要保住第十次能打扰到你。</div>
+            </div>
+          </div>
+
+          <div class="sec">后台推送 <span class="secsub">· 关掉小程序也能提醒你</span></div>
+          <div class="box">
+            <div class="whyd" style="margin-bottom:10rpx">
+              应用内推送只在你打开时工作。若要「关掉页面也收到提醒」，需在电脑上注册一个后台任务——它会每天定点检查安农公开通知，有紧急的就弹系统通知。
+            </div>
+            <div class="daemon">
+              <div class="dh">开启方式（双击运行，无需装任何东西）</div>
+              <div class="dl">① 打开项目文件夹 → <span class="dc">tools</span> 目录</div>
+              <div class="dl">② 双击 <span class="dc">注册后台推送.bat</span></div>
+              <div class="dl">③ 同意后，每天 08:00 / 20:00 自动检查</div>
+              <div class="dl">想立刻看效果 → 双击 <span class="dc">开始推送.bat</span></div>
+            </div>
+          </div>
+
+          <div class="sec">推送留痕 <span class="secsub">· 可追问、可重置</span></div>
+          <div class="box">
+            <div class="kvrow"><span class="kk">累计推送批次</span><span class="vv">7 次</span></div>
+            <div class="kvrow"><span class="kk">已推记录</span><span class="vv">31 条</span></div>
+            <div class="kvrow"><span class="kk">最近一次</span><span class="vv">11月6日 08:00</span></div>
+            <div class="hint">「新收录」就是拿这份记录比出来的——推过的不会再标新，所以不会天天拿同一条烦你。</div>
+          </div>
+
+          <div class="sec">当前推送流 <span class="secsub">· 前 6 条</span></div>
+
+          <div class="pc lv-now">
+            <div class="prow">
+              <span class="plv now">🔴 今天就要办</span>
+              <span class="pnew">新</span>
+              <span class="prank">#1</span>
+            </div>
+            <div class="ptitle">关于2026年国家励志奖学金、国家助学金评审结果的公示及材料补交通知</div>
+            <div class="pmeta">学生资助管理中心 · 剩 0 天</div>
+            <div class="ptags">
+              <span class="tg">奖助学金</span>
+              <span class="tg g">✓ 可核对原文</span>
+              <span class="tg s">推送分 88</span>
+            </div>
+          </div>
+
+          <div class="pc lv-hot">
+            <div class="prow">
+              <span class="plv hot">🟠 三天内要办</span>
+              <span class="pnew">新</span>
+              <span class="prank">#2</span>
+            </div>
+            <div class="ptitle">关于2026-2027学年第一学期期中考试安排的通知</div>
+            <div class="pmeta">教务处 · 剩 3 天</div>
+            <div class="ptags">
+              <span class="tg">考试安排</span>
+              <span class="tg o">真实采集</span>
+              <span class="tg s">推送分 58</span>
+            </div>
+          </div>
+
+          <div class="pc lv-soon">
+            <div class="prow">
+              <span class="plv soon">🟡 一周内</span>
+              <span class="prank">#3</span>
+            </div>
+            <div class="ptitle">机械与车辆工程学院2026-2027学年第一学期第十周考试安排</div>
+            <div class="pmeta">工学院 · 剩 6 天</div>
+            <div class="ptags">
+              <span class="tg">考试安排</span>
+              <span class="tg s">推送分 8</span>
+            </div>
+          </div>
+
+          <div class="whybox">
+            推送引擎的三条不变式：<b>① 只推和你身份、关注相符的通知</b>（详情页可逐条核对，不是黑箱）；
+            <b>② 只有三天内截止的才允许打扰</b>，其余静默进流；            <b>③ 排序完全由可解释分数决定</b>——
+            今天截止 +40、三天内 +28、点名学院 +22、自定关键词 +20、订阅标签 +16、新收录 +8，无随机、无暗箱。
+          </div>
+
+        </div>
+        <div class="tabbar">
+          <div class="tb"><span class="i">📡</span>雷达</div>
+          <div class="tb"><span class="i">🕒</span>时间轴</div>
+          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">⭐</span>订阅</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ⑫ 问知时（学生自问自答引擎） ========== -->
+    <div class="col" data-no="12">
+      <div class="col-h"><span><b>⑫ 问知时（自问自答）</b></span><span class="route">pages/ask（新增）</span></div>
+      <div class="phone light" id="p12">
+        <div class="pbar"><span class="t">15:37</span><span class="ti">问知时</span><span class="d">••• ⊙</span></div>
+        <div class="psub">有问题直接问 · 每个答案都附「依据」一行</div>
+        <div class="pbody">
+
+          <div class="hcard tone-alert">
+            <div class="hq"><span class="hqi">💬</span><span class="hqt">今天有什么非要办的？</span></div>
+            <div class="ha">今天有 1 件要办：关于报送2026-2027学年本科生转专业工作领导小组名单及选录细则的通知。</div>
+            <div class="hm">去看今天要办的 ›</div>
+          </div>
+
+          <div class="askstat">
+            <div class="sti"><div class="stn">13</div><div class="stl">个问题</div></div>
+            <div class="sti"><div class="stn">10</div><div class="stl">条和你有关</div></div>
+            <div class="sti"><div class="stn">70%</div><div class="stl">数据完备度</div></div>
+          </div>
+
+          <div class="acard tone-alert">
+            <div class="aq">今天有什么非要办的？</div>
+            <div class="aa">今天有 1 件要办：关于报送2026-2027学年本科生转专业工作领导小组名单及选录细则的通知。</div>
+
+            <div class="abasis">
+              <span class="abl">依据</span>
+              <span class="abt">统计口径：倒计时 = 0 的条目，共 1 条。</span>
+            </div>
+
+            <div class="ilist">
+              <div class="it">相关条目（1 条）</div>
+              <div class="irow">
+                <div class="imid">
+                  <div class="ititle">关于报送2026-2027学年本科生转专业工作领导小组名单及选录细则的通知</div>
+                  <div class="imeta">本科生院 · 截止 2026-11-06</div>
+                </div>
+                <div class="idd lv-lv-now">今天</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="acard tone-busy">
+            <div class="aq">我要准备哪些材料？</div>
+            <div class="aa">一周内你一共要准备 9 项材料，来自 4 条通知。</div>
+
+            <div class="abasis">
+              <span class="abl">依据</span>
+              <span class="abt">统计口径：把倒计时 0-7 天内各条通知的 materials 拆开后汇总，共 9 项。</span>
+            </div>
+
+            <div class="mlist">
+              <div class="mt">要准备的材料（共 9 项）</div>
+              <div class="mrow">
+                <span class="mdot">•</span>
+                <div class="mbody">
+                  <div class="mname">工作领导小组名单（附件3格式）</div>
+                  <div class="mfrom">来自：转专业工作领导小组名单及选录细则的通知 ›</div>
+                </div>
+              </div>
+              <div class="mrow">
+                <span class="mdot">•</span>
+                <div class="mbody">
+                  <div class="mname">转专业选录细则（附件2模板）</div>
+                  <div class="mfrom">来自：转专业工作领导小组名单及选录细则的通知 ›</div>
+                </div>
+              </div>
+              <div class="mrow">
+                <span class="mdot">•</span>
+                <div class="mbody">
+                  <div class="mname">家庭经济困难认定表</div>
+                  <div class="mfrom">来自：国家励志奖学金、国家助学金材料补交通知 ›</div>
+                </div>
+              </div>
+              <div class="mrow">
+                <span class="mdot">•</span>
+                <div class="mbody">
+                  <div class="mname">成绩排名证明</div>
+                  <div class="mfrom">来自：国家励志奖学金、国家助学金材料补交通知 ›</div>
+                </div>
+              </div>
+              <div class="more">还有 5 项 ›</div>
+            </div>
+          </div>
+
+          <div class="sec">还能问什么 <span class="secsub">· 点一下就有答案</span></div>
+
+          <div class="qgroup">
+            <div class="ghead"><span class="gi">📅</span><span class="gl">今天 / 这周</span></div>
+            <div class="qlist">
+              <div class="qrow on">
+                <div class="qbody"><div class="qq">今天有什么非要办的？</div><div class="qh">只看今天截止的</div></div>
+                <div class="qa">已答</div>
+              </div>
+              <div class="qrow">
+                <div class="qbody"><div class="qq">这周还剩几件事？</div><div class="qh">一周内的待办总量</div></div>
+                <div class="qa">问 ›</div>
+              </div>
+              <div class="qrow">
+                <div class="qbody"><div class="qq">哪天我可以空出来？</div><div class="qh">未来一周哪天没有截止</div></div>
+                <div class="qa">问 ›</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="qgroup">
+            <div class="ghead"><span class="gi">🎯</span><span class="gl">先办哪个</span></div>
+            <div class="qlist">
+              <div class="qrow">
+                <div class="qbody"><div class="qq">要是只办一件，该办哪个？</div><div class="qh">按紧急度 + 可核对度给出唯一推荐</div></div>
+                <div class="qa">问 ›</div>
+              </div>
+              <div class="qrow">
+                <div class="qbody"><div class="qq">给我一张今日待办清单</div><div class="qh">按分数排出前几件</div></div>
+                <div class="qa">问 ›</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="qgroup">
+            <div class="ghead"><span class="gi">🔍</span><span class="gl">我漏了什么</span></div>
+            <div class="qlist">
+              <div class="qrow">
+                <div class="qbody"><div class="qq">我是不是漏了什么？</div><div class="qh">上次看之后新收录的</div></div>
+                <div class="qa">问 ›</div>
+              </div>
+              <div class="qrow">
+                <div class="qbody"><div class="qq">有没有已经过期的？</div><div class="qh">过期条目单独列出，不再混在待办里</div></div>
+                <div class="qa">问 ›</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="qgroup">
+            <div class="ghead"><span class="gi">🎫</span><span class="gl">是不是给我的</span></div>
+            <div class="qlist">
+              <div class="qrow">
+                <div class="qbody"><div class="qq">哪些是全校都能报的？</div><div class="qh">不限身份、门槛最低的机会</div></div>
+                <div class="qa">问 ›</div>
+              </div>
+              <div class="qrow">
+                <div class="qbody"><div class="qq">哪些点名了我们学院？</div><div class="qh">本学院专属的机会别漏</div></div>
+                <div class="qa">问 ›</div>
+              </div>
+              <div class="qrow">
+                <div class="qbody"><div class="qq">哪些有硬门槛（绩点/处分）？</div><div class="qh">先把够不着的挑出来，省得白忙</div></div>
+                <div class="qa">问 ›</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="qgroup">
+            <div class="ghead"><span class="gi">📦</span><span class="gl">要准备什么</span></div>
+            <div class="qlist">
+              <div class="qrow">
+                <div class="qbody"><div class="qq">我要准备哪些材料？</div><div class="qh">把所有待办的材料汇总成一张清单</div></div>
+                <div class="qa">问 ›</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="qgroup">
+            <div class="ghead"><span class="gi">🛡</span><span class="gl">数据可靠吗</span></div>
+            <div class="qlist">
+              <div class="qrow">
+                <div class="qbody"><div class="qq">哪几条必须去官网原文看？</div><div class="qh">带安农官网链接的，可逐字核对</div></div>
+                <div class="qa">问 ›</div>
+              </div>
+              <div class="qrow">
+                <div class="qbody"><div class="qq">数据可靠吗？会不会骗我？</div><div class="qh">自查自纠系统每次展示前都查一遍</div></div>
+                <div class="qa">问 ›</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="acts">
+            <div class="ab primary">看办事日历 ›</div>
+            <div class="ab">回推送流</div>
+          </div>
+
+          <div class="whybox">
+            答问原则：<b>每个答案都由真实字段算出，附「依据」一行说明算法</b>；数据不足时如实说「算不出来」，不编结论。
+            13 个问题覆盖你今天 / 先办哪个 / 漏没漏 / 是不是给我的 / 要备什么 / 数据可靠不靠这六件最常冒出来的疑问。
+          </div>
+
+        </div>
+        <div class="tabbar">
+          <div class="tb"><span class="i">📡</span>雷达</div>
+          <div class="tb"><span class="i">🕒</span>时间轴</div>
+          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">⭐</span>订阅</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ⑬ 办事日历（同一份数据的另一个视角） ========== -->
+    <div class="col" data-no="13">
+      <div class="col-h"><span><b>⑬ 办事日历（哪天忙 / 哪天空）</b></span><span class="route">pages/calendar（新增）</span></div>
+      <div class="phone light" id="p13">
+        <div class="pbar"><span class="t">15:38</span><span class="ti">办事日历</span><span class="d">••• ⊙</span></div>
+        <div class="psub">具体哪天忙 · 哪天能空出来</div>
+        <div class="pbody">
+
+          <div class="mbar">
+            <div class="mnav">‹</div>
+            <div class="mlab">
+              <div class="ml">2026 年 11 月</div>
+              <div class="mtoday">回到今天</div>
+            </div>
+            <div class="mnav">›</div>
+          </div>
+
+          <div class="calbox">
+            <div class="wkrow">
+              <div class="wk">一</div><div class="wk">二</div><div class="wk">三</div>
+              <div class="wk">四</div><div class="wk">五</div>
+              <div class="wk wkend">六</div><div class="wk wkend">日</div>
+            </div>
+            <div class="crow">
+              <div class="cell blank"></div><div class="cell blank"></div><div class="cell blank"></div>
+              <div class="cell blank"></div><div class="cell blank"></div><div class="cell blank"></div>
+              <div class="cell"><div class="cd">1</div></div>
+            </div>
+            <div class="crow">
+              <div class="cell"><div class="cd">2</div></div>
+              <div class="cell"><div class="cd">3</div></div>
+              <div class="cell"><div class="cd">4</div></div>
+              <div class="cell"><div class="cd">5</div></div>
+              <div class="cell has lv-now today sel"><div class="cd">6</div><div class="cdot"></div><div class="ccnt">2</div></div>
+              <div class="cell"><div class="cd">7</div></div>
+              <div class="cell"><div class="cd">8</div></div>
+            </div>
+            <div class="crow">
+              <div class="cell has lv-soon"><div class="cd">9</div><div class="cdot"></div></div>
+              <div class="cell has lv-soon"><div class="cd">10</div><div class="cdot"></div></div>
+              <div class="cell"><div class="cd">11</div></div>
+              <div class="cell"><div class="cd">12</div></div>
+              <div class="cell"><div class="cd">13</div></div>
+              <div class="cell wkend"><div class="cd">14</div></div>
+              <div class="cell wkend"><div class="cd">15</div></div>
+            </div>
+            <div class="crow">
+              <div class="cell has lv-plan"><div class="cd">16</div><div class="cdot"></div></div>
+              <div class="cell"><div class="cd">17</div></div>
+              <div class="cell"><div class="cd">18</div></div>
+              <div class="cell"><div class="cd">19</div></div>
+              <div class="cell has lv-plan"><div class="cd">20</div><div class="cdot"></div></div>
+              <div class="cell wkend"><div class="cd">21</div></div>
+              <div class="cell wkend"><div class="cd">22</div></div>
+            </div>
+            <div class="crow">
+              <div class="cell"><div class="cd">23</div></div>
+              <div class="cell"><div class="cd">24</div></div>
+              <div class="cell"><div class="cd">25</div></div>
+              <div class="cell"><div class="cd">26</div></div>
+              <div class="cell"><div class="cd">27</div></div>
+              <div class="cell wkend"><div class="cd">28</div></div>
+              <div class="cell wkend"><div class="cd">29</div></div>
+            </div>
+            <div class="crow">
+              <div class="cell"><div class="cd">30</div></div>
+              <div class="cell blank"></div><div class="cell blank"></div>
+              <div class="cell blank"></div><div class="cell blank"></div>
+              <div class="cell blank"></div><div class="cell blank"></div>
+            </div>
+          </div>
+
+          <div class="legend">
+            <div class="lg"><span class="dot now"></span>今天/明天</div>
+            <div class="lg"><span class="dot hot"></span>三天内</div>
+            <div class="lg"><span class="dot soon"></span>一周内</div>
+            <div class="lg"><span class="dot plan"></span>本月内</div>
+          </div>
+
+          <div class="sumline">这个月有 6 件要办，分布在 5 天。</div>
+
+          <div class="sec">11 月 6 日（今天） <span class="secsub">· 2 件</span></div>
+          <div class="ibox">
+            <div class="irow lv-now">
+              <div class="imid">
+                <div class="ititle">关于报送2026-2027学年本科生转专业工作领导小组名单及选录细则的通知</div>
+                <div class="imeta">本科生院 · 截止 2026-11-06</div>
+              </div>
+              <div class="idd">今天</div>
+            </div>
+            <div class="irow lv-soon">
+              <div class="imid">
+                <div class="ititle">关于2026年国家励志奖学金、国家助学金评审结果的公示及材料补交通知</div>
+                <div class="imeta">学生工作处 · 截止 2026-11-06</div>
+              </div>
+              <div class="idd">今天</div>
+            </div>
+          </div>
+
+          <div class="sec">本月全部待办 <span class="secsub">· 6 件 收起</span></div>
+          <div class="ibox">
+            <div class="irow lv-now">
+              <div class="imid">
+                <div class="ititle">关于报送2026-2027学年本科生转专业工作领导小组名单及选录细则的通知</div>
+                <div class="imeta">本科生院 · 截止 2026-11-06</div>
+              </div>
+              <div class="idd">今天</div>
+            </div>
+            <div class="irow lv-soon">
+              <div class="imid">
+                <div class="ititle">关于2026-2027学年第一学期期中考试安排的通知</div>
+                <div class="imeta">教务处 · 截止 2026-11-09</div>
+              </div>
+              <div class="idd">剩 6 天</div>
+            </div>
+            <div class="irow lv-soon">
+              <div class="imid">
+                <div class="ititle">机械与车辆工程学院2026-2027学年第一学期第十周考试安排</div>
+                <div class="imeta">工学院 · 通知公告 · 截止 2026-11-10</div>
+              </div>
+              <div class="idd">剩 6 天</div>
+            </div>
+            <div class="irow lv-plan">
+              <div class="imid">
+                <div class="ititle">关于开展2026年度“正大杯”市场调查与分析大赛校内选拔的补充通知</div>
+                <div class="imeta">教务处 · 截止 2026-11-16</div>
+              </div>
+              <div class="idd">剩 13 天</div>
+            </div>
+            <div class="irow lv-plan">
+              <div class="imid">
+                <div class="ititle">关于中国国际大学生创新大赛（2027）校级项目培育申报的通知</div>
+                <div class="imeta">创新创业学院 · 截止 2026-11-20</div>
+              </div>
+              <div class="idd">剩 17 天</div>
+            </div>
+          </div>
+
+          <div class="whybox">
+            日历口径：<b>只落你关注标签 + 身份匹配上的通知</b>，按官方原文的截止日归档。已过期的标灰，不再占用待办位置。
+            时间轴回答「这周我还有几件事」，日历回答「具体哪天忙」——两者同一批数据，不是两套事实。
+          </div>
+
+        </div>
+        <div class="tabbar">
+          <div class="tb"><span class="i">📡</span>雷达</div>
+          <div class="tb"><span class="i">🕒</span>时间轴</div>
+          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">⭐</span>订阅</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <b>「农芯智」AI 智能体创新大赛</b> 参赛作品 · 知时 · 数字安农信息雷达<br>
+    数据来自公网公开通知页聚合；仅聚合公开信息，不涉及教务后台 / 课表 / 成绩 / 学籍
+    <div class="line">
+      十三屏对应十个真实页面：雷达(①) · 时间轴(⑥) · 简报(⑦) · 搜索(④) · 详情(③⑧) · 订阅(⑤⑨) · 数据自查(⑩) · 推送设置(⑪) · 问知时(⑫) · 办事日历(⑬)<br>
+      ⑧⑨ 为本轮新增的「和我有关吗」「要办什么（办理清单）」「收藏按截止日排 + 办事进度」三项学生视角能力<br>
+      ⑩ 为自查自纠系统：三条铁律（出处可举证 / 链接不伪造 / 引文可定位）+ 自动纠正 + 留痕，每次展示前先自己查一遍<br>
+      ⑪ 为主动推送引擎：可解释评分排序 + 每条写明推送理由 + 只有三天内才打扰 + 留痕判定"新收录"，并可开启后台系统级推送<br>
+      ⑫ 为「问知时」自问自答引擎：13 个安农学生高频疑问（今天要办啥 / 先办哪个 / 我漏了什么 / 是不是给我的 / 要备什么材料 / 数据可靠吗），
+      每个答案都由真实字段算出并附「依据」一行说明算法，算不出就如实说算不出，不编结论<br>
+      ⑬ 为办事日历：把有截止的通知落到月历格子上，回答「具体哪天忙、哪天能空」，与时间轴同一批数据，不是两套事实<br>
+      主题切换基于 CSS 变量，与小程序 <b>miniprogram/app.wxss</b> 的 .theme-light / .theme-dark 同源<br>
+      本地查看：双击本文件即可 · 小程序真机预览：微信开发者工具导入 <b>miniprogram</b> 目录
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* 主题切换：与 miniprogram/utils/theme.js 行为一致（切换后持久化，刷新保持） */
+function setTheme(t){
+  document.querySelectorAll('.phone').forEach(function(p){
+    p.classList.remove('light','dark');
+    p.classList.add(t);
+  });
+  var bl = document.getElementById('btnLight'), bd = document.getElementById('btnDark');
+  bl.classList.toggle('on', t === 'light');
+  bd.classList.toggle('on', t === 'dark');
+  bd.classList.toggle('dark-on', t === 'dark');
+  /* 同步页头主题按钮文案 */
+  document.querySelectorAll('.tbtn').forEach(function(b){
+    b.textContent = (t === 'dark' ? '🌙 深色' : '☀️ 浅色');
+  });
+  try{ localStorage.setItem('zhishi_preview_theme', t); }catch(e){}
+}
+
+/* 初始化：读取上次选择，否则默认浅色（数字安农） */
+(function init(){
+  var t = 'light';
+  try{ t = localStorage.getItem('zhishi_preview_theme') || 'light'; }catch(e){}
+  setTheme(t);
+
+  /* 点原文高亮 → 提示（演示交互，模拟"跳到原文"） */
+  document.querySelectorAll('.rawbox .hl').forEach(function(el){
+    el.addEventListener('click', function(){
+      var tip = el.getAttribute('title') || el.textContent.slice(0,16);
+      el.style.outline = '2px solid #F3AE00';
+      setTimeout(function(){ el.style.outline = 'none'; }, 700);
+    });
+  });
+
+  initCards();
+})();
+
+/* ============================================================
+   一句话卡片墙 —— 默认只给结论，点开才贴全文
+   ------------------------------------------------------------
+   为什么：十三屏平铺在一面墙上，信息密度过高、挤在一起。
+   现在默认是"一句话总览"，想细看哪屏就点哪张，全文独占一行。
+   ============================================================ */
+function initCards(){
+  var cards = document.getElementById('cards');
+  var grid = document.getElementById('grid');
+  var stage = document.getElementById('stage');
+  var stageBody = document.getElementById('stageBody');
+  var stageNo = document.getElementById('stageNo');
+  var stageNm = document.getElementById('stageNm');
+  if (!cards || !grid || !stage) return;
+
+  /* 每个 .col 配一个专属占位（隐藏），收起时精确放回原位 */
+  var holder = {};   /* data-no → 占位节点 */
+  Array.prototype.forEach.call(grid.querySelectorAll('.col'), function(col){
+    var no = col.getAttribute('data-no');
+    var ph = document.createElement('div');
+    ph.style.display = 'none';
+    col.parentNode.insertBefore(ph, col);
+    holder[no] = ph;
+  });
+
+  function openCard(no){
+    var col = grid.querySelector('.col[data-no="' + no + '"]');
+    if (!col) return;
+    closeCard();                       /* 先收起上一屏，保证一次只展开一屏 */
+    stageBody.appendChild(col);        /* 把它搬到舞台 */
+    stageNo.textContent = ('0' + no).slice(-2);
+    var nm = cards.querySelector('.pcard[data-no="' + no + '"] .pc-nm');
+    stageNm.textContent = nm ? nm.textContent : '';
+    stage.classList.add('on');
+    Array.prototype.forEach.call(cards.querySelectorAll('.pcard'), function(c){
+      c.classList.toggle('open', c.getAttribute('data-no') === String(no));
+    });
+    /* 平滑滚到舞台（jsdom 等无布局环境没有该方法，做个守卫） */
+    if (typeof stage.scrollIntoView === 'function' && !window.__noScroll) {
+      try { stage.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
+    }
+  }
+
+  function closeCard(){
+    /* 舞台里的 col 按各自占位精确放回 */
+    Array.prototype.slice.call(stageBody.querySelectorAll('.col')).forEach(function(col){
+      var no = col.getAttribute('data-no');
+      var ph = holder[no];
+      if (ph && ph.parentNode) ph.parentNode.insertBefore(col, ph);
+    });
+    stage.classList.remove('on');
+    Array.prototype.forEach.call(cards.querySelectorAll('.pcard'), function(c){
+      c.classList.remove('open');
+    });
+  }
+
+  Array.prototype.forEach.call(cards.querySelectorAll('.pcard'), function(card){
+    card.addEventListener('click', function(){
+      openCard(card.getAttribute('data-no'));
+    });
+  });
+
+  var closeBtn = document.getElementById('stageClose');
+  if (closeBtn) closeBtn.addEventListener('click', closeCard);
+
+  /* 视图模式：一句话总览 / 全部展开 */
+  window.setMode = function(mode){
+    var bc = document.getElementById('btnCards');
+    var ba = document.getElementById('btnAll');
+    if (mode === 'all') {
+      closeCard();
+      grid.classList.add('on');
+      cards.style.display = 'none';
+      bc.classList.remove('on');
+      ba.classList.add('on');
+    } else {
+      closeCard();
+      grid.classList.remove('on');
+      cards.style.display = '';
+      bc.classList.add('on');
+      ba.classList.remove('on');
+    }
+    try{ localStorage.setItem('zhishi_preview_mode', mode); }catch(e){}
+  };
+
+  /* 默认：若上次选过则沿用，否则"一句话总览" */
+  var saved = 'cards';
+  try{ saved = localStorage.getItem('zhishi_preview_mode') || 'cards'; }catch(e){}
+  window.setMode(saved);
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>知时 · 安农校园信息雷达 | 主链路演示</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --line:#2a2f3a;
+    --text:#e8eaed; --sub:#9aa4b2; --accent:#4dd6a8; --accent2:#5b9cf8;
+    --warn:#f5a524; --danger:#f2565b; --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 20% -10%, #1a2432 0%, var(--bg) 55%);
+    color:var(--text);
+    font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.6; min-height:100vh; padding:28px 20px 60px;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+
+  /* navbar */
+  .navbar{display:flex;justify-content:space-between;align-items:center;gap:12px;
+    flex-wrap:wrap;margin-bottom:18px}
+  .navbar a{font-size:12.5px;color:var(--accent);text-decoration:none;font-weight:600;
+    border:1px solid rgba(77,214,168,.35);border-radius:9px;padding:7px 16px}
+  .navbar a:hover{background:rgba(77,214,168,.08);border-color:var(--accent)}
+  .navbar .pos{font-size:12px;color:var(--sub);letter-spacing:1px}
+  .navbar .pos b{color:var(--accent)}
+
+  /* header */
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:8px}
+  .brand{display:flex;align-items:center;gap:14px}
+  .logo{width:46px;height:46px;border-radius:12px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;font-weight:700;color:#08120e;
+    box-shadow:0 6px 20px rgba(77,214,168,.28)}
+  .brand h1{font-size:22px;letter-spacing:.5px}
+  .brand p{font-size:13px;color:var(--sub);margin-top:2px}
+  .meta{font-size:12.5px;color:var(--sub);text-align:right}
+  .meta b{color:var(--accent)}
+
+  /* pipeline */
+  .pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0 8px}
+  .stage{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px 16px;position:relative;transition:.35s}
+  .stage .idx{font-size:11px;color:var(--sub);letter-spacing:1px}
+  .stage .name{font-size:15px;font-weight:600;margin-top:2px}
+  .stage .desc{font-size:11.5px;color:var(--sub);margin-top:4px}
+  .stage.active{border-color:var(--accent);background:linear-gradient(180deg,rgba(77,214,168,.10),transparent)}
+  .stage.active .name{color:var(--accent)}
+  .stage.done{border-color:rgba(77,214,168,.35)}
+  .stage.done::after{content:"✓";position:absolute;top:10px;right:12px;color:var(--accent);font-size:13px}
+  .stage .cnt{position:absolute;bottom:8px;right:12px;font-size:11px;color:var(--sub)}
+
+  /* controls */
+  .ctrl{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  button{font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;
+    border-radius:10px;padding:10px 16px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--text);transition:.2s}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+  button.primary{background:linear-gradient(135deg,var(--accent),#38b98f);
+    color:#07120d;border:none;box-shadow:0 6px 18px rgba(77,214,168,.25)}
+  button.primary:hover{transform:translateY(-1px);color:#07120d}
+  button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+  /* ===== 三能力导航 ===== */
+  .caps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:26px}
+  .cap{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 18px;cursor:pointer;transition:.25s;position:relative;overflow:hidden}
+  .cap::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--line);transition:.25s}
+  .cap:hover{border-color:rgba(77,214,168,.4);transform:translateY(-2px)}
+  .cap.on{border-color:var(--accent);background:linear-gradient(180deg,rgba(77,214,168,.08),var(--panel))}
+  .cap.on::before{background:var(--accent)}
+  .cap .cn{font-size:11px;color:var(--sub);letter-spacing:1.2px}
+  .cap .ct{font-size:15.5px;font-weight:600;margin:5px 0 6px}
+  .cap.on .ct{color:var(--accent)}
+  .cap .cd{font-size:12px;color:var(--sub);line-height:1.6}
+  .cap .cbadge{position:absolute;top:12px;right:12px;font-size:10px;color:var(--accent);
+    background:rgba(77,214,168,.12);border-radius:5px;padding:1px 7px}
+
+  /* panel */
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px;margin-top:18px;animation:fade .35s}
+  .panel h2{font-size:15px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .panel h2 .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+  .panel .hint{font-size:12.5px;color:var(--sub);margin-bottom:16px;line-height:1.7}
+  .panel .hint b{color:var(--accent)}
+
+  /* 搜索框 */
+  .sbox{display:flex;align-items:center;gap:10px;background:var(--panel2);
+    border:1px solid var(--line);border-radius:11px;padding:11px 16px;transition:.2s}
+  .sbox:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(77,214,168,.1)}
+  .sbox .sic{font-size:15px}
+  .sbox input{flex:1;background:none;border:none;outline:none;
+    font-family:inherit;font-size:14.5px;color:var(--text)}
+  .sbox input::placeholder{color:#5f6a78}
+  .sbox .scl{font-size:13px;color:var(--sub);cursor:pointer;padding:2px 6px}
+  .sbox .scl:hover{color:var(--accent)}
+
+  /* 标签 chip */
+  .trow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .tchip{font-size:12.5px;padding:6px 13px;border-radius:20px;cursor:pointer;
+    background:var(--panel2);border:1px solid var(--line);color:var(--sub);transition:.2s;
+    display:flex;align-items:center;gap:5px}
+  .tchip:hover{border-color:var(--accent);color:var(--accent)}
+  .tchip.on{background:rgba(77,214,168,.13);border-color:var(--accent);color:var(--accent);font-weight:600}
+  .tchip .tnum{font-size:10.5px;background:rgba(255,255,255,.07);border-radius:5px;padding:0 5px}
+
+  /* 热词 */
+  .sec{font-size:12px;color:var(--sub);letter-spacing:1.5px;margin:20px 0 10px;
+    display:flex;justify-content:space-between;align-items:center}
+  .sec .hdcl{font-size:11.5px;color:var(--accent);cursor:pointer;letter-spacing:0}
+  .wchips{display:flex;gap:8px;flex-wrap:wrap}
+  .wchip{font-size:12.5px;padding:5px 13px;border-radius:8px;cursor:pointer;
+    background:rgba(91,156,248,.1);border:1px solid rgba(91,156,248,.25);color:#8fbcff}
+  .wchip:hover{border-color:#8fbcff}
+  .wchip.his{background:var(--panel2);border-color:var(--line);color:var(--sub)}
+
+  /* 结果条 */
+  .rhead{font-size:13px;color:var(--sub);margin:18px 0 12px}
+  .rhead .hl2{color:var(--accent);font-weight:700;font-size:15px}
+  .rhead .rftag{color:#8fbcff}
+  .rhead .rfreal{color:var(--accent)}
+
+  /* 通知卡（推送 / 搜索共用） */
+  .mc{border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:12px;padding:13px 16px;background:var(--panel2);margin-bottom:10px;
+    transition:.25s;position:relative}
+  .mc.hi{border-left-color:var(--danger)}
+  .mc.md{border-left-color:var(--warn)}
+  .mc.lo{border-left-color:#3a4150}
+  .mc.click{cursor:pointer}
+  .mc.click:hover{border-color:rgba(77,214,168,.45);transform:translateX(3px)}
+  .mc .r1{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+  .mc .tt{font-size:13.8px;font-weight:600;line-height:1.5}
+  .mc .dd{font-size:12px;font-weight:700;padding:3px 10px;border-radius:8px;white-space:nowrap;
+    background:rgba(242,86,91,.14);color:var(--danger)}
+  .mc.md .dd{background:rgba(245,165,36,.14);color:var(--warn)}
+  .mc.lo .dd{background:rgba(77,214,168,.14);color:var(--accent)}
+  .mc .sr{font-size:11.5px;color:var(--sub);margin-top:5px}
+  .mc .d1{font-size:13px;color:#cdd6e0;margin-top:8px;line-height:1.6;
+    padding:8px 12px;border-radius:9px;background:rgba(77,214,168,.06);
+    border-left:2px solid rgba(77,214,168,.4)}
+  .mc .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+  .mc .tg{font-size:11px;padding:2px 9px;border-radius:6px;
+    background:rgba(91,156,248,.13);color:#8fbcff}
+  .mc .tg.g{background:rgba(77,214,168,.13);color:var(--accent)}
+  .mc .tg.o{background:rgba(245,165,36,.13);color:var(--warn)}
+  .mc .go{margin-top:9px;font-size:12px;color:var(--accent);font-weight:600}
+
+  /* 原文命中片段 */
+  .snip{margin-top:9px;background:rgba(0,0,0,.24);border-radius:8px;padding:9px 12px}
+  .snip .snl{font-size:10.5px;color:var(--warn);display:block;margin-bottom:4px;letter-spacing:.5px}
+  .snip .snt{font-size:12.2px;color:#aab3c0;line-height:1.7}
+  .ell{color:#5f6a78}
+  .mhl{color:#07120d;background:var(--accent);border-radius:3px;padding:0 3px;font-weight:700}
+
+  /* 命中来源说明（无可见高亮时） */
+  .whyhit{margin-top:8px;font-size:11.5px;color:var(--sub);line-height:1.6;
+    background:rgba(91,156,248,.08);border-left:2px solid var(--accent2);
+    border-radius:0 8px 8px 0;padding:7px 12px}
+  .whyhit b{color:#8fbcff}
+
+  /* 分组推送 */
+  .grp{margin-bottom:14px;border:1px solid var(--line);border-radius:13px;
+    overflow:hidden;background:var(--panel2)}
+  .ghd{display:flex;align-items:center;gap:11px;padding:13px 16px;cursor:pointer;
+    background:linear-gradient(90deg,rgba(77,214,168,.05),transparent);transition:.2s}
+  .ghd:hover{background:linear-gradient(90deg,rgba(77,214,168,.11),transparent)}
+  .ghd .gico{font-size:17px}
+  .ghd .gmid{flex:1}
+  .ghd .gk{font-size:14.5px;font-weight:600}
+  .ghd .gd{font-size:11.5px;color:var(--sub);margin-top:1px}
+  .ghd .gurg{font-size:10.5px;padding:1px 8px;border-radius:5px;
+    background:rgba(242,86,91,.16);color:var(--danger);font-weight:600}
+  .ghd .gnum{font-size:12px;color:var(--sub);white-space:nowrap}
+  .ghd .garrow{font-size:12px;color:var(--accent);width:14px;text-align:center}
+  .gbody{padding:12px 14px 4px;border-top:1px dashed var(--line);animation:fade .3s}
+
+  /* 详情追溯 */
+  .dtl-hd{border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:13px;padding:16px 18px;background:var(--panel2);margin-bottom:14px}
+  .dtl-hd.hi{border-left-color:var(--danger)}
+  .dtl-hd.md{border-left-color:var(--warn)}
+  .dtl-hd .dt{font-size:16px;font-weight:600;line-height:1.5}
+  .dtl-hd .ds{font-size:12.5px;color:var(--sub);margin-top:6px}
+  .dtl-hd .dc{display:flex;align-items:baseline;gap:16px;margin-top:10px}
+  .dtl-hd .cn{font-size:20px;font-weight:700;color:var(--danger)}
+  .dtl-hd.md .cn{color:var(--warn)}
+  .dtl-hd .cd{font-size:12.5px;color:var(--sub)}
+  .trate{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:11px;
+    border-top:1px dashed var(--line)}
+  .trate .trn{font-size:15px;font-weight:700;color:var(--accent)}
+  .trate .trt{font-size:12px;color:var(--sub)}
+
+  /* 四要素 */
+  .facts{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:6px 18px;margin-bottom:14px}
+  .fx{display:flex;padding:11px 0;border-bottom:1px dashed var(--line);font-size:13px}
+  .fx:last-child{border-bottom:none}
+  .fx .fk{width:100px;color:var(--sub);flex-shrink:0;font-size:12.5px}
+  .fx .fv{flex:1;line-height:1.55}
+
+  /* 视图切换 */
+  .tabs{display:flex;gap:10px;margin-bottom:14px}
+  .tb{flex:1;text-align:center;font-size:13.5px;padding:10px 0;border-radius:11px;
+    background:var(--panel2);border:1px solid var(--line);color:var(--sub);cursor:pointer;transition:.2s}
+  .tb:hover{border-color:var(--accent)}
+  .tb.on{background:linear-gradient(135deg,rgba(77,214,168,.16),rgba(77,214,168,.06));
+    border-color:var(--accent);color:var(--accent);font-weight:600}
+
+  /* 一句话读懂 */
+  .one{font-size:14.5px;font-weight:600;line-height:1.6;padding:15px 18px;
+    border-left:3px solid var(--accent);border-radius:11px;
+    background:linear-gradient(90deg,rgba(77,214,168,.1),transparent);margin-bottom:16px}
+  .one .ol{display:block;font-size:11px;color:var(--sub);font-weight:400;
+    letter-spacing:1.5px;margin-bottom:4px}
+
+  /* 要点 */
+  .pt{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;margin-bottom:10px;transition:.2s}
+  .pt.on{border-color:var(--accent);background:linear-gradient(90deg,rgba(77,214,168,.09),var(--panel2))}
+  .pt .pn{display:inline-block;font-size:10.5px;color:var(--accent);
+    border:1px solid var(--line);border-radius:8px 0 8px 0;padding:1px 11px;margin-bottom:8px}
+  .pt .pm{font-size:13.5px;line-height:1.6}
+  .pt .ps{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);
+    font-size:12.2px;color:var(--sub);line-height:1.7}
+  .pt .pq{color:var(--warn)}
+  .pt .pj{margin-top:8px;font-size:12px;color:var(--accent);font-weight:600;cursor:pointer}
+  .pt .pj:hover{text-decoration:underline}
+
+  /* 原文 */
+  .rawbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .rawbar .rb1{font-size:13px;color:var(--accent);font-weight:600}
+  .rbtn{font-size:12px;color:var(--text);background:var(--panel2);
+    border:1px solid var(--line);border-radius:9px;padding:5px 14px;cursor:pointer}
+  .rbtn:hover{border-color:var(--accent);color:var(--accent)}
+  .raw{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:18px;font-size:13.5px;line-height:2;color:#c8d0db}
+  .raw .q{transition:background .2s}
+  .raw .q.hl{background:rgba(245,165,36,.14);border-bottom:1px solid rgba(245,165,36,.4)}
+  .raw .q.allon{background:rgba(77,214,168,.16)}
+  .raw .q.on{background:rgba(77,214,168,.28);color:#bdf5e1;border-bottom-color:var(--accent)}
+  .raw .q.clk{cursor:pointer}
+  .rawmeta{display:flex;justify-content:space-between;font-size:11.5px;color:#7a8494;margin-top:10px}
+
+  /* tip */
+  .tip{margin-top:14px;font-size:12.5px;color:var(--sub);line-height:1.8;
+    border-left:3px solid var(--accent2);padding-left:14px}
+  .tip .tg2{display:block;color:var(--accent);font-weight:600;margin-bottom:3px}
+  .tip.warnbox{border-left-color:var(--warn)}
+  .tip.warnbox .tg2{color:var(--warn)}
+
+  /* 空态 */
+  .empty{text-align:center;color:var(--sub);font-size:13.5px;padding:34px 10px;line-height:1.9}
+  .empty b{color:var(--accent)}
+
+  /* 浏览标签列表 */
+  .browselist{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .brow{background:var(--panel2);border:1px solid var(--line);border-radius:11px;
+    padding:13px 16px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:11px}
+  .brow:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .brow .bico{font-size:17px}
+  .brow .bmid{flex:1}
+  .brow .bk{font-size:13.5px;font-weight:600}
+  .brow .bd{font-size:11.5px;color:var(--sub)}
+  .brow .bnum{font-size:11.5px;color:var(--accent);white-space:nowrap}
+
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  /* footer */
+  .footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:11.5px;color:var(--sub);line-height:1.8}
+  .footer b{color:var(--accent)}
+  .legend{font-size:11.5px;color:var(--sub);margin-top:10px}
+  .legend span{margin-right:14px}
+  .compliance{margin-top:16px;background:var(--panel2);border:1px solid var(--line);
+    border-left:3px solid var(--accent2);border-radius:11px;padding:14px 18px;font-size:12.5px}
+  .compliance b{color:var(--accent)}
+
+  @media(max-width:920px){
+    .pipe{grid-template-columns:1fr 1fr}
+    .caps{grid-template-columns:1fr}
+    .browselist{grid-template-columns:1fr}
+    .facts .fx{flex-direction:column;gap:3px}
+    .fx .fk{width:auto}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="navbar">
+    <a href="overview.html">← 返回项目总览</a>
+    <div class="pos">DEMO 01 · 主链路演示 · <b>与小程序同源</b></div>
+  </div>
+
+  <header>
+    <div class="brand">
+      <div class="logo">知</div>
+      <div>
+        <h1>知时 · 安农校园信息雷达</h1>
+        <p>公开通知的聚合 · 浓缩 · 溯源推送</p>
+      </div>
+    </div>
+    <div class="meta">
+      数据源：<b>教务处 / 学院 / 学工 / 图书馆 公开页面</b><br>
+      链路：聚合 → 理解 → 归类 → 推送
+    </div>
+  </header>
+
+  <!-- pipeline -->
+  <div class="pipe" id="pipe">
+    <div class="stage" data-i="0"><div class="idx">STEP 01</div><div class="name">聚合</div><div class="desc">公开通知页</div><div class="cnt" id="c0">待运行</div></div>
+    <div class="stage" data-i="1"><div class="idx">STEP 02</div><div class="name">理解</div><div class="desc">浓缩 + 溯源</div><div class="cnt" id="c1">待运行</div></div>
+    <div class="stage" data-i="2"><div class="idx">STEP 03</div><div class="name">归类</div><div class="desc">按标签归档</div><div class="cnt" id="c2">待运行</div></div>
+    <div class="stage" data-i="3"><div class="idx">STEP 04</div><div class="name">推送</div><div class="desc">分组送到你面前</div><div class="cnt" id="c3">待运行</div></div>
+  </div>
+
+  <div class="ctrl">
+    <button class="primary" id="run">▶ 运行智能体（一条完整链路）</button>
+    <button id="reset">重置</button>
+    <button id="speed">速度：正常</button>
+  </div>
+
+  <!-- 三能力导航 -->
+  <div class="caps">
+    <div class="cap" data-cap="push">
+      <div class="cbadge" id="cb-push">待运行</div>
+      <div class="cn">能力 01</div>
+      <div class="ct">按标签分类推送</div>
+      <div class="cd">通知归到 9 个标签组，组内按倒计时排序，紧急的标红。</div>
+    </div>
+    <div class="cap" data-cap="search">
+      <div class="cbadge">随时可用</div>
+      <div class="cn">能力 02</div>
+      <div class="ct">主动搜索</div>
+      <div class="cd">全文检索，每条结果都给出「命中原文的哪一句」并可核对。</div>
+    </div>
+    <div class="cap" data-cap="trace">
+      <div class="cbadge" id="cb-trace">点击任一条</div>
+      <div class="cn">能力 03</div>
+      <div class="ct">浓缩 + 出处</div>
+      <div class="cd">每条要点挂一段原文引文，双向互跳。不是「AI 说什么就信什么」。</div>
+    </div>
+  </div>
+
+  <!-- ============ 面板：推送 ============ -->
+  <div class="panel" id="panel-push">
+    <h2><span class="dot"></span>按标签分组推送 · 画像加载中</h2>
+    <div class="hint">聚合公开页 → 理解层浓缩 → 按 9 个统一标签归类 → 只推<b>你订阅的标签</b>。点分组标题展开。</div>
+    <div id="pushBox">
+      <div class="empty">
+        <div>点击上方 <b>「运行智能体」</b></div>
+        <div>看公开通知如何变成分组推送的可溯源提醒</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 面板：搜索 ============ -->
+  <div class="panel" id="panel-search" style="display:none">
+    <h2><span class="dot"></span>主动搜索 · 一搜就到，且知道为什么搜到</h2>
+    <div class="hint">搜索范围：标题 / AI 浓缩 / 原文全文 / 来源单位，全部来自公网公开通知页。每条结果都带<b>原文命中片段</b>。</div>
+
+    <div class="sbox">
+      <span class="sic">🔍</span>
+      <input id="sInput" placeholder="搜通知｜如「转专业」「奖学金」「竞赛」" autocomplete="off">
+      <span class="scl" id="sClear" style="display:none">✕</span>
+    </div>
+
+    <div class="trow" id="sTags"></div>
+
+    <div id="sBody"></div>
+  </div>
+
+  <!-- ============ 面板：详情追溯 ============ -->
+  <div class="panel" id="panel-trace" style="display:none">
+    <h2><span class="dot"></span>浓缩 + 溯源 · 每句话都能自己核对</h2>
+    <div class="hint" id="traceHint">从上方「推送」或「搜索」里点开任一条，这里会展开它的浓缩与原文。</div>
+    <div id="traceBody">
+      <div class="empty">
+        <div>点「推送」里的卡片，或到「搜索」里搜一条</div>
+        <div>就能在这里看<b>浓缩三句话 + 逐句原文出处</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="legend"><span>● 高优先（≤3天截止）</span><span>● 中优先（≤7天）</span><span>● 低优先（其余）</span></div>
+
+    <div class="compliance">
+      <div><b>合规说明：</b>本 demo 采集对象仅为教务处、学院、学生工作处、图书馆等<b>公网公开通知页面</b>，
+        等同于「人工去各大官网翻通知」的自动化，<b>不涉及教务系统后台、不获取任何私域或敏感数据</b>。</div>
+      <div style="margin-top:8px"><b>诚实说明：</b>浓缩由理解层产出，每句话挂原文出处；抽不到的字段写「原文未明确说明」，
+        不做推测性补全。<b>不伪造、不猜测</b>——做不到的也如实写出来，这是可信度的来源。</div>
+      <div style="margin-top:8px" id="foot-stats"></div>
+    </div>
+
+    <div style="margin-top:14px"><a href="overview.html" style="font-size:12.5px;color:#4dd6a8;text-decoration:none;font-weight:600">← 返回项目总览</a></div>
+  </div>
+</div>
+
+<script src="zhishi-core.js"></script>
+<script src="zhishi-data.js"></script>
+<script>
+/* ================================================================
+ * 知时 · 网页版主演示（与小程序完全同源）
+ *
+ * 数据：zhishi-data.js（由 export_mp_data_to_web.py 从小程序导出）
+ * 算法：zhishi-core.js（tags / search / 溯源 / 分组，与 miniprogram/utils 同源）
+ *
+ * 所以：这里看到的分组、搜索排序、溯源定位，和小程序里是**同一套结果**。
+ * ================================================================ */
+(function () {
+  'use strict';
+
+  var NOTICES = ZS_DATA.NOTICES;
+  var PROFILE = ZS_DATA.PROFILE;
+  var INTERESTS = PROFILE.interests || [];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+  var esc = function (s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  };
+
+  /* 用 highlight 切分生成高亮 HTML */
+  function hlHTML(text, words) {
+    return ZS.highlight(text, words).map(function (sg) {
+      return sg.hl ? '<span class="mhl">' + esc(sg.text) + '</span>' : esc(sg.text);
+    }).join('');
+  }
+
+  var speed = 1;
+  var SPEEDS = [1, 0.5, 0.15];
+  var SPEED_LABEL = ['速度：正常', '速度：快', '速度：极速'];
+  var speedIdx = 0;
+  var running = false;
+
+  /* ---------- 面板切换 ---------- */
+  var caps = document.querySelectorAll('.cap');
+  var panels = { push: $('panel-push'), search: $('panel-search'), trace: $('panel-trace') };
+  function showCap(name) {
+    caps.forEach(function (c) { c.classList.toggle('on', c.dataset.cap === name); });
+    Object.keys(panels).forEach(function (k) { panels[k].style.display = (k === name) ? 'block' : 'none'; });
+  }
+  caps.forEach(function (c) {
+    c.addEventListener('click', function () { showCap(c.dataset.cap); });
+  });
+  showCap('push');
+
+  /* ---------- 阶段控制 ---------- */
+  function setStage(i, state) {
+    var el = document.querySelector('.stage[data-i="' + i + '"]');
+    el.classList.remove('active', 'done');
+    if (state) el.classList.add(state);
+  }
+
+  function resetStages() {
+    ['c0', 'c1', 'c2', 'c3'].forEach(function (c, i) {
+      $(c).textContent = '待运行';
+      setStage(i, null);
+    });
+  }
+
+  /* ---------- 主链路 ---------- */
+  async function run() {
+    if (running) return;
+    running = true;
+    $('run').disabled = true;
+    resetStages();
+    $('pushBox').innerHTML = '<div class="empty">正在运行…请稍候</div>';
+    $('cb-push').textContent = '待运行';
+
+    /* STEP 0 聚合 */
+    setStage(0, 'active');
+    $('c0').textContent = '聚合中…';
+    await sleep(600 / speed);
+    var st = ZS.getStats(NOTICES, INTERESTS);
+    $('c0').textContent = st.collected + ' 条（真实 ' + st.realCnt + '）';
+    setStage(0, 'done');
+
+    /* STEP 1 理解 */
+    setStage(1, 'active');
+    $('c1').textContent = 'AI 浓缩中…';
+    await sleep(700 / speed);
+    $('c1').textContent = st.understood + ' 条已浓缩';
+    setStage(1, 'done');
+
+    /* STEP 2 归类 */
+    setStage(2, 'active');
+    $('c2').textContent = '按标签归档…';
+    await sleep(500 / speed);
+    $('c2').textContent = st.tagCnt + ' 个标签';
+    setStage(2, 'done');
+
+    /* STEP 3 推送 */
+    setStage(3, 'active');
+    $('c3').textContent = '分组推送…';
+    await sleep(400 / speed);
+
+    var groups = ZS.matchByTag(NOTICES, INTERESTS);
+    renderGroups(groups);
+    $('c3').textContent = groups.length + ' 组 / ' + st.matched + ' 条';
+    $('cb-push').textContent = groups.length + ' 组 · ' + st.matched + ' 条';
+    setStage(3, 'done');
+
+    $('run').disabled = false;
+    running = false;
+  }
+
+  /* ---------- 分组推送渲染 ---------- */
+  var openTags = {};
+  function renderGroups(groups) {
+    var box = $('pushBox');
+    if (!groups.length) {
+      box.innerHTML = '<div class="empty"><div>你的关注标签下暂无匹配通知</div>' +
+        '<div style="margin-top:8px"><b>' + INTERESTS.length + ' 个关注</b>（' +
+        esc(INTERESTS.join(' / ')) + '）</div></div>';
+      return;
+    }
+    /* 默认第一组展开 */
+    if (Object.keys(openTags).length === 0 && groups[0]) openTags[groups[0].tag] = true;
+
+    var html = '<div class="sec" style="margin-top:0">按标签推送 · ' + groups.length +
+      ' 组 · 点标题展开/收起</div>';
+    groups.forEach(function (g) {
+      var open = !!openTags[g.tag];
+      html += '<div class="grp">';
+      html += '<div class="ghd" data-tag="' + esc(g.tag) + '">' +
+        '<span class="gico">' + g.icon + '</span>' +
+        '<div class="gmid"><div class="gk">' + esc(g.tag) + '</div>' +
+        '<div class="gd">' + esc(g.desc) + '</div></div>' +
+        (g.urgent ? '<span class="gurg">紧急</span>' : '') +
+        '<span class="gnum">' + g.count + ' 条</span>' +
+        '<span class="garrow">' + (open ? '▾' : '▸') + '</span>' +
+        '</div>';
+      if (open) {
+        html += '<div class="gbody">';
+        g.items.forEach(function (n) { html += cardHTML(n, []); });
+        html += '</div>';
+      }
+      html += '</div>';
+    });
+    box.innerHTML = html;
+
+    /* 分组展开 */
+    box.querySelectorAll('.ghd').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var t = el.dataset.tag;
+        openTags[t] = !openTags[t];
+        renderGroups(groups);
+      });
+    });
+    bindCards(box);
+  }
+
+  /* ---------- 通知卡 ---------- */
+  function cardHTML(n, words) {
+    var cd = '';
+    if (n.countdown !== null && n.countdown !== undefined) {
+      cd = n.countdown < 0 ? '<span class="dd">已结束</span>' : '<span class="dd">剩 ' + n.countdown + ' 天</span>';
+    }
+    var titleHTML = words && words.length ? hlHTML(n.title, words) : esc(n.title);
+
+    var snip = '';
+    if (n.snippet) {
+      var snipHl = words && words.length ? ZS.highlight(n.snippet, words).some(function (s) { return s.hl; }) : false;
+      if (snipHl) {
+        snip = '<div class="snip"><span class="snl">原文命中</span><div class="snt">' +
+          (n.snippetPrefix ? '<span class="ell">' + esc(n.snippetPrefix) + '</span>' : '') +
+          (words && words.length ? hlHTML(n.snippet, words) : esc(n.snippet)) +
+          (n.snippetSuffix ? '<span class="ell">' + esc(n.snippetSuffix) + '</span>' : '') +
+          '</div></div>';
+      }
+    }
+
+    /* 命中来源说明：当标题和原文都没有可见高亮时，必须说清"为什么搜到"
+       —— 否则用户看到一条没有高亮的结果会莫名其妙 */
+    var whyHit = '';
+    if (n.needExplain && n.hitSources && n.hitSources.length) {
+      whyHit = '<div class="whyhit">为什么搜到：命中<b>' +
+        esc(n.hitSources.join(' / ')) + '</b>（标题与原文中无该词字面出现）</div>';
+    }
+
+    var tr = ZS.traceRate(n);
+    var pts = (n.digestPoints || []).length;
+
+    return '<div class="mc click ' + n.level + '" data-id="' + esc(n.id) + '">' +
+      '<div class="r1"><div class="tt">' + titleHTML + '</div>' + cd + '</div>' +
+      '<div class="sr">' + esc(n.source) + ' · ' + esc(n.publish) +
+      (n.deadline ? ' · 截止 ' + esc(n.deadline) : '') + '</div>' +
+      (n.digestOne ? '<div class="d1">' + esc(n.digestOne) + '</div>' : '') +
+      snip +
+      whyHit +
+      '<div class="tags"><span class="tg">' + esc(n.event) + '</span>' +
+      (n.real ? '<span class="tg g">真实公开数据</span>' : '<span class="tg">演示数据</span>') +
+      (pts ? '<span class="tg o">' + tr.traceable + '/' + pts + ' 句可溯源</span>' : '') +
+      '</div>' +
+      '<div class="go">📌 看浓缩与原文出处 ›</div>' +
+      '</div>';
+  }
+
+  function bindCards(root) {
+    root.querySelectorAll('.mc[data-id]').forEach(function (el) {
+      el.addEventListener('click', function () { openTrace(el.dataset.id, currentQuery); });
+    });
+  }
+
+  /* ---------- 搜索 ---------- */
+  var currentQuery = '';
+  var HISTORY_KEY = 'zhishi_web_search_history';
+  var sInput = $('sInput');
+  var sTagsEl = $('sTags');
+  var sBody = $('sBody');
+  var tagFilter = '';
+  var searched = false;
+
+  function getHistory() {
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { return []; }
+  }
+  function pushHistory(q) {
+    var h = getHistory().filter(function (x) { return x !== q; });
+    h.unshift(q);
+    h = h.slice(0, 8);
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch (e) {}
+  }
+  function clearHistory() {
+    try { localStorage.removeItem(HISTORY_KEY); } catch (e) {}
+    renderSearchBody();
+  }
+
+  function renderTags() {
+    var tc = ZS.tagCounts(NOTICES);
+    var html = '<div class="tchip ' + (tagFilter === '' ? 'on' : '') + '" data-t="">全部</div>';
+    ZS.TAGS.forEach(function (t) {
+      html += '<div class="tchip ' + (tagFilter === t.key ? 'on' : '') + '" data-t="' + esc(t.key) + '">' +
+        t.icon + ' ' + esc(t.key) +
+        (tc[t.key] ? '<span class="tnum">' + tc[t.key] + '</span>' : '') +
+        '</div>';
+    });
+    sTagsEl.innerHTML = html;
+    sTagsEl.querySelectorAll('.tchip').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var t = el.dataset.t;
+        tagFilter = (tagFilter === t) ? '' : t;
+        renderTags();
+        if (searched || tagFilter) doSearch(currentQuery);
+      });
+    });
+  }
+
+  function renderSearchBody() {
+    if (!searched) {
+      var html = '<div class="sec">热门搜索</div><div class="wchips">';
+      ZS.hotWords(NOTICES).forEach(function (w) {
+        html += '<div class="wchip" data-w="' + esc(w) + '">' + esc(w) + '</div>';
+      });
+      html += '</div>';
+
+      var his = getHistory();
+      if (his.length) {
+        html += '<div class="sec">搜索历史 <span class="hdcl" id="hdcl">清空</span></div><div class="wchips">';
+        his.forEach(function (w) {
+          html += '<div class="wchip his" data-w="' + esc(w) + '">' + esc(w) + '</div>';
+        });
+        html += '</div>';
+      }
+
+      html += '<div class="sec">按标签浏览</div><div class="browselist">';
+      var tc = ZS.tagCounts(NOTICES);
+      ZS.TAGS.forEach(function (t) {
+        html += '<div class="brow" data-t="' + esc(t.key) + '">' +
+          '<span class="bico">' + t.icon + '</span>' +
+          '<div class="bmid"><div class="bk">' + esc(t.key) + '</div>' +
+          '<div class="bd">' + esc(t.desc) + '</div></div>' +
+          '<span class="bnum">' + (tc[t.key] || 0) + ' 条 ›</span></div>';
+      });
+      html += '</div>';
+      sBody.innerHTML = html;
+
+      sBody.querySelectorAll('.wchip').forEach(function (el) {
+        el.addEventListener('click', function () {
+          sInput.value = el.dataset.w;
+          doSearch(el.dataset.w);
+        });
+      });
+      var hd = $('hdcl');
+      if (hd) hd.addEventListener('click', clearHistory);
+      sBody.querySelectorAll('.brow').forEach(function (el) {
+        el.addEventListener('click', function () {
+          sInput.value = '';
+          tagFilter = el.dataset.t;
+          renderTags();
+          doSearch('');
+        });
+      });
+      return;
+    }
+
+    /* 已搜索：结果骨架由 doSearch 自己保证，这里只管返回按钮 */
+    var backBtn = currentQuery
+      ? '<button id="sBack" style="font-size:12px;padding:6px 14px;margin-bottom:14px">‹ 返回（热词 / 标签浏览）</button>'
+      : '';
+    sBody.innerHTML = backBtn + '<div id="sRes"></div>';
+    var back = $('sBack');
+    if (back) back.addEventListener('click', function () {
+      searched = false; currentQuery = ''; tagFilter = ''; sInput.value = '';
+      renderTags(); renderSearchBody();
+    });
+    doSearch(currentQuery);
+  }
+
+  function doSearch(q) {
+    var query = String(q || '').trim();
+    currentQuery = query;
+    if (!query && !tagFilter) {
+      searched = false;
+      renderSearchBody();
+      $('sClear').style.display = 'none';
+      return;
+    }
+    searched = true;
+    $('sClear').style.display = query ? 'block' : 'none';
+
+    /* 关键：结果容器必须先存在（首次搜索时 renderSearchBody 走的是
+       「未搜索」分支，不会创建 #sRes）。这里先补齐骨架，
+       否则内联写入会抛 "Cannot set properties of null" 而整页失效。 */
+    if (!$('sRes')) {
+      var backBtn = query
+        ? '<button id="sBack" style="font-size:12px;padding:6px 14px;margin-bottom:14px">‹ 返回（热词 / 标签浏览）</button>'
+        : '';
+      sBody.innerHTML = backBtn + '<div id="sRes"></div>';
+      var bk = $('sBack');
+      if (bk) bk.addEventListener('click', function () {
+        searched = false; currentQuery = ''; tagFilter = ''; sInput.value = '';
+        renderTags(); renderSearchBody();
+      });
+    }
+
+    var words = ZS.splitQuery(query);
+    var results = ZS.search(NOTICES, query, { tag: tagFilter });
+    var realCnt = results.filter(function (r) { return r.real; }).length;
+
+    var head = '找到 <span class="hl2">' + results.length + '</span> 条' +
+      (tagFilter ? ' <span class="rftag">· 标签「' + esc(tagFilter) + '」</span>' : '') +
+      (realCnt ? ' <span class="rfreal">· 其中真实公开数据 ' + realCnt + ' 条</span>' : '');
+
+    var html = '<div class="rhead">' + head + '</div>';
+    if (!results.length) {
+      html += '<div class="empty"><div>没有搜到相关通知</div>' +
+        '<div style="margin-top:8px">换个说法试试，或点上方标签直接浏览</div></div>';
+    } else {
+      results.forEach(function (r) { html += cardHTML(r, words); });
+    }
+    html += '<div class="tip"><span class="tg2">所有结果可溯源</span>' +
+      '点进任一条，都能看到 AI 浓缩的每句话对应的原文出处，可一键跳回原文高亮核对。</div>';
+
+    var box = $('sRes');
+    box.innerHTML = html;
+    bindCards(box);
+    if (query) pushHistory(query);
+  }
+
+  sInput.addEventListener('input', function () {
+    $('sClear').style.display = sInput.value ? 'block' : 'none';
+  });
+  sInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') doSearch(sInput.value);
+  });
+  $('sClear').addEventListener('click', function () {
+    sInput.value = ''; currentQuery = ''; tagFilter = '';
+    searched = false; $('sClear').style.display = 'none';
+    renderTags(); renderSearchBody();
+  });
+
+  /* ---------- 详情追溯 ---------- */
+  var traceState = { id: null, tab: 'digest', activeIdx: -1, rawFocused: false, words: [] };
+
+  function openTrace(id, query) {
+    var n = NOTICES.filter(function (x) { return x.id === id; })[0];
+    if (!n) return;
+    traceState.id = id;
+    traceState.tab = 'digest';
+    traceState.activeIdx = -1;
+    traceState.rawFocused = false;
+    traceState.words = ZS.splitQuery(query || '');
+    showCap('trace');
+    renderTrace();
+    /* scrollIntoView 不是所有环境都有（旧浏览器 / 某些内嵌 WebView），做防御 */
+    var pt = $('panel-trace');
+    if (pt && typeof pt.scrollIntoView === 'function') {
+      pt.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function renderTrace() {
+    var n = NOTICES.filter(function (x) { return x.id === traceState.id; })[0];
+    if (!n) return;
+    var level = ZS.levelOf(n);
+    var tr = ZS.traceRate(n);
+    var words = traceState.words;
+
+    $('traceHint').innerHTML = '正在看：<b>' + esc(n.event) + '</b> · ' + esc(n.source) +
+      ' · 发布于 ' + esc(n.publish) + '　（改看别的：回「推送」或「搜索」点另一条）';
+
+    var html = '';
+
+    /* 头部 */
+    html += '<div class="dtl-hd ' + level + '">';
+    html += '<div class="dt">' + (words.length ? hlHTML(n.title, words) : esc(n.title)) +
+      (n.real ? ' <span class="tg g" style="font-size:11px;padding:2px 9px;border-radius:6px">真实公开数据</span>' : '') +
+      '</div>';
+    html += '<div class="ds">' + esc(n.source) + ' · 发布于 ' + esc(n.publish) + '</div>';
+    html += '<div class="dc">';
+    if (n.countdown !== null && n.countdown !== undefined) {
+      html += n.countdown < 0
+        ? '<span class="cd">已结束（截止 ' + esc(n.deadline) + '）</span>'
+        : '<span class="cn">剩 ' + n.countdown + ' 天</span><span class="cd">截止 ' + esc(n.deadline) + '</span>';
+    } else if (n.deadline) {
+      html += '<span class="cd">截止 ' + esc(n.deadline) + '</span>';
+    }
+    html += '</div>';
+    if (tr.traceTotal > 0) {
+      html += '<div class="trate"><span class="trn">' + tr.traceable + '/' + tr.traceTotal + '</span>' +
+        '<span class="trt">条要点可在原文中原样定位</span></div>';
+    }
+    html += '</div>';
+
+    /* 搜索词提示 */
+    if (words.length) {
+      html += '<div class="tip" style="margin-bottom:14px;border-left-color:#8fbcff">' +
+        '<span class="tg2" style="color:#8fbcff">你在搜「' + esc(currentQuery) + '」</span>' +
+        '下方标题与原文里，命中的词会高亮。这页每句浓缩都挂着它对应的原文位置。</div>';
+    }
+
+    /* 四要素 */
+    html += '<div class="facts">';
+    html += factRow('谁该看', n.audience);
+    html += factRow('要交什么', n.materials);
+    html += factRow('去哪办', n.entry);
+    html += factRow('剩几天',
+      (typeof n.countdown === 'number') && n.countdown >= 0
+        ? '剩 ' + n.countdown + ' 天（截止 ' + n.deadline + '）'
+        : (n.deadline ? '截止 ' + n.deadline : '原文未明确说明'));
+    html += '<div class="fx"><div class="fk">抽取方式</div><div class="fv">' +
+      (n.real ? '本地理解层（规则）抽取 · 要素完整度 ' : '演示数据 · 完整度 ') +
+      Math.round((n.confidence || 0) * 100) + '%' +
+      ((n.confidence || 0) < 0.5 ? ' <span style="color:var(--warn)">（要素不全，建议直接看原文）</span>' : '') +
+      '</div></div>';
+    html += '</div>';
+
+    /* 视图切换 */
+    html += '<div class="tabs">' +
+      '<div class="tb ' + (traceState.tab === 'digest' ? 'on' : '') + '" data-tab="digest">✨ 浓缩</div>' +
+      '<div class="tb ' + (traceState.tab === 'raw' ? 'on' : '') + '" data-tab="raw">📄 原文（出处）</div>' +
+      '</div>';
+
+    if (traceState.tab === 'digest') {
+      html += '<div class="one"><span class="ol">一句话读懂</span>' + esc(n.digestOne || '（本节暂无浓缩，可直接看原文）') + '</div>';
+      html += '<div class="sec" style="margin-top:0">要点 · 每句都挂着原文出处</div>';
+      (n.digestPoints || []).forEach(function (p, i) {
+        var on = traceState.activeIdx === i;
+        html += '<div class="pt ' + (on ? 'on' : '') + '" data-idx="' + i + '">' +
+          '<div class="pn">要点 ' + (i + 1) + '</div>' +
+          '<div class="pm">' + esc(p.text) + '</div>' +
+          (on ? '<div class="ps">📌 原文出处：<span class="pq">「' + esc(p.quote) + '」</span></div>' : '') +
+          '<div class="pj" data-jump="' + i + '">去原文核对 ›</div>' +
+          '</div>';
+      });
+      if (tr.traceTotal > 0) {
+        if (tr.traceable === tr.traceTotal) {
+          html += '<div class="tip"><span class="tg2">✅ 全部要点已定位到原文</span>' +
+            '本页 ' + tr.traceTotal + ' 条要点，每一条都能在下方原文里原样找到（黄色高亮）。' +
+            '这不是「AI 说什么你就信什么」，而是每句话都能自己核对。</div>';
+        } else {
+          html += '<div class="tip warnbox"><span class="tg2">⚠ 有 ' + (tr.traceTotal - tr.traceable) +
+            ' 条要点未能在原文中定位</span>可能是原文格式差异导致。我们宁可标出来，也不假装 100% 准确。</div>';
+        }
+      }
+    } else {
+      html += '<div class="rawbar"><div class="rb1">📄 原文（聚合自公开页面）</div>' +
+        '<div class="rbtn" id="btnAll">' + (traceState.rawFocused ? '取消高亮' : '全部高亮') + '</div></div>';
+      var segs = ZS.buildRawSegs(n.raw, n.digestPoints || []);
+      html += '<div class="raw">';
+      segs.forEach(function (sg) {
+        var cls = 'q' + (sg.hl ? ' hl clk' : '') +
+          (sg.idx === traceState.activeIdx ? ' on' : '') +
+          (traceState.rawFocused ? ' allon' : '');
+        html += '<span class="' + cls + '" data-idx="' + sg.idx + '">' + esc(sg.text) + '</span>';
+      });
+      html += '</div>';
+      html += '<div class="rawmeta"><span>来源：' + esc(n.source) + ' · 发布于 ' + esc(n.publish) + '</span>' +
+        '<span>字数：' + (n.raw || '').length + ' 字</span></div>';
+      html += '<div class="tip">绿色为当前聚焦句，黄色为 AI 引用过的句子。点黄色句可跳回对应要点核对——<b>出处就在这里</b>。</div>';
+    }
+
+    $('traceBody').innerHTML = html;
+
+    /* 交互绑定 */
+    $('traceBody').querySelectorAll('.tb').forEach(function (el) {
+      el.addEventListener('click', function () {
+        traceState.tab = el.dataset.tab;
+        traceState.activeIdx = -1;
+        traceState.rawFocused = false;
+        renderTrace();
+      });
+    });
+    $('traceBody').querySelectorAll('.pt').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        if (e.target.dataset.jump !== undefined) return;
+        traceState.activeIdx = Number(el.dataset.idx);
+        traceState.rawFocused = false;
+        renderTrace();
+      });
+    });
+    $('traceBody').querySelectorAll('.pj').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.stopPropagation();
+        traceState.tab = 'raw';
+        traceState.activeIdx = Number(el.dataset.jump);
+        traceState.rawFocused = false;
+        renderTrace();
+      });
+    });
+    $('traceBody').querySelectorAll('.raw .q').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var idx = Number(el.dataset.idx);
+        if (idx < 0) return;
+        traceState.tab = 'digest';
+        traceState.activeIdx = idx;
+        traceState.rawFocused = false;
+        renderTrace();
+      });
+    });
+    var btnAll = $('btnAll');
+    if (btnAll) btnAll.addEventListener('click', function () {
+      traceState.tab = 'raw';
+      traceState.rawFocused = !traceState.rawFocused;
+      traceState.activeIdx = -1;
+      renderTrace();
+    });
+  }
+
+  function factRow(k, v) {
+    return '<div class="fx"><div class="fk">' + k + '</div><div class="fv">' +
+      esc(v || '原文未明确说明') + '</div></div>';
+  }
+
+  /* ---------- 页脚统计 ---------- */
+  function renderFootStats() {
+    var st = ZS.getStats(NOTICES, INTERESTS);
+    var trAll = 0, ptAll = 0;
+    NOTICES.forEach(function (n) {
+      var t = ZS.traceRate(n);
+      trAll += t.traceable; ptAll += t.traceTotal;
+    });
+    $('foot-stats').innerHTML = '<b>当前数据：</b>通知池 ' + st.collected + ' 条（真实公开页 ' + st.realCnt +
+      ' 条）· 已浓缩 ' + st.understood + ' 条 · 标签 ' + st.tagCnt + ' 个 · 命中画像 ' + st.matched +
+      ' 条　|　<b>溯源锚点：</b>' + trAll + '/' + ptAll + ' 条要点可在原文原样定位。' +
+      '　|　网页版与小程序<b>同源</b>：数据来自同一份导出，算法来自同一套实现。';
+  }
+
+  /* ---------- 事件 ---------- */
+  $('run').addEventListener('click', run);
+  $('reset').addEventListener('click', function () {
+    if (running) return;
+    resetStages();
+    openTags = {};
+    $('pushBox').innerHTML = '<div class="empty"><div>点击上方 <b>「运行智能体」</b></div>' +
+      '<div>看公开通知如何变成分组推送的可溯源提醒</div></div>';
+    $('cb-push').textContent = '待运行';
+    $('cb-trace').textContent = '点击任一条';
+    traceState.id = null;
+    $('traceHint').innerHTML = '从上方「推送」或「搜索」里点开任一条，这里会展开它的浓缩与原文。';
+    $('traceBody').innerHTML = '<div class="empty"><div>点「推送」里的卡片，或到「搜索」里搜一条</div>' +
+      '<div>就能在这里看<b>浓缩三句话 + 逐句原文出处</b></div></div>';
+    showCap('push');
+  });
+  $('speed').addEventListener('click', function () {
+    speedIdx = (speedIdx + 1) % SPEEDS.length;
+    speed = SPEEDS[speedIdx];
+    $('speed').textContent = SPEED_LABEL[speedIdx];
+  });
+
+  /* ---------- 初始化 ---------- */
+  document.querySelector('#panel-push h2').innerHTML =
+    '<span class="dot"></span>按标签分组推送 · 画像 ' + INTERESTS.length + ' 项：' +
+    INTERESTS.map(function (t) {
+      return '<span class="tg" style="font-size:11px;padding:2px 9px;border-radius:6px;background:rgba(77,214,168,.13);color:var(--accent)">' + esc(t) + '</span>';
+    }).join(' ');
+
+  renderTags();
+  renderSearchBody();
+  renderFootStats();
+})();
+</script>
+</body>
+</html>

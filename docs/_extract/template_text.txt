@@ -1,0 +1,79 @@
+[Paragraph] [Image]
+[Paragraph] XXX智能体·说明文档
+[Paragraph] 
+【表格 1：7行x3列】
+  | 作品名 | ： | XXX |
+  | 队长 | ： | XXX |
+  | 队员 | ： | XXX |
+  | 队员 | ： | XXX |
+  | 队长学号 | ： | XXX |
+  | 联系电话 | ： | XXX |
+  | 完成时间 | ： | XXX |
+[Paragraph] 
+[Paragraph] 
+[Heading] 原创代码类作品项目说明文档
+[Paragraph] （赛团队须根据作品实际架构和业务
+[Heading] 一、作品简介
+[Paragraph] （一）项目背景
+[Paragraph] 说明本智能体面向的用户和具体使用
+[Paragraph] （二）项目目标
+[Paragraph] 说明本智能体能够完成的主要任务、
+[Paragraph] （三）核心创新点
+[Paragraph] 说明团队自主设计、实现或改进的内
+[Paragraph] （四）应用价值
+[Paragraph] 说明作品适用的场景及其在效率、质
+[Heading] 二、智能体架构或工作流说明
+[Paragraph] （一）整体系统架构
+[Paragraph] 说明作品采用的架构形式，附整体架
+[Paragraph] （二）业务全流程工作流
+[Paragraph] 结合业务流程图，按照智能体实际执
+[Heading] 三、提示词与关键配置说明
+[Paragraph] （一）系统角色提示词（System Prompt）
+[Paragraph] 提供系统角色提示词或核心指令，说
+[Paragraph] （二）任务规划与决策配置
+[Paragraph] 说明智能体如何识别用户意图、拆解
+[Paragraph] （三）工具调用配置
+[Paragraph] 说明智能体调用外部工具或服务的触
+[Paragraph] （四）知识库检索与上下文配置
+[Paragraph] 用知识库检索的，提供检索增强提示
+[Paragraph] （五）多轮对话与记忆配置
+[Paragraph] 说明多轮对话的上下文管理方式，以
+[Paragraph] （六）提示词及关键配置优化
+[Paragraph] 说明开发过程中发现的问题、对应的
+[Heading] 四、核心实现与自主贡献说明
+[Paragraph] （一）核心功能实现
+[Paragraph] 说明智能体关键功能的实现方式，包
+[Paragraph] （可附工作流截图、架构图或关键代
+[Paragraph] （二）第三方框架与开源项目使用情
+[Paragraph] 列明开发过程中使用的第三方平台、
+[Paragraph] （三）团队自主贡献
+[Paragraph] 说明团队在作品开发过程中自主完成
+[Heading] 五、知识库构建说明
+[Paragraph] 本章节适用于使用知识库或外部数据
+[Paragraph] 
+[Paragraph] （一）知识库数据源
+[Paragraph] 说明知识库所使用的数据类型、原始
+[Paragraph] （二）数据预处理流程
+[Paragraph] 说明原始数据的清洗、解析、去重、
+[Paragraph] （三）向量数据库配置
+[Paragraph] 说明所使用的数据存储或向量检索组
+[Paragraph] （四）检索策略
+[Paragraph] 说明知识检索方式，包括关键词检索
+[Paragraph] （五）知识上下文注入规则
+[Paragraph] 说明检索结果如何传递给大模型，包
+[Paragraph] （六）知识库更新机制
+[Paragraph] 说明知识库新增、修改、删除及批量
+[Heading] 六、插件/工具集成清单
+[Paragraph] 本章节用于说明作品集成的自定义工
+[Paragraph] 
+[Paragraph] 按表格逐行填写所集成的自研代码工
+【表格 2：2行x7列】
+  | 序号 | 工具名称及类型 | 功能用途 | 调用条件 | 输入与输出 | 实现及配置方式 | 异常处理 |
+  | 1 | 文档读取工具（自研代 | 读取文档内容 | 用户上传文档 | 输入：文件；输出：文 | Python实现，需安装相关 | 文件格式错误时提示用 |
+[Paragraph] （可按需增加更多行；如有多个工具
+[Heading] 七、运行环境说明
+[Paragraph] 说明作品的运行环境、部署方式及必
+[Paragraph] 平台搭建类：填写所使用的平台名称
+[Paragraph] 原创代码类：填写操作系统、CPU、内
+[Heading] 八、项目总结与优化展望
+[Paragraph] 总结项目已实现的主要功能及实际应

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>知时 · 想请你看一眼</title>
+<style>
+  :root{
+    --bg:#F7F8F7; --surface:#FFFFFF; --surface-2:#F2F5F2;
+    --border:#E4E9E4; --border-soft:#EEF2EE;
+    --brand:#0A6B4B; --brand-soft:rgba(10,107,75,.08);
+    --gold:#E5A21B; --gold-soft:rgba(229,162,27,.12); --gold-ink:#8A6000;
+    --alert:#D9633B; --alert-soft:rgba(217,99,59,.10); --alert-ink:#A9431D;
+    --txt:#1A2420; --txt-2:#5E6B64; --txt-3:#98A49C;
+    --on-brand:#FFFFFF; --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{overflow-x:hidden}
+  body{background:var(--bg);color:var(--txt);line-height:1.75;
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    padding:calc(26px + env(safe-area-inset-top)) 18px calc(48px + env(safe-area-inset-bottom));
+    max-width:560px;margin:0 auto;-webkit-tap-highlight-color:transparent}
+
+  .badge{display:inline-block;font-size:10.5px;color:var(--brand);
+    background:var(--brand-soft);border-radius:999px;padding:3px 10px;margin-bottom:12px}
+  h1{font-size:21px;font-weight:700;letter-spacing:.2px;line-height:1.45}
+  .sub{font-size:12.5px;color:var(--txt-3);margin-top:7px}
+
+  .card{background:var(--surface);border:1px solid var(--border-soft);
+    border-radius:var(--radius);padding:15px 16px;margin-top:16px}
+  .card p{font-size:13px;color:var(--txt-2)}
+  .card p+p{margin-top:9px}
+  .card b{color:var(--txt)}
+
+  h2{font-size:13px;font-weight:600;margin:26px 0 4px;color:var(--txt-2)}
+  .hint{font-size:11.5px;color:var(--txt-3);margin-bottom:10px}
+
+  /* ---------- 三屏：手机横向滑动 ---------- */
+  .rail{display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;
+    scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+    padding:2px 18px 8px;margin:0 -18px;scrollbar-width:none}
+  .rail::-webkit-scrollbar{display:none}
+
+  .phone{flex:0 0 auto;width:min(304px,80vw);scroll-snap-align:center;
+    background:var(--bg);border:1px solid var(--border);border-radius:20px;
+    overflow:hidden;display:flex;flex-direction:column}
+  .phone .nav{background:var(--brand);color:var(--on-brand);text-align:center;
+    font-size:12.5px;font-weight:600;padding:11px 0}
+  .phone .scr{padding:15px 13px 18px;flex:1}
+  .phone .lab{font-size:10px;color:var(--txt-3);letter-spacing:1px;margin-bottom:9px;text-align:center}
+  .phone .tabs{display:flex;background:var(--surface);
+    border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);margin-top:auto}
+  .phone .tabs div{flex:1;text-align:center;font-size:10px;padding:9px 0;color:var(--txt-3)}
+  .phone .tabs div.on{color:var(--brand);font-weight:600}
+
+  .phone .mhead{display:flex;align-items:center;padding-bottom:11px;margin-bottom:11px;
+    border-bottom:1px solid var(--border-soft)}
+  .phone .lg{width:28px;height:28px;border-radius:7px;background:var(--brand);
+    color:var(--on-brand);display:flex;align-items:center;justify-content:center;
+    font-size:9.5px;font-weight:700;margin-right:8px}
+  .phone .t1{font-size:13.5px;font-weight:600;line-height:1.3}
+  .phone .t2{font-size:10px;color:var(--txt-3);margin-top:1px}
+  .phone .bell{margin-left:auto;font-size:10px;color:var(--brand);
+    background:var(--brand-soft);border-radius:999px;padding:2px 8px;white-space:nowrap}
+  .phone .sentry{display:flex;align-items:center;background:var(--surface);
+    border:1px solid var(--border-soft);border-radius:12px;padding:9px 11px;
+    font-size:11px;color:var(--txt-3);margin-bottom:10px}
+  .phone .sentry span:last-child{margin-left:auto;color:var(--brand)}
+  .phone .hero{background:var(--brand);color:var(--on-brand);border-radius:12px;padding:13px;margin-bottom:10px}
+  .phone .hero .k{font-size:10px;opacity:.8}
+  .phone .hero .line{font-size:13.5px;font-weight:600;line-height:1.45;margin:6px 0 9px}
+  .phone .hero .lead{font-size:11px;opacity:.92;border-top:1px solid rgba(255,255,255,.25);padding-top:8px}
+  .phone .hero .act{display:inline-block;font-size:10px;background:rgba(255,255,255,.16);
+    border-radius:7px;padding:4px 9px;margin-top:8px}
+  .phone .sec{font-size:11.5px;font-weight:600;margin:15px 0 8px;display:flex;align-items:center}
+  .phone .sec small{font-size:10px;color:var(--txt-3);font-weight:400;margin-left:5px}
+  .phone .c{background:var(--surface);border:1px solid var(--border-soft);
+    border-radius:12px;padding:11px;margin-bottom:8px}
+  .phone .c.hi{border-color:rgba(217,99,59,.35)}
+  .phone .r1{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+  .phone .tt{font-size:12px;font-weight:600;line-height:1.45}
+  .phone .dd{font-size:9.5px;padding:2px 6px;border-radius:5px;white-space:nowrap;
+    color:var(--brand);background:var(--brand-soft)}
+  .phone .dd.hi{color:var(--alert-ink);background:var(--alert-soft)}
+  .phone .dd.md{color:var(--gold-ink);background:var(--gold-soft)}
+  .phone .sr{font-size:10px;color:var(--txt-3);margin-top:6px}
+  .phone .why{font-size:10.5px;color:var(--txt-2);background:var(--surface-2);
+    border-radius:7px;padding:7px 9px;margin-top:8px;line-height:1.6}
+  .phone .tg{display:inline-block;font-size:9.5px;color:var(--txt-2);
+    background:var(--surface-2);border-radius:5px;padding:2px 6px;margin:8px 5px 0 0}
+  .phone .go{font-size:10.5px;color:var(--brand);font-weight:500;margin-top:8px}
+  .phone .stat{display:flex;background:var(--surface);border:1px solid var(--border-soft);
+    border-radius:12px;padding:10px 0;margin-bottom:10px}
+  .phone .stat div{flex:1;text-align:center}
+  .phone .stat div+div{border-left:1px solid var(--border-soft)}
+  .phone .stat b{display:block;font-size:16px;font-weight:600;color:var(--brand)}
+  .phone .stat span{font-size:9.5px;color:var(--txt-3)}
+  .phone .pill{display:inline-flex;align-items:center;gap:5px;font-size:10px;
+    color:var(--brand);background:var(--brand-soft);border-radius:999px;padding:4px 9px;margin-bottom:9px}
+  .phone .dot{width:5px;height:5px;border-radius:50%;background:var(--brand)}
+  .phone .btnrow{display:flex;gap:7px;margin-top:9px}
+  .phone .ab{flex:1;text-align:center;font-size:10.5px;padding:7px 0;
+    border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--txt-2)}
+  .phone .ab.primary{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+  .phone .chip{display:inline-block;font-size:10.5px;padding:5px 11px;border-radius:999px;
+    background:var(--surface);border:1px solid var(--border);color:var(--txt-2);margin:0 5px 6px 0}
+  .phone .chip.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand);font-weight:600}
+  .phone .kv{display:flex;justify-content:space-between;font-size:11px;padding:7px 0;
+    border-bottom:1px solid var(--border-soft);color:var(--txt)}
+  .phone .kv span{color:var(--txt-3)}
+  .phone .pf{font-size:9.5px;color:var(--txt-3);text-align:center;margin-top:12px;line-height:1.7}
+
+  /* ---------- 问题 ---------- */
+  .q{background:var(--surface);border:1px solid var(--border-soft);
+    border-radius:var(--radius);padding:14px 15px;margin-top:9px;
+    display:flex;gap:12px;align-items:flex-start}
+  .q .n{width:23px;height:23px;flex-shrink:0;border-radius:7px;background:var(--brand);
+    color:#fff;font-size:11.5px;font-weight:700;display:flex;align-items:center;
+    justify-content:center;margin-top:2px}
+  .q .body{flex:1;min-width:0}
+  .q .t{font-size:13.5px;font-weight:600;line-height:1.55}
+  .q .h{font-size:11.5px;color:var(--txt-3);margin-top:4px}
+
+  /* ---------- 模板与按钮 ---------- */
+  .tmpl{background:var(--surface-2);border:1px dashed var(--border);
+    border-radius:var(--radius);padding:14px 15px;font-size:12.5px;color:var(--txt-2);
+    line-height:2;white-space:pre-wrap;margin-top:9px;
+    font-family:-apple-system,"PingFang SC",monospace}
+  .btn{margin-top:12px;display:block;width:100%;border:0;cursor:pointer;
+    background:var(--brand);color:#fff;font-size:13.5px;font-weight:600;
+    padding:13px 0;border-radius:12px;font-family:inherit;text-align:center;
+    text-decoration:none;line-height:1.4}
+  .btn.ghost{background:var(--surface);color:var(--txt-2);
+    border:1px solid var(--border);margin-top:9px}
+  .btn:active{opacity:.86}
+
+  .foot{font-size:10.5px;color:var(--txt-3);text-align:center;margin-top:26px;line-height:1.9}
+  .toast{position:fixed;left:50%;bottom:calc(30px + env(safe-area-inset-bottom));
+    transform:translate(-50%,16px);background:rgba(26,36,32,.92);color:#fff;
+    font-size:12.5px;padding:9px 18px;border-radius:999px;opacity:0;
+    pointer-events:none;transition:.22s;z-index:9}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+<!-- KPI 由 tools/sync_promo_kpi.js 从 web/zhishi-data.js 现算同步，基准 2026-11-15；勿手改 -->
+</head>
+<body>
+
+<div class="badge">知时 · 想请你看一眼</div>
+<h1>一个把校园通知收回来的小工具</h1>
+<div class="sub">五分钟 · 不用客气，说难听的最有用</div>
+
+<div class="card">
+  <p><b>知时</b>把散在教务处、团委、图书馆各个地方的通知收在一起，按你关心的事筛出来，提醒你哪些快到期了。</p>
+  <p>下面三屏是它的界面。看完回答三个问题就行，不用写长。</p>
+</div>
+
+<h2>界面</h2>
+<div class="hint">左右滑动，看三屏 ›</div>
+
+<div class="rail">
+  <!-- 要办 -->
+  <div class="phone">
+    <div class="nav">知时 · 数字安农</div>
+    <div class="scr">
+      <div class="lab">要办 · 首页</div>
+      <div class="mhead">
+        <div class="lg">AAU</div>
+        <div><div class="t1">知时 · 今日要办</div><div class="t2">公开通知 · 聚合 · 浓缩 · 溯源</div></div>
+        <div class="bell">12 条</div>
+      </div>
+      <div class="sentry">搜索通知｜转专业 · 奖学金<span>›</span></div>
+      <div class="hero">
+        <div class="k">今日头条</div>
+        <div class="line">有 1 条三天内要办，共 12 条与你有关</div>
+        <div class="lead">关于 2026 年转专业工作的通知 · 教务处</div>
+        <div class="act">去看简报 ›</div>
+      </div>
+      <div class="stat">
+        <div><b>12</b><span>与你有关</span></div>
+        <div><b>1</b><span>三天内</span></div>
+        <div><b data-kpi="real">124</b><span>全部通知</span></div>
+      </div>
+      <div class="sec">三天内要办 <small>会提醒你</small></div>
+      <div class="c hi">
+        <div class="r1"><div class="tt">关于 2026 年转专业申请截止的通知</div><span class="dd hi">剩 2 天</span></div>
+        <div class="sr">教务处 · 长江西路校区</div>
+        <div class="why">为什么推给你：关注「转专业」+ 截止临近</div>
+        <div class="go">看浓缩与原文出处 ›</div>
+      </div>
+      <div class="c">
+        <div class="r1"><div class="tt">第一届「农芯智」AI 智能体创新大赛</div><span class="dd md">剩 6 天</span></div>
+        <div class="sr">团委 · 12 月 3 日前报名</div>
+        <span class="tg">学科竞赛</span><span class="tg">可核对原文</span>
+      </div>
+      <div class="pf">仅使用公开通知数据</div>
+    </div>
+    <div class="tabs"><div class="on">要办</div><div>时间轴</div><div>简报</div><div>订阅</div></div>
+  </div>
+
+  <!-- 简报 -->
+  <div class="phone">
+    <div class="nav">今日简报</div>
+    <div class="scr">
+      <div class="lab">简报 · 主动送达</div>
+      <div class="pill"><span class="dot"></span>已连接智能体服务</div>
+      <div class="c">
+        <div class="r1"><div class="tt">今日主动送达清单</div><span class="dd">规则模式</span></div>
+        <div class="sr">全部 <span data-kpi="real">124</span> 条 · 12 条跟你有关 · 只提醒 1 条</div>
+        <div class="why">因为只有这 1 条在三天内截止，其余先不打扰你</div>
+        <div class="btnrow"><div class="ab primary">重新汇总</div><div class="ab">复制到备忘录</div></div>
+      </div>
+      <div class="sec">该主动提醒你 <small>1 件</small></div>
+      <div class="c hi">
+        <div class="r1"><div class="tt">转专业申请截止</div><span class="dd hi">剩 2 天</span></div>
+        <div class="sr">教务处 · 匹配 92 分</div>
+        <div class="why">凭什么推：关注转专业 · 截止临近</div>
+      </div>
+      <div class="sec">先不提醒 <small>收在列表里</small></div>
+      <div class="c">
+        <div class="tt">关于开展期中教学检查的通知</div>
+        <div class="sr">教务处 · 无截止</div>
+        <span class="tg">考试安排</span>
+      </div>
+      <div class="c">
+        <div class="tt">图书馆冬季开放时间调整</div>
+        <div class="sr">图书馆 · 长期有效</div>
+        <span class="tg">校园服务</span>
+      </div>
+      <div class="pf">不打扰，也是设计的一部分</div>
+    </div>
+    <div class="tabs"><div>要办</div><div>时间轴</div><div class="on">简报</div><div>订阅</div></div>
+  </div>
+
+  <!-- 订阅 -->
+  <div class="phone">
+    <div class="nav">我的订阅</div>
+    <div class="scr">
+      <div class="lab">订阅 · 画像</div>
+      <div class="sec" style="margin-top:0">智能体服务 <small>不开它也在跑</small></div>
+      <div class="c">
+        <div class="pill" style="margin-bottom:6px"><span class="dot"></span>已连接</div>
+        <div class="sr">服务版本 1.0.0</div>
+        <div class="btnrow"><div class="ab primary">立即跑一轮</div><div class="ab">改地址</div></div>
+      </div>
+      <div class="sec">关注事项</div>
+      <div>
+        <span class="chip on">转专业</span><span class="chip on">学科竞赛</span>
+        <span class="chip on">奖助学金</span><span class="chip">考试安排</span>
+        <span class="chip">校园服务</span><span class="chip">就业信息</span>
+      </div>
+      <div class="sec">我的画像</div>
+      <div class="c" style="padding-bottom:5px">
+        <div class="kv"><span>身份</span>本科生</div>
+        <div class="kv"><span>年级</span>2025 级 · 大一</div>
+        <div class="kv"><span>学院</span>信息与人工智能学院</div>
+        <div class="kv" style="border:none"><span>提醒节奏</span>截止前 7 / 3 / 1 天</div>
+      </div>
+      <div class="btnrow"><div class="ab primary">保存画像</div></div>
+      <div class="pf">画像只用于本地匹配</div>
+    </div>
+    <div class="tabs"><div>要办</div><div>时间轴</div><div>简报</div><div class="on">订阅</div></div>
+  </div>
+</div>
+
+<h2>三个问题</h2>
+<div class="hint">凭第一感觉说就行</div>
+
+<div class="q">
+  <div class="n">1</div>
+  <div class="body">
+    <div class="t">打开第一眼，你知道它是干什么的吗？</div>
+    <div class="h">看不懂也直接讲，这句话对我最有用</div>
+  </div>
+</div>
+
+<div class="q">
+  <div class="n">2</div>
+  <div class="body">
+    <div class="t">有没有哪一步，你会想直接退出去？</div>
+    <div class="h">哪里嫌麻烦、哪里看不懂、哪里觉得多余</div>
+  </div>
+</div>
+
+<div class="q">
+  <div class="n">3</div>
+  <div class="body">
+    <div class="t">如果每天早上给你推一条「三天内要办的事」，你会看吗？</div>
+    <div class="h">会看 / 不会看 / 看情况，说真实想法</div>
+  </div>
+</div>
+
+<h2>照着这个格式回我就行</h2>
+<div class="tmpl" id="tmpl">1）第一眼感受：
+2）想退出的地方：
+3）每日提醒会不会看：</div>
+
+<button class="btn" onclick="copyTmpl()">复制这个格式</button>
+<a class="btn ghost" href="https://zhishi-anau.app.workbuddy.host/?sharecode=MYWJ4KD3LI">想点着试试的话，这里能打开</a>
+
+<div class="foot">知时 · 校园公开通知聚合<br>只用公开通知数据，不涉及任何个人信息</div>
+
+<div class="toast" id="toast">已复制</div>
+
+<script>
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg||'已复制';
+  t.classList.add('on');
+  setTimeout(function(){t.classList.remove('on');},1600);
+}
+function doCopy(text){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){toast('已复制');},function(){legacy(text);});
+  }else{legacy(text);}
+}
+function legacy(text){
+  var ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');toast('已复制');}catch(e){toast('请长按手动复制');}
+  document.body.removeChild(ta);
+}
+function copyTmpl(){doCopy(document.getElementById('tmpl').innerText);}
+</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/timeline/timeline",
+    "pages/digest/digest",
+    "pages/search/search",
+    "pages/detail/detail",
+    "pages/me/me",
+    "pages/selfcheck/selfcheck",
+    "pages/push/push",
+    "pages/ask/ask",
+    "pages/calendar/calendar"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#00653E",
+    "navigationBarTitleText": "知时 · 数字安农信息雷达",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F4F7F4",
+    "backgroundColorTop": "#00653E",
+    "backgroundColorBottom": "#F4F7F4"
+  },
+  "tabBar": {
+    "color": "#93A096",
+    "selectedColor": "#00653E",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "雷达"
+      },
+      {
+        "pagePath": "pages/timeline/timeline",
+        "text": "时间轴"
+      },
+      {
+        "pagePath": "pages/digest/digest",
+        "text": "简报"
+      },
+      {
+        "pagePath": "pages/me/me",
+        "text": "订阅"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

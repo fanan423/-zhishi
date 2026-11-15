@@ -1,0 +1,322 @@
+<view class="screen theme-{{theme}}">
+<view class="wrap">
+
+  <view class="mhead">
+    <view class="lg"><view class="sun"></view><text class="aa">AAU</text><view class="book"></view><text class="y">1928</text></view>
+    <view class="bx">
+      <view class="t1">我的订阅</view>
+      <view class="t2">订阅哪些标签，就推哪些通知</view>
+    </view>
+    <view class="tbtn" bindtap="toggleTheme">{{themeIcon}} {{theme === 'dark' ? '深色' : '浅色'}}</view>
+  </view>
+
+  <!-- 运行模式 -->
+  <view class="modebar {{cloudReady ? 'on' : ''}}">
+    <text class="mdot"></text>
+    <text wx:if="{{cloudReady}}">已开通云服务 · 订阅会同步到云端<text wx:if="{{syncText}}">（上次同步 {{syncText}}）</text></text>
+    <text wx:else>当前为本地模式 · 订阅保存在本机</text>
+  </view>
+
+  <!-- ★ 智能体服务：谁来替你盯着（你不打开它也在跑） -->
+  <block wx:if="{{ag}}">
+    <view class="sec">智能体服务 <text class="secsub">· 你不打开小程序，它也在替你盯着</text></view>
+    <view class="agbox {{ag.reachable ? 'on' : (ag.configured ? 'warn' : 'off')}}">
+      <view class="agr1">
+        <text class="agdot"></text>
+        <view class="agrl">
+          <view class="aglabel">{{ag.label}}</view>
+          <view class="agsub" wx:if="{{ag.base}}">服务地址：{{ag.base}}</view>
+          <view class="agsub" wx:else>未配置服务地址 · 只在打开小程序时现算</view>
+          <view class="agsub" wx:if="{{ag.version && ag.version.version}}">服务版本 {{ag.version.version}} · 智能体 {{ag.version.agent}}</view>
+          <view class="agsub warn" wx:if="{{ag.configured && !ag.reachable && ag.error}}">连接失败：{{ag.error}}</view>
+        </view>
+      </view>
+
+      <view class="agacts">
+        <view class="agbtn" bindtap="goDigestAgent">看今日清单</view>
+        <view class="agbtn" bindtap="runAgentNow">{{ag.reachable ? '立即跑一轮' : '刷新状态'}}</view>
+        <view class="agbtn" bindtap="toggleAgentConfig">{{agShowConfig ? '收起' : '改地址'}}</view>
+      </view>
+
+      <view class="agcfg" wx:if="{{agShowConfig}}">
+        <input class="agin" value="{{agBaseInput}}" placeholder="如 https://agent.example.com（留空 = 本地模式）"
+               bindinput="onAgentBaseInput" confirm-type="done" />
+        <view class="agcfgtip">小程序正式环境需 https 且域名已加进「request 合法域名」白名单；不填则用本地算法，功能照常。</view>
+        <view class="agacts">
+          <view class="agbtn primary" bindtap="saveAgentBase">保存并探测</view>
+          <view class="agbtn" bindtap="clearAgentBase">清空（回本地）</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 概览卡 -->
+  <view class="ovc">
+    <view class="ovl">已为你聚合</view>
+    <view class="ovn">{{totalNotices}}<text class="ovu">条通知</text></view>
+    <view class="ovs">其中 <text class="ovhl">{{realNotices}}</text> 条来自安农官网公开页面</view>
+  </view>
+
+  <!-- 快捷入口 -->
+  <view class="quick">
+    <view class="qb" bindtap="goAsk">
+      <text class="qbi">💬</text>
+      <text class="qbt">问知时</text>
+    </view>
+    <view class="qb" bindtap="goCalendar">
+      <text class="qbi">📅</text>
+      <text class="qbt">日历</text>
+    </view>
+    <view class="qb" bindtap="goTimeline">
+      <text class="qbi">🕒</text>
+      <text class="qbt">时间轴</text>
+    </view>
+    <view class="qb" bindtap="goDigest">
+      <text class="qbi">📋</text>
+      <text class="qbt">今日简报</text>
+    </view>
+  </view>
+
+  <!-- 身份 -->
+  <view class="sec">我的身份 <text class="secsub">· 决定哪些通知和你有关</text></view>
+  <view class="box">
+    <view class="idtip" wx:if="{{identityIncomplete}}">⚠ 建议补全身份，推送会更准（下面都是你自己选的标签）</view>
+
+    <picker mode="selector" range="{{identityTypeOpts}}" value="{{identityTypeIdx}}" bindchange="onIdentityType">
+      <view class="row">
+        <view class="rk">身份类型</view>
+        <view class="rv">{{profile.identityType}} <text class="arrow">›</text></view>
+      </view>
+    </picker>
+
+    <picker mode="selector" range="{{gradeOpts}}" value="{{gradeIdx}}" bindchange="onGrade">
+      <view class="row">
+        <view class="rk">年级</view>
+        <view class="rv">{{profile.grade}} <text class="arrow">›</text></view>
+      </view>
+    </picker>
+
+    <picker mode="selector" range="{{collegeOpts}}" value="{{collegeIdx}}" bindchange="onCollege">
+      <view class="row">
+        <view class="rk">学院</view>
+        <view class="rv">{{profile.college}} <text class="arrow">›</text></view>
+      </view>
+    </picker>
+
+    <view class="row">
+      <view class="rk">专业</view>
+      <input class="rin" value="{{profile.major}}" placeholder="选填，如：计算机科学与技术"
+             bindinput="onMajor" />
+    </view>
+
+    <picker mode="selector" range="{{campusOpts}}" value="{{campusIdx}}" bindchange="onCampus">
+      <view class="row">
+        <view class="rk">校区</view>
+        <view class="rv">{{profile.campus}} <text class="arrow">›</text></view>
+      </view>
+    </picker>
+
+    <view class="idsum">当前身份：{{identitySummary}}</view>
+  </view>
+
+  <!-- 关注标签 -->
+  <view class="sec">关注标签 · 决定哪些通知会推给你</view>
+  <view class="box">
+    <view class="chips">
+      <view class="chip {{profile.interests.indexOf(item.key) >= 0 ? 'on' : ''}}"
+            wx:for="{{allTags}}" wx:key="key"
+            data-ev="{{item.key}}" bindtap="toggleEvent">
+        {{item.icon}} {{item.key}}
+        <text class="cnum" wx:if="{{tagCounts[item.key]}}">{{tagCounts[item.key]}}</text>
+      </view>
+    </view>
+
+    <view class="cops">
+      <text class="cop" bindtap="selectAll">全选</text>
+      <text class="cop" bindtap="resetDefault">恢复默认</text>
+    </view>
+
+    <view class="hint">
+      已选 {{profile.interests.length}} / {{allTags.length}} 个标签 ·
+      按当前身份将收到 <text class="reach">{{reachable}}</text> 条通知<text wx:if="{{reachableUrgent > 0}}" class="reachw">（含 {{reachableUrgent}} 条紧急）</text>
+    </view>  </view>
+
+  <!-- 我的关键词：输入一个词（如"正大杯"），之后命中它的通知就主动推给你 -->
+  <view class="sec">我的关键词 <text class="secsub">· 输入你在意的具体名词，命中就推给你</text></view>
+  <view class="box">
+    <view class="kwlead">
+      标签是"我们替你分好的类"；关键词是"你自己敲进去的词"——
+      比如你参加了正大杯，就订「正大杯」，以后凡是有它出现的通知都会主动推给你。
+    </view>
+
+    <view class="kwin">
+      <input class="kwinbox" value="{{kwInput}}" placeholder="如：正大杯 / 挑战杯 / 数学建模"
+             confirm-type="done" bindinput="onKwInput" bindconfirm="onKwConfirm" />
+      <view class="kwadd {{kwInput ? 'on' : ''}}" bindtap="addKeyword">添加</view>
+    </view>
+
+    <!-- 已订阅的关键词：数字 = 当前池里命中几条；紧急的标红 -->
+    <view class="kwchips" wx:if="{{kwStats.length > 0}}">
+      <view class="kwchip {{item.count === 0 ? 'empty' : ''}}" wx:for="{{kwStats}}" wx:key="kw">
+        <text class="kwchip-t">{{item.kw}}</text>
+        <text class="kwchip-n" wx:if="{{item.count > 0}}">{{item.count}} 条</text>
+        <text class="kwchip-n empty" wx:else>暂无命中</text>
+        <text class="kwchip-hot" wx:if="{{item.urgent > 0}}">{{item.urgent}} 紧急</text>
+        <text class="kwchip-x" data-kw="{{item.kw}}" catchtap="removeKeyword">×</text>
+      </view>
+    </view>
+
+    <!-- 推荐词：池里真命中、你还没订的 -->
+    <view class="kwsug" wx:if="{{kwSuggest.length > 0}}">
+      <text class="kwsug-l">你可能还关心：</text>
+      <text class="kwsug-w" wx:for="{{kwSuggest}}" wx:key="*this"
+            data-kw="{{item}}" bindtap="tapSuggest">+ {{item}}</text>
+    </view>
+
+    <view class="hint" wx:if="{{kwStats.length > 0}}">
+      已订 {{kwStats.length}} / {{kwMax}} 个关键词 ·
+      按当前身份可命中 <text class="reach">{{kwReach}}</text> 条通知<text wx:if="{{kwReachUrgent > 0}}" class="reachw">（含 {{kwReachUrgent}} 条紧急）</text>
+    </view>
+    <view class="hint" wx:else>
+      还没有关键词 —— 输入一个你在意的具体名词试试（最多 {{kwMax}} 个）
+    </view>
+  </view>
+
+  <!-- 提醒设置 -->
+  <view class="sec">提醒设置</view>
+  <view class="box">
+    <picker mode="selector" range="{{advanceOpts}}" value="{{advanceIdx}}" bindchange="onAdvance">
+      <view class="row">
+        <view class="rk">提前量</view>
+        <view class="rv">{{profile.advance}} <text class="arrow">›</text></view>
+      </view>
+    </picker>
+
+    <picker mode="selector" range="{{channelOpts}}" value="{{channelIdx}}" bindchange="onChannel">
+      <view class="row">
+        <view class="rk">提醒方式</view>
+        <view class="rv">{{profile.channel}} <text class="arrow">›</text></view>
+      </view>
+    </picker>
+
+    <!-- ★ 微信服务通知：真·触达（关掉小程序也能找你） -->
+    <view class="row wxrow">
+      <view class="wxrowl">
+        <view class="rk">微信服务通知</view>
+        <view class="wxrows {{wxNotify.granted ? (wxNotify.demo ? 'demo' : 'real') : 'off'}}">{{wxNotify.status}}</view>
+      </view>
+      <button class="wxbtn {{wxNotify.granted ? 'on' : ''}}" bindtap="enableWxNotify" disabled="{{wxBusy}}">
+        {{wxBusy ? '请求中…' : (wxNotify.granted ? '更新' : '开启')}}
+      </button>
+    </view>
+    <view class="wxrowtip">{{wxNotify.statusTip}}</view>
+  </view>
+
+  <!-- 我的收藏：按「离截止还有几天」排序，紧急的顶上来 -->
+  <block wx:if="{{favList.length > 0}}">
+    <view class="sec">
+      我的收藏 <text class="secsub">· {{favList.length}} 条</text>
+      <text class="secwarn" wx:if="{{favAlerts > 0}}">{{favAlerts}} 条要抓紧</text>
+    </view>
+    <view class="box">
+      <view class="frow lv-{{item.lv}}" wx:for="{{favList}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
+        <view class="fmid">
+          <view class="ft">{{item.title}}</view>
+          <view class="fs">{{item.source}} · 发布于 {{item.publish}}<text wx:if="{{item.deadline}}"> · 截止 {{item.deadline}}</text></view>
+          <view class="fprog" wx:if="{{item.stepTotal > 0}}">
+            <text class="fpi {{item.allDone ? 'ok' : ''}}">{{item.allDone ? '☑ 全部办完' : '☐ 已办 ' + item.stepDone + '/' + item.stepTotal + ' 步'}}</text>
+            <text class="fplink">继续办 ›</text>
+          </view>
+        </view>
+        <view class="fdd lv-{{item.lv}}">{{item.lvLabel}}</view>
+      </view>
+    </view>
+    <view class="favhint">收藏会一直留着，按「还剩几天」自动排在最前——不用担心看过了就忘。</view>
+  </block>
+
+  <!-- 已删除通知：本地隐藏，可找回（不触碰云端公开数据） -->
+  <block wx:if="{{hiddenList.length > 0}}">
+    <view class="sec">
+      已删除 <text class="secsub">· {{hiddenList.length}} 条</text>
+      <text class="secwarn" bindtap="clearHidden">清空</text>
+    </view>
+    <view class="box">
+      <view class="hrow" wx:for="{{hiddenList}}" wx:key="id">
+        <view class="hmid" data-id="{{item.id}}" bindtap="goDetail">
+          <view class="ft">{{item.title}}</view>
+          <view class="fs">{{item.source}}<text wx:if="{{item.publish}}"> · {{item.publish}}</text></view>
+        </view>
+        <view class="hbtn" data-id="{{item.id}}" catchtap="restoreHidden">找回</view>
+      </view>
+    </view>
+    <view class="favhint">删除只是本地隐藏，不改变云端公开数据；点「找回」即可恢复。</view>
+  </block>
+
+  <!-- 问知时：把学生脑子里的疑问做成一问一答 -->
+  <view class="sec">问知时 <text class="secsub">· 有问题直接问，答案带依据</text></view>
+  <view class="scbox" bindtap="goAsk">
+    <view class="scic">💬</view>
+    <view class="scbd">
+      <view class="sct">13 个高频疑问，一问一答</view>
+      <view class="scd">"这周还剩几件事""先办哪个""我漏了什么""哪些是全校能报的"——每个答案都由真实字段算出，并附一行「依据」说明算法。</view>
+    </view>
+    <view class="scar">›</view>
+  </view>
+
+  <!-- 办事日历 -->
+  <view class="sec">办事日历 <text class="secsub">· 哪天忙一目了然</text></view>
+  <view class="scbox" bindtap="goCalendar">
+    <view class="scic">📅</view>
+    <view class="scbd">
+      <view class="sct">按月看截止日分布</view>
+      <view class="scd">把有截止的通知落到对应日期格子上，红橙黄绿代表紧急度，今天高亮。回答「具体哪天我忙、哪天能空出来」。</view>
+    </view>
+    <view class="scar">›</view>
+  </view>
+
+  <!-- 主动推送：控制推什么、推多少、要不要打扰 -->
+  <view class="sec">主动推送 <text class="secsub">· 决定怎么推、推多少、要不要打扰你</text></view>
+  <view class="scbox" bindtap="goPush">
+    <view class="scic">🔔</view>
+    <view class="scbd">
+      <view class="sct">推送设置与运行状态</view>
+      <view class="scd">可解释排序 · 每个理由都能核对 · 只有三天内截止才允许打扰。还能开启「关掉页面也提醒」的后台推送。</view>
+    </view>
+    <view class="scar">›</view>
+  </view>
+
+  <!-- 数据自查自纠：把"查过什么、扔了什么"摊开给用户看 -->
+  <view class="sec">数据自查 <text class="secsub">· 每次展示前先自己查一遍</text></view>
+  <view class="scbox" bindtap="goSelfcheck">
+    <view class="scic">🛡</view>
+    <view class="scbd">
+      <view class="sct">查看数据自查报告</view>
+      <view class="scd">三条铁律：出处可举证 · 链接不伪造 · 引文可定位。不可靠的直接剔除，可疑的如实标注，全部留痕。</view>
+    </view>
+    <view class="scar">›</view>
+  </view>
+
+  <!-- 数据边界 -->
+  <view class="note">
+    <view class="nt1">数据边界（我们只用这些）</view>
+    <view class="nl">✓ 公网公开通知页面（学院 / 教务处 / 图书馆 / 学工 · ahau.edu.cn）</view>
+    <view class="nl">✓ 你在这里主动填写的身份标签（身份类型 / 年级 / 学院 / 专业 / 校区）与关注标签</view>
+    <view class="nl no">✕ 不采集身份证号、学号、手机号等敏感信息</view>
+    <view class="nl no">✕ 不读取课表、成绩、学籍等任何私域数据</view>
+    <view class="nl no">✕ 不接入教务系统后台、不获取登录态</view>
+  </view>
+
+  <view class="acts">
+    <button class="ab primary {{dirty ? '' : 'dis'}}" bindtap="save" disabled="{{!dirty}}">
+      {{dirty ? '保存修改' : '已保存'}}
+    </button>
+    <button class="ab" bindtap="about">关于知时</button>
+  </view>
+
+  <view class="foot">
+    <view><text class="hl">合规：</text>仅聚合公网公开通知页面，不涉及教务系统后台与任何私域数据。</view>
+    <view style="margin-top:8rpx">本项目为「农芯智」AI 智能体创新大赛参赛作品。</view>
+  </view>
+
+</view>
+</view>

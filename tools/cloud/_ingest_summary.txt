@@ -1,0 +1,97 @@
+知时小程序 · 云端入库与验证报告
+=================================
+生成时间: 2026-11-06
+应用 ID : wbapp_lBRRlCoeVBJxbo2R0uqNgo
+表      : zhishi_notices / zhishi_profiles
+
+【一】需求①「信息要来自安农」——已落地
+  数据源: 安徽农业大学公网公开通知页 (ahau.edu.cn)
+  入库条数: 33  (real=true 33 / 33)
+  原文链接: 33 / 33 条含 ahau.edu.cn 链接
+  覆盖站点(unit): 5
+    gxy  工学院 · 通知公告        8
+    lib  图书馆 · 新闻公告        8
+    jgxy 经济管理学院 · 工作动态  8
+    www  安徽农业大学官网         8
+    xxb  信息与计算机学院 · 通知公告 1
+  标签分布(event):
+    校内通知 13 / 讲座培训 7 / 图书资源 5 / 学工事务 3
+    考试安排 2 / 选课 1 / 学科竞赛 1 / 奖助学金 1
+
+  新增列: url, site, unit, src_generated_at
+  入库角色: migrate（服务端管理员，绕过 RLS）
+  采集口径: 仅公网公开通知页，不含任何登录态/私域数据
+
+【二】需求②「写入用户个人身份信息，用于分类推送」——已落地
+  合规口径: 只存"身份标签"，不采集身份证号/学号/手机号/成绩/课表
+
+  zhishi_profiles 新增列:
+    identity_type  身份类型（本科生/研究生/教职工）
+    major          专业（自由文本）
+    campus         校区（长江西路校区/…）
+  原有列复用: grade(年级) / college(学院)
+
+  身份维度汇总（identity.js 为单一事实来源）:
+    IDENTITY_TYPES 本科生 / 研究生 / 教职工
+    GRADES         8 档（含研究生年级）
+    COLLEGES       12 学院
+    CAMPUSES       3 校区
+
+  分类推送逻辑:
+    AUDIENCE_RULES 关键词 -> 身份约束
+      先判身份专属词（研究生/教职工/大一/大四）
+      命中则按 identityType / grade 校验
+      无专属词再用通用词（全体/全校/师生）兜底
+      判不出则放行（不漏推）
+
+  接入点: cloud.js / store.js(passesIdentity) / identity.js
+          me 页(我的身份) / index 页(当前身份条) / detail 页(原文溯源)
+
+【三】小程序完善（本轮多版本迭代）
+  V1 数据与状态层加固
+    - store.js 新增 warmUp()：缓存优先，首屏秒开
+    - hydrateNotices() 云端成功即落本地缓存(CACHE_KEY=zhishi_notices_cache_v2)
+    - sourceInfo() 暴露数据源 cloud/cache/local + 上次同步时间
+    - fillProfile() 画像缺字段自动补齐；identityComplete() 完成度判定
+    - tagCounts/getStats 改基于 ACTIVE_NOTICES（含云端数据），新增 urgent/siteCnt
+    - cloud.js 全部调用加 try/catch，异常不崩、自动降级
+  V2 首页重构（从演示件 → 真实信息流）
+    - 自动加载：进页即预热+拉云端，无需手动"运行智能体"
+    - 关注流视图：三档分区（三天内/一周内/长期），倒计时升序
+    - 按标签视图：保留原分组能力，可切换
+    - 顶部身份条（可点进改）、数据源状态条、紧急提示条
+    - 下拉刷新 + 手动刷新；空态引导区分"未订阅/无匹配"
+  V3 订阅页升级
+    - 概览卡（聚合总数 / 其中安农官网条数）
+    - 身份未完成提示；实时预览"按当前身份将收到 N 条（含 M 条紧急）"
+    - 同步状态文案（上次同步时间）
+  V4 详情页增强
+    - 关键信息卡置顶（截止/谁该看/去哪办/要交什么）
+    - 收藏功能（utils/favorites.js）：收藏即提醒，可在"我的"查看
+    - 分享：转发给同学 / 分享到朋友圈
+  V5 全局样式统一
+    - app.wxss 固化设计口径（色板/圆角/间距），补通用 .ab/.chip/.hr
+    - 自检脚本补入 search.wxml/wxss
+
+  新增文件: miniprogram/utils/favorites.js
+            tools/cloud/test_feed.js（关注流/身份/收藏功能自测）
+
+【四】验证结果
+  端到端 pipeline 自测 (test_pipeline.js) : 通过 11 / 11
+    归一化 33 条、全部 real、event 均为合法标签、均有安农链接
+    身份筛选: 大一 31 / 大四 32 / 研究生 31 / 教职工 32
+    按标签分组(大一+默认4标签): 学科竞赛1 / 奖助学金1 / 考试安排2
+  身份匹配自测 (test_identity.js) : 通过 17 / 17
+  关注流/收藏自测 (test_feed.js) : 通过 23 / 23
+    三档分区不重不漏、画像补齐、身份切换生效、收藏幂等、排序稳定
+  网页版渲染测试 (check_render.js) : 通过 17 / 17
+  小程序代码自检 (check_miniprogram.py) : 通过，无致命错误
+  WXML/WXSS 兼容性 (check_wxml.py) : 通过（含 search 页）
+  全站自检 (check_all_pages.py) : 通过
+  云端实测查询: total=33, real=33, units=5, ahau_urls=33
+
+【五】待办
+  1) AppID 仍为 touristappid —— 正式发布需替换真实 AppID
+  2) data/notices.js 本地池仍含 8 条 demo —— 现作为云端不可用时的降级兜底
+     如需清空请告知
+  3) 身份字段维度（类型/年级/学院/专业/校区）如需增删请告知

@@ -1,0 +1,169 @@
+<view class="screen theme-{{theme}}">
+<view class="wrap">
+
+  <!-- 简报头 -->
+  <view class="bhead">
+    <view class="lg"><view class="sun"></view><text class="aa">AAU</text><view class="book"></view><text class="y">1928</text></view>
+    <view class="bx">
+      <view class="t1">今日简报</view>
+      <view class="t2">{{stamp}} 生成 · 知时 · 数字安农信息雷达</view>
+    </view>
+  </view>
+
+  <!-- 一句话总结 -->
+  <view class="sumcard lv-{{brief.index.level}}">
+    <view class="sumlb">一句话总结</view>
+    <view class="sumtx" wx:for="{{sentences}}" wx:key="*this">{{item}}</view>
+    <view class="sumidx">
+      <text class="sin">知时指数</text>
+      <text class="siv">{{brief.index.score}}</text>
+      <text class="sil">{{brief.index.label}}</text>
+    </view>
+  </view>
+
+  <block wx:if="{{hasAny}}">
+
+    <!-- 三天内要办 -->
+    <block wx:if="{{brief.must.length > 0}}">
+      <view class="sec red">⏰ 三天内要办 · {{brief.must.length}} 件</view>
+      <view class="icard {{item.countdown <= 0 ? 'now' : 'hi'}}"
+            wx:for="{{brief.must}}" wx:key="id"
+            data-id="{{item.id}}" bindtap="goDetail">
+        <view class="ir1">
+          <view class="it">{{item.title}}</view>
+          <view class="idd">
+            {{item.countdown === 0 ? '今天' : (item.countdown < 0 ? '已过期' : 'D-' + item.countdown)}}
+          </view>
+        </view>
+        <view class="isr">{{item.icon}} {{item.event}} · 截止 {{item.deadline}}</view>
+        <view class="ione" wx:if="{{item.digestOne}}">{{item.digestOne}}</view>
+        <view class="ientry" wx:if="{{item.entry}}">📍 {{item.entry}}</view>
+      </view>
+    </block>
+
+    <!-- 本周留意 -->
+    <block wx:if="{{brief.watch.length > 0}}">
+      <view class="sec">📅 本周留意 · {{brief.watch.length}} 件</view>
+      <view class="wcard" wx:for="{{brief.watch}}" wx:key="id"
+            data-id="{{item.id}}" bindtap="goDetail">
+        <view class="wr1">
+          <view class="wt">{{item.title}}</view>
+          <view class="wdd">D-{{item.countdown}}</view>
+        </view>
+        <view class="wsr">{{item.icon}} {{item.event}} · 截止 {{item.deadline}}</view>
+      </view>
+    </block>
+
+  </block>
+
+  <!-- 空态 -->
+  <view class="empty" wx:else>
+    <view>今天没有临近截止的事</view>
+    <view style="margin-top:10rpx">去看看还有哪些通知可以关注</view>
+    <view class="ebtn" bindtap="goTimeline">看完整时间轴 ›</view>
+  </view>
+
+  <!-- 数据可信度 -->
+  <view class="sec">数据可信度<text class="secsub">· 你看到的从哪来</text></view>
+  <view class="trust trust-{{trustLevel}}">
+    <view class="tr1">
+      <text class="trl">真实公开源占比</text>
+      <text class="trv">{{brief.stats.realCnt}} / {{brief.stats.collected}}</text>
+    </view>
+    <view class="trbar"><view class="trfill"></view></view>
+    <view class="trmsg">{{trustLabel}}</view>
+    <view class="trsub">
+      其中 {{brief.stats.linkedCnt}} 条带可核对原文链接；已浓缩 {{brief.stats.understood}} 条 · 来源站点 {{brief.stats.siteCnt}} 个 · 覆盖标签 {{brief.stats.tagCnt}} 类
+    </view>
+    <view class="trsub trnote">
+      没链接的条目标注为「演示样例 / 未留存链接」，不当真实通知使用。有链接的可在详情页复制原文地址逐字比对。
+    </view>
+  </view>
+
+  <!-- ★ 智能体主动送达（服务端常驻、按点自己跑出来的清单） -->
+  <view class="sec">🤖 智能体主动送达<text class="secsub">· 你不打开它也在跑</text></view>
+
+  <view class="agent">
+    <!-- 状态条：如实标注到底连没连上、是远端算的还是本地算的 -->
+    <view class="aghead">
+      <view class="agdot agdot-{{agentMode}}{{agentDegraded ? ' warn' : ''}}"></view>
+      <view class="aglab">{{agentLabel}}</view>
+      <view class="agvia">{{agentVia === 'remote' ? '服务端算' : '本地算'}}</view>
+    </view>
+
+    <!-- 降级提示（配了服务却没连上，必须说出来） -->
+    <view class="agwarn" wx:if="{{agentDegraded}}">
+      智能体服务未连接，已降级用本地算法现算（结论口径一致，但不含大模型理解）。
+      <text class="agwarnr" wx:if="{{agentDegradeReason}}">原因：{{agentDegradeReason}}</text>
+    </view>
+
+    <!-- 加载中 -->
+    <view class="agloading" wx:if="{{agentLoading && !agentReady}}">正在向智能体要今天的清单…</view>
+
+    <!-- 出错 -->
+    <view class="agwarn" wx:elif="{{agentErr}}">取清单失败：{{agentErr}}</view>
+
+    <block wx:elif="{{agentReady}}">
+      <!-- 主动送达（该打断你的） -->
+      <block wx:if="{{agentNotify.length > 0}}">
+        <view class="agtl">该主动提醒你 · {{agentNotify.length}} 件</view>
+        <view class="agnotify" wx:for="{{agentNotify}}" wx:key="id"
+              data-id="{{item.id}}" bindtap="goAgentDetail">
+          <view class="agnr1">
+            <view class="agnt">{{item.title}}</view>
+            <view class="agnd">{{item.dueText}}</view>
+          </view>
+          <view class="agnsr">{{item.event}}<text wx:if="{{item.source}}"> · {{item.source}}</text></view>
+          <view class="agnrs" wx:if="{{item.reasonLine}}">💡 {{item.reasonLine}}</view>
+          <view class="agnone" wx:if="{{item.digestOne}}">{{item.digestOne}}</view>
+        </view>
+      </block>
+
+      <!-- 静默进流（不打扰） -->
+      <block wx:if="{{agentSilent.length > 0}}">
+        <view class="agsl">静默进流 · 不打扰你（{{agentSilent.length}} 条示例）</view>
+        <view class="agsitem" wx:for="{{agentSilent}}" wx:key="id"
+              data-id="{{item.id}}" bindtap="goAgentDetail">
+          <text class="agst">{{item.title}}</text>
+          <text class="agsd">{{item.dueText}}</text>
+        </view>
+      </block>
+
+      <view class="agem" wx:if="{{agentNotify.length === 0 && agentSilent.length === 0}}">
+        按你当前的订阅，今天没有需要主动送达的事。
+      </view>
+
+      <!-- 元信息：让"它什么时候算的、用的什么模型"可核对 -->
+      <view class="agmeta" wx:if="{{agentMeta}}">
+        <text>最近计算：{{agentMeta.ranAt}}</text>
+        <text>模式：{{agentMeta.mode === 'llm' ? '大模型理解 + 规则打分' : '纯规则'}}</text>
+        <text wx:if="{{agentMeta.model}}">模型：{{agentMeta.model}}</text>
+        <text>命中 {{agentMeta.counts.matched}} 条 · 打扰 {{agentMeta.counts.notify}} 条 · 静默 {{agentMeta.counts.silent}} 条</text>
+        <text wx:if="{{agentMeta.elapsedMs}}">耗时 {{agentMeta.elapsedMs}} ms</text>
+      </view>
+
+      <view class="agacts">
+        <view class="agbtn" bindtap="rerunAgent">🔄 让它重算一遍</view>
+        <view class="agbtn" bindtap="copyAgent">📋 复制清单</view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 快捷入口 -->
+  <view class="quick">
+    <view class="qbtn" bindtap="goTimeline">🕒 时间轴</view>
+    <view class="qbtn" bindtap="goSearch">🔍 搜通知</view>
+    <view class="qbtn" bindtap="goMe">⭐ 我的订阅</view>
+  </view>
+
+  <view class="acts">
+    <button class="ab primary" bindtap="copyBrief">复制简报</button>
+  </view>
+
+  <view class="foot">
+    <view><text class="hl">简报怎么来的：</text>把你自己关注范围内、按身份筛过的通知，按「几天内截止」压成一段话。</view>
+    <view style="margin-top:8rpx">内容全部实时派生，不预置结论；订阅一改，简报立刻跟着变。</view>
+  </view>
+
+</view>
+</view>

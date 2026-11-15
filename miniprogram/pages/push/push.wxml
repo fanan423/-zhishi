@@ -1,0 +1,185 @@
+<view class="screen theme-{{theme}}">
+<view class="wrap">
+
+  <!-- 引擎状态 -->
+  <view class="sumcard">
+    <view class="sumlb">🔔 主动推送引擎</view>
+    <view class="sumtx">{{summary.line}}</view>
+    <view class="sumidx">
+      <text class="sin">覆盖率</text>
+      <text class="siv">{{stats.coverage}}%</text>
+      <text class="sil">全池 {{stats.pool}} 条 → 推 {{stats.pushing}} 条 · 打扰 {{stats.notify}} 条</text>
+    </view>
+  </view>
+
+  <!-- 应用内推送开关 -->
+  <view class="sec">应用内推送 <text class="secsub">· 打开小程序时生效</text></view>
+  <view class="box">
+    <view class="trow">
+      <view class="tl">
+        <view class="tt">推送总开关</view>
+        <view class="td">{{flags.pushOn ? '已开启 —— 进入即自动按档案排好推送流' : '已关闭 —— 首页不再自动排序推送'}}</view>
+      </view>
+      <view class="sw {{flags.pushOn ? 'on' : ''}}" data-k="pushOn" bindtap="toggleFlag">
+        <view class="swd"></view>
+      </view>
+    </view>
+
+    <view class="trow">
+      <view class="tl">
+        <view class="tt">新收录提醒</view>
+        <view class="td">{{flags.pushNew ? '有新增条目时标记并排到最前' : '不区分新旧，按紧急度排'}}</view>
+      </view>
+      <view class="sw {{flags.pushNew ? 'on' : ''}}" data-k="pushNew" bindtap="toggleFlag">
+        <view class="swd"></view>
+      </view>
+    </view>
+
+    <view class="trow">
+      <view class="tl">
+        <view class="tt">计分排序</view>
+        <view class="td">{{flags.pushScore ? '按可解释分数排（紧急 + 身份契合 + 新收录）' : '仅按倒计时排'}}</view>
+      </view>
+      <view class="sw {{flags.pushScore ? 'on' : ''}}" data-k="pushScore" bindtap="toggleFlag">
+        <view class="swd"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 打扰策略 -->
+  <view class="sec">打扰策略 <text class="secsub">· 什么程度才配打断你</text></view>
+  <view class="box">
+    <picker mode="selector" range="{{['只打扰三天内（推荐）', '有新就打扰', '从不打扰，只静默进流']}}"
+            value="{{notifyLevel === 'hot' ? 0 : (notifyLevel === 'all' ? 1 : 2)}}"
+            bindchange="onNotifyLevel">
+      <view class="row">
+        <view class="rk">打扰级别</view>
+        <view class="rv">{{notifyLevelText}} <text class="arrow">›</text></view>
+      </view>
+    </picker>
+    <view class="whybox">
+      <view class="whyt">为什么默认只打扰三天内</view>
+      <view class="whyd">通知权限是最贵的资源。每次有新条目都弹一下，用户一周内就会关掉通知 —— 那时再紧急的事也提醒不到了。宁可少打扰九次，也要保住第十次能打扰到你。</view>
+    </view>
+  </view>
+
+  <!-- ★ 微信服务通知（真·触达：关掉小程序也能找你） -->
+  <view class="sec">微信服务通知 <text class="secsub">· 关掉小程序也能提醒你</text></view>
+  <view class="box">
+    <view class="wxhead">
+      <view class="wxl">
+        <view class="wxt">当前状态</view>
+        <view class="wxs {{wx.granted ? (wx.demo ? 'demo' : 'real') : 'off'}}">{{wx.status}}</view>
+      </view>
+      <view class="wxtag {{wx.demo ? 'demo' : 'real'}}">{{wx.demo ? '演示模式' : '真实下发'}}</view>
+    </view>
+
+    <view class="whyd" style="margin:6rpx 0 12rpx">{{wx.statusTip}}</view>
+
+    <view class="wxrow" wx:if="{{wx.granted}}">
+      <text class="wxk">已订阅类别</text>
+      <view class="wxv">
+        <text class="wxtype" wx:for="{{wx.typeNames}}" wx:key="*this">{{item}}</text>
+        <text class="wxempty" wx:if="{{wx.typeNames.length === 0}}">—</text>
+      </view>
+    </view>
+    <view class="wxrow">
+      <text class="wxk">提前几天提醒</text>
+      <picker mode="selector" range="{{advanceOptions}}" range-key="label" value="{{advanceIdx}}" bindchange="onAdvanceChange">
+        <view class="wxv pick">{{advanceOptions[advanceIdx].label}} <text class="arrow">›</text></view>
+      </picker>
+    </view>
+    <view class="wxrow">
+      <text class="wxk">送达留痕</text>
+      <text class="wxv">{{wx.sends}} 次{{wx.sends > 0 ? '' : '（暂无）'}}</text>
+    </view>
+
+    <view class="wxacts">
+      <button class="ab primary {{busy ? 'dis' : ''}}" bindtap="enableWxNotify" disabled="{{busy}}">
+        {{busy ? '请求中…' : (wx.granted ? '更新订阅授权' : '开启微信服务通知')}}
+      </button>
+      <button class="ab ghost" bindtap="simulateDeliver">模拟一次主动送达</button>
+    </view>
+
+    <view class="whybox">
+      <view class="whyt">这一步到底做了什么</view>
+      <view class="whyd">① 通过微信官方订阅消息接口取得你的授权（必须你本人点，我们无法替你开）；② 把你订的类别和提前几天写进云端；③ 云端每天检查公开通知，临近截止就通过微信服务通知送达。<text class="dc" wx:if="{{wx.demo}}">当前未在小程序后台配置订阅消息模板，因此走完整交互但暂不真发；配置模板 ID 后自动转为真实下发，你无需重新操作。</text></view>
+    </view>
+  </view>
+
+  <!-- ★ 触达时间线（可演示、可复核的"主动找你"闭环） -->
+  <view class="sec">触达时间线 <text class="secsub">· 什么时候会主动找你</text></view>
+  <view class="box">
+    <view class="reachsum">
+      与你相关 <text class="rsn">{{reach.mine}}</text> 条 · 已规划提醒 <text class="rsn">{{reach.scheduled}}</text> 条 ·
+      未来 14 天内会打扰 <text class="rsn hl">{{reach.upcoming}}</text> 次
+    </view>
+    <view class="whyd" style="margin-top:6rpx">按你选的「{{reach.advanceText}}」推演：每条通知在截止前会主动提醒几次、具体哪天提醒，全部由真实发布日与截止日算出。</view>
+
+    <block wx:if="{{reachDays.length > 0}}">
+      <view class="dayline">
+        <view class="daygroup" wx:for="{{reachDays}}" wx:key="dateText" wx:for-item="day">
+          <view class="daydot {{day.items[0].plan[0].kind}}"></view>
+          <view class="daybody">
+            <view class="daydate">{{day.dateText}} <text class="daycnt">{{day.items.length}} 条</text></view>
+            <view class="dayitem" wx:for="{{day.items}}" wx:key="id" wx:for-item="it">
+              <view class="dit">{{it.title}}</view>
+              <view class="dmeta">{{it.source}} · {{it.deadlineText}} 截止 · 剩 {{it.daysLeft}} 天</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+    <view class="empty" wx:else>当前档案下，未来两周没有需要提醒的条目</view>
+  </view>
+
+  <!-- 推送留痕 -->
+  <view class="sec">推送留痕 <text class="secsub">· 可追问、可重置</text></view>
+  <view class="box">
+    <view class="kvrow"><text class="kk">累计推送批次</text><text class="vv">{{state.pushCount}} 次</text></view>
+    <view class="kvrow"><text class="kk">已推记录</text><text class="vv">{{state.tracked}} 条</text></view>
+    <view class="kvrow"><text class="kk">最近一次</text><text class="vv">{{stateText}}</text></view>
+    <view class="hint">「新收录」就是拿这份记录比出来的 —— 推过的不会再标新，所以不会天天拿同一条烦你。</view>
+    <view class="acts">
+      <button class="ab" bindtap="resetState">重置推送记录（全部标为未读）</button>
+    </view>
+  </view>
+
+  <!-- 推送流预览 -->
+  <view class="sec">当前推送流 <text class="secsub">· 前 {{cards.length}} 条</text></view>
+
+  <block wx:if="{{cards.length > 0}}">
+    <view class="pcard lv-{{item.pushLevel}}" wx:for="{{cards}}" wx:key="id"
+          data-id="{{item.id}}" bindtap="goDetail">
+      <view class="prow">
+        <text class="plv {{item.pushLevel}}">{{item.pushLevelIcon}} {{item.pushLevelLabel}}</text>
+        <text class="pnew" wx:if="{{item.isNew}}">新</text>
+        <text class="prank">#{{item.rank}}</text>
+      </view>
+      <view class="ptitle">{{item.title}}</view>
+      <view class="pmeta">{{item.source}}<text wx:if="{{item.site}}"> · {{item.site}}</text>
+        <text wx:if="{{item.countdown !== null}}" class="pcd {{item.countdown < 0 ? 'exp' : (item.countdown <= 3 ? 'now' : 'far')}}">{{item.countdown < 0 ? '已过期' : '剩 ' + item.countdown + ' 天'}}</text>
+      </view>
+      <view class="pd1" wx:if="{{item.digestOne}}">{{item.digestOne}}</view>
+      <view class="ptags">
+        <text class="tg">{{item.event}}</text>
+        <text class="tg g" wx:if="{{item.real && item.url}}">✓ 可核对原文</text>
+        <text class="tg o" wx:if="{{item.real && !item.url}}">真实采集</text>
+        <text class="tg wx" wx:if="{{wx.granted && item.pushLevel !== 'soon' && item.pushLevel !== 'plan' && item.pushLevel !== 'far'}}">📲 微信会提醒</text>
+        <text class="tg s">推送分 {{item.pushScore}}</text>
+      </view>
+    </view>
+  </block>
+  <view class="empty" wx:else>当前档案下暂无推送</view>
+
+  <view class="acts">
+    <button class="ab primary" bindtap="goIndex">看完整推送流 ›</button>
+  </view>
+
+  <view class="foot">
+    <view><text class="hl">推送原则：</text>只推和你身份、关注相符的通知，且只有三天内截止的才允许打扰，其余静默进流；每条都能在详情页逐条核对是否与你相关。</view>
+    <view style="margin-top:8rpx">数据来源：安徽农业大学公网公开通知页（ahau.edu.cn）。仅聚合公开信息，不涉及教务后台 / 课表 / 成绩 / 学籍。</view>
+  </view>
+
+</view>
+</view>

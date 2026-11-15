@@ -1,0 +1,106 @@
+<view class="screen theme-{{theme}}">
+<view class="wrap">
+
+  <!-- 今日一问：顶部大卡，把最该看的结论端出来 -->
+  <view class="hcard tone-{{headline.tone}}" bindtap="onHeadline">
+    <view class="hq">
+      <text class="hqi">💬</text>
+      <text class="hqt">{{headline.q}}</text>
+    </view>
+    <view class="ha">{{headline.answer}}</view>
+    <view class="hm" wx:if="{{headline.more}}">{{headline.more}}</view>
+  </view>
+
+  <!-- 数据自评：问答能覆盖多少数据 -->
+  <view class="statbar">
+    <view class="sti">
+      <text class="stn">{{stats.questions}}</text>
+      <text class="stl">个问题</text>
+    </view>
+    <view class="sti">
+      <text class="stn">{{stats.pool}}</text>
+      <text class="stl">条和你有关</text>
+    </view>
+    <view class="sti">
+      <text class="stn">{{stats.readyRate}}%</text>
+      <text class="stl">数据完备度</text>
+    </view>
+  </view>
+
+  <!-- 答案区：当前打开的问题 -->
+  <block wx:if="{{opened}}">
+    <view class="acard tone-{{opened.tone}}">
+      <view class="aq">{{opened.q}}</view>
+      <view class="aa">{{opened.answer}}</view>
+
+      <view class="abasis">
+        <text class="abl">依据</text>
+        <text class="abt">{{opened.basis}}</text>
+      </view>
+
+      <!-- 材料清单（need_material 这类问题会带） -->
+      <block wx:if="{{opened.materials}}">
+        <view class="mlist">
+          <view class="mt">要准备的材料（共 {{opened.materials.length}} 项）</view>
+          <view class="mrow" wx:for="{{opened.materials}}" wx:key="material">
+            <text class="mdot">•</text>
+            <view class="mbody">
+              <text class="mname">{{item.material}}</text>
+              <text class="mfrom" data-id="{{item.id}}" catchtap="goDetail">来自：{{item.from}} ›</text>
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <!-- 相关条目 -->
+      <block wx:if="{{opened.items.length > 0}}">
+        <view class="ilist">
+          <view class="it">相关条目（{{opened.itemCount}} 条）</view>
+          <view class="irow" wx:for="{{opened.items}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
+            <view class="imid">
+              <view class="ititle">{{item.title}}</view>
+              <view class="imeta">{{item.source}}<text wx:if="{{item.deadline}}"> · 截止 {{item.deadline}}</text></view>
+            </view>
+            <view class="idd lv-{{item.level}}">
+              {{item.countdown === null ? '长期' : (item.countdown < 0 ? '已过期' : (item.countdown === 0 ? '今天' : '剩' + item.countdown + '天'))}}
+            </view>
+          </view>
+          <view class="imore" wx:if="{{opened.itemCount > opened.items.length}}">还有 {{opened.itemCount - opened.items.length}} 条，去首页推送流看全部 ›</view>
+        </view>
+      </block>
+      <view class="iempty" wx:if="{{opened.items.length === 0 && !opened.materials}}">这条问题下没有需要处理的条目</view>
+    </view>
+  </block>
+
+  <!-- 问题目录：按组罗列 -->
+  <view class="sec">还能问什么 <text class="secsub">· 点一下就有答案</text></view>
+
+  <view class="qgroup" wx:for="{{groups}}" wx:key="key" wx:for-item="g">
+    <view class="ghead">
+      <text class="gi">{{g.icon}}</text>
+      <text class="gl">{{g.label}}</text>
+    </view>
+    <view class="qlist">
+      <view class="qrow {{expandId === q.id ? 'on' : ''}}" wx:for="{{g.questions}}" wx:key="id" wx:for-item="q"
+            data-id="{{q.id}}" bindtap="onAsk">
+        <view class="qbody">
+          <text class="qq">{{q.q}}</text>
+          <text class="qh">{{q.hint}}</text>
+        </view>
+        <text class="qa">{{expandId === q.id ? '已答' : '问 ›'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="acts">
+    <button class="ab primary" bindtap="goCalendar">看办事日历 ›</button>
+    <button class="ab" bindtap="goIndex">回推送流</button>
+  </view>
+
+  <view class="foot">
+    <view><text class="hl">答问原则：</text>每个答案都由真实字段算出，附「依据」一行说明算法；数据不足时如实说「算不出来」，不编结论。</view>
+    <view style="margin-top:8rpx">数据来源：安徽农业大学公网公开通知页（ahau.edu.cn）。仅聚合公开信息，不涉及教务后台 / 课表 / 成绩 / 学籍。</view>
+  </view>
+
+</view>
+</view>

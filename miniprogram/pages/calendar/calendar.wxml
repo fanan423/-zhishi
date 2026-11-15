@@ -1,0 +1,86 @@
+<view class="screen theme-{{theme}}">
+<view class="wrap">
+
+  <!-- 月份切换 -->
+  <view class="mbar">
+    <view class="mnav" bindtap="prevMonth">‹</view>
+    <view class="mlab">
+      <text class="ml">{{monthLabel}}</text>
+      <text class="mtoday" bindtap="goToday">回到今天</text>
+    </view>
+    <view class="mnav" bindtap="nextMonth">›</view>
+  </view>
+
+  <!-- 月历网格 -->
+  <view class="calbox">
+    <view class="wkrow">
+      <text class="wk {{item === '六' || item === '日' ? 'wkend' : ''}}" wx:for="{{weekdays}}" wx:key="*this">{{item}}</text>
+    </view>
+    <view class="crow" wx:for="{{weeks}}" wx:key="*this" wx:for-item="week">
+      <view class="cell {{cell.blank ? 'blank' : ''}} {{cell.hasItem ? 'has lv-' + cell.level : ''}} {{cell.isToday ? 'today' : ''}} {{cell.isPast ? 'past' : ''}} {{selectedDay === cell.day && !cell.blank ? 'sel' : ''}}"
+            wx:for="{{week}}" wx:key="key" wx:for-item="cell"
+            data-d="{{cell.day}}" bindtap="onPickDay">
+        <text class="cd" wx:if="{{!cell.blank}}">{{cell.day}}</text>
+        <view class="cdot" wx:if="{{cell.hasItem}}"></view>
+        <text class="ccnt" wx:if="{{cell.count > 1}}">{{cell.count}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 图例 -->
+  <view class="legend">
+    <view class="lg"><text class="dot now"></text>今天/明天</view>
+    <view class="lg"><text class="dot hot"></text>三天内</view>
+    <view class="lg"><text class="dot soon"></text>一周内</view>
+    <view class="lg"><text class="dot plan"></text>本月内</view>
+  </view>
+
+  <!-- 本月总结 -->
+  <view class="sumline">{{summary}}</view>
+
+  <!-- 选中日详情 -->
+  <view class="sec">{{selectedLabel}}</view>
+  <block wx:if="{{selectedItems.length > 0}}">
+    <view class="ibox">
+      <view class="irow lv-{{item.level}}" wx:for="{{selectedItems}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
+        <view class="imid">
+          <view class="ititle">{{item.title}}</view>
+          <view class="imeta">{{item.source}}<text wx:if="{{item.deadline}}"> · 截止 {{item.deadline}}</text></view>
+        </view>
+        <view class="idd">{{item.countdown < 0 ? '已过期' : (item.countdown === 0 ? '今天' : '剩' + item.countdown + '天')}}</view>
+      </view>
+    </view>
+  </block>
+  <view class="empty" wx:else>这天没有截止事项，可以安排别的。</view>
+
+  <!-- 本月全部 -->
+  <view class="sec" bindtap="toggleList">
+    本月全部待办 <text class="secsub">· {{monthCount}} 件 {{showList ? '收起' : '展开'}}</text>
+  </view>
+  <block wx:if="{{showList}}">
+    <block wx:if="{{monthItems.length > 0}}">
+      <view class="ibox">
+        <view class="irow lv-{{item.level}}" wx:for="{{monthItems}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
+          <view class="imid">
+            <view class="ititle">{{item.title}}</view>
+            <view class="imeta">{{item.source}} · 截止 {{item.deadline}}</view>
+          </view>
+          <view class="idd">{{item.countdown < 0 ? '已过期' : (item.countdown === 0 ? '今天' : '剩' + item.countdown + '天')}}</view>
+        </view>
+      </view>
+    </block>
+    <view class="empty" wx:else>这个月还没有要办的事。</view>
+  </block>
+
+  <view class="acts">
+    <button class="ab primary" bindtap="goAsk">问知时 ›</button>
+    <button class="ab" bindtap="goIndex">回推送流</button>
+  </view>
+
+  <view class="foot">
+    <view><text class="hl">日历口径：</text>只落你关注标签 + 身份匹配上的通知，按官方原文的截止日归档。已过期的标灰，不再占用待办位置。</view>
+    <view style="margin-top:8rpx">数据来源：安徽农业大学公网公开通知页（ahau.edu.cn）。仅聚合公开信息，不涉及教务后台 / 课表 / 成绩 / 学籍。</view>
+  </view>
+
+</view>
+</view>

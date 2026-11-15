@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据从哪来 · 跑在哪 | 知时</title>
+<style>
+  :root{--bg:#0f1115;--panel:#171a21;--panel2:#1e222b;--line:#2a2f3a;
+    --text:#e8eaed;--sub:#9aa4b2;--accent:#4dd6a8;--accent2:#5b9cf8;
+    --warn:#f5a524;--danger:#f2565b;--radius:14px;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(1200px 600px at 20% -10%,#1a2432 0%,var(--bg) 55%);
+    color:var(--text);font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;min-height:100vh;padding:26px 20px 60px}
+  .wrap{max-width:1120px;margin:0 auto}
+  h1{font-size:20px;letter-spacing:.5px}
+  .sub{font-size:13px;color:var(--sub);margin-top:5px}
+  .sub b{color:var(--accent)}
+
+  .sec{margin-top:34px;font-size:12.5px;color:var(--sub);letter-spacing:2.5px;
+    border-bottom:1px solid var(--line);padding-bottom:9px;display:flex;
+    justify-content:space-between;align-items:flex-end}
+  .sec small{font-size:11px;color:#5f6a78;letter-spacing:0}
+
+  /* 答案卡 */
+  .ans{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+  .ac{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 22px;position:relative;overflow:hidden}
+  .ac::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+  .ac.b::before{background:var(--accent2)}
+  .ac .q{font-size:11px;color:var(--sub);letter-spacing:1.5px}
+  .ac .a{font-size:15px;font-weight:600;margin:6px 0 10px;color:var(--accent)}
+  .ac.b .a{color:var(--accent2)}
+  .ac p{font-size:13px;color:#c8d0db;margin-bottom:7px}
+  .ac p:last-child{margin-bottom:0}
+  .ac b{color:var(--text)}
+  .ac .no{color:var(--danger)}
+
+  /* 链路图 */
+  .flow{margin-top:20px;background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);padding:24px 20px;overflow-x:auto}
+  .fl{display:flex;align-items:center;gap:0;min-width:880px}
+  .node{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:14px 12px;text-align:center;position:relative}
+  .node .lbl{font-size:10.5px;color:var(--sub);letter-spacing:1.2px}
+  .node .ttl{font-size:13.5px;font-weight:600;margin-top:5px}
+  .node .desc{font-size:11.5px;color:var(--sub);margin-top:5px;line-height:1.6}
+  .node.row1{border-color:rgba(77,214,168,.35)}
+  .node.row1 .ttl{color:var(--accent)}
+  .node.row2{border-color:rgba(91,156,248,.35)}
+  .node.row2 .ttl{color:var(--accent2)}
+  .node.row3{border-color:rgba(245,165,36,.35)}
+  .node.row3 .ttl{color:var(--warn)}
+  .arrow{flex:0 0 34px;text-align:center;color:#4a5464;font-size:18px}
+  .node .badge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+    font-size:9.5px;padding:1px 8px;border-radius:20px;white-space:nowrap;
+    background:var(--accent);color:#08120e;font-weight:700}
+  .node.row2 .badge{background:var(--accent2);color:#061322}
+  .node.row3 .badge{background:var(--warn);color:#1b1206}
+
+  /* 数据源三层 */
+  .layers{margin-top:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .lyr{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 18px;position:relative;overflow:hidden}
+  .lyr::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
+  .lyr.ok::before{background:var(--accent)}
+  .lyr.mid::before{background:var(--warn)}
+  .lyr.no::before{background:var(--danger)}
+  .lyr .lt{font-size:11px;letter-spacing:1px;color:var(--sub)}
+  .lyr .lh{font-size:15px;font-weight:600;margin:4px 0 7px}
+  .lyr.ok .lh{color:var(--accent)}
+  .lyr.mid .lh{color:var(--warn)}
+  .lyr.no .lh{color:var(--danger)}
+  .lyr p{font-size:12.5px;color:var(--sub);line-height:1.7}
+  .lyr p b{color:#c8d0db}
+  .lyr .tag{display:inline-block;margin-top:9px;font-size:10.5px;padding:2px 9px;
+    border-radius:20px;font-weight:600}
+  .lyr.ok .tag{background:rgba(77,214,168,.14);color:var(--accent);border:1px solid rgba(77,214,168,.32)}
+  .lyr.mid .tag{background:rgba(245,165,36,.14);color:var(--warn);border:1px solid rgba(245,165,36,.32)}
+  .lyr.no .tag{background:rgba(242,86,91,.14);color:var(--danger);border:1px solid rgba(242,86,91,.32)}
+
+  /* 平台表 */
+  .tbl{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:6px 4px;margin-top:20px;overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:760px}
+  th{font-size:11.5px;color:var(--sub);letter-spacing:.5px;text-align:left;
+    padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap;font-weight:500}
+  td{padding:14px;border-bottom:1px solid rgba(42,47,58,.55);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:rgba(255,255,255,.02)}
+  .name{font-size:13.5px;font-weight:600}
+  .name small{display:block;font-size:11px;color:var(--sub);font-weight:400;margin-top:2px}
+  .st{display:inline-block;font-size:11px;padding:2px 9px;border-radius:20px;white-space:nowrap;font-weight:600}
+  .st.yes{background:rgba(77,214,168,.14);color:var(--accent);border:1px solid rgba(77,214,168,.32)}
+  .st.half{background:rgba(245,165,36,.14);color:var(--warn);border:1px solid rgba(245,165,36,.32)}
+  .st.no{background:rgba(242,86,91,.14);color:var(--danger);border:1px solid rgba(242,86,91,.32)}
+  .why2{font-size:12px;color:#c8d0db}
+  .why2 b{color:var(--accent)}
+  .why2 i{color:var(--warn);font-style:normal}
+
+  .note{margin-top:18px;background:var(--panel2);border:1px solid var(--line);
+    border-left:3px solid var(--accent2);border-radius:12px;padding:16px 18px;font-size:13px}
+  .note h3{font-size:13.5px;color:var(--accent2);margin-bottom:8px;letter-spacing:.5px}
+  .note p{color:#c8d0db;margin-bottom:8px}
+  .note p:last-child{margin-bottom:0}
+  .note b{color:var(--accent)}
+  .note em{color:var(--warn);font-style:normal}
+  .note.danger{border-left-color:var(--danger)}
+  .note.danger h3{color:var(--danger)}
+
+  .back{display:inline-block;margin-top:20px;font-size:13px;color:var(--accent);text-decoration:none}
+  .back:hover{text-decoration:underline}
+  @media(max-width:900px){.ans,.layers{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>数据从哪来 · 跑在哪</h1>
+  <div class="sub">正面回答评委必问的两个问题：<b>你的数据源是什么</b>、<b>它运行在什么平台上</b></div>
+
+  <!-- 两个答案 -->
+  <div class="sec">先给结论 <small>一句话版，答辩可直接照念</small></div>
+  <div class="ans">
+    <div class="ac">
+      <div class="q">QUESTION 01</div>
+      <div class="a">数据源：公网公开通知页 + 学生自填偏好</div>
+      <p><b>不是"爬"，是"聚合"。</b>我们只读学校自己挂出来给所有人看的公开页面——教务处、学院、学工、图书馆的官网通知栏。等同于"人工每天翻六遍官网"的自动化。</p>
+      <p>学生的年级、学院、关注偏好，由学生<b>在小程序里主动填写</b>。</p>
+      <p><span class="no">不碰：</span>教务系统后台、课表成绩学籍、任何需登录的内部数据。</p>
+    </div>
+    <div class="ac b">
+      <div class="q">QUESTION 02</div>
+      <div class="a">平台：微信小程序（学生端）+ 网页版（演示端）</div>
+      <p><b>学生真正用的形态是微信小程序</b>——通知触达的最短路径，点开即用，不用装 App。</p>
+      <p><b>网页版七页</b>用于答辩演示与功能核对，双击即开。</p>
+      <p>后端（定时聚合 + 大模型理解）规划部署在<b>学校提供的云资源/算力</b>上——这块学校本就给参赛队开放申请。</p>
+    </div>
+  </div>
+
+  <!-- 链路图 -->
+  <div class="sec">完整链路 <small>一条公开通知，如何变成一张提醒卡片</small></div>
+  <div class="flow">
+    <div class="fl">
+      <div class="node row1">
+        <div class="badge">数据源</div>
+        <div class="lbl">STEP 01</div>
+        <div class="ttl">聚合公开页</div>
+        <div class="desc">教务处/学院/学工/图书馆官网通知栏，定时读取</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node row2">
+        <div class="badge">理解层</div>
+        <div class="lbl">STEP 02</div>
+        <div class="ttl">AI 读懂并重构</div>
+        <div class="desc">大模型抽取五要素：谁能报/交什么/去哪办/几号截止/来源</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node row2">
+        <div class="badge">匹配层</div>
+        <div class="lbl">STEP 03</div>
+        <div class="ttl">按画像筛选</div>
+        <div class="desc">比对学生填的年级/学院/关注标签，只留相关的</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node row3">
+        <div class="badge">推送出口</div>
+        <div class="lbl">STEP 04</div>
+        <div class="ttl">主动推送到微信</div>
+        <div class="desc">小程序订阅消息 + 倒计时卡片，临期再提醒一次</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 采集端已实装 -->
+  <div class="sec">采集端：已经真实跑起来了 <small>不是纸上方案</small></div>
+  <div class="note" style="border-left-color:var(--accent);margin-top:20px">
+    <h3>本项目的采集器已实装，并真实抓取到公开通知</h3>
+    <p>我们写了一个采集脚本（<b>tools/collect_notices.py</b>），它做三件事：<b>①</b> 请求公开通知页 HTML → <b>②</b> 按站点规则解析出标题/正文/日期 → <b>③</b> 存入通知库。</p>
+    <p>它已经<b>真实抓取到若干条公开通知</b>，全部带原文、来源 URL、抓取时间。这些通知在 Demo 里带蓝色「真实数据」徽章——<b>不是我编的，是脚本从官网抓的</b>。</p>
+    <p>技术要点：<b>各站点页面模板不同</b>，所以采集器采用"一个站点一套解析规则"的设计——配一次、长期用。这也是"教务处 / 学院已跑通"的实际含义。</p>
+  </div>
+
+  <!-- 数据源三层 -->
+  <div class="sec">数据源拆解 <small>按合规性分三层，态度写在明面上</small></div>
+  <div class="layers">
+    <div class="lyr ok">
+      <div class="lt">LAYER 01 · 现在就做</div>
+      <div class="lh">公网公开页</div>
+      <p>教务处、学院、学工、图书馆的通知页。<b>不用登录、不算隐私</b>，就是学校公开挂出来的信息。Demo 里那条农芯智通知，就是从官网真实抓取。</p>
+      <div class="tag">● 已跑通</div>
+    </div>
+    <div class="lyr mid">
+      <div class="lt">LAYER 02 · 需授权</div>
+      <div class="lh">公众号 / QQ群</div>
+      <p>公众号公开推文（用户送链接再解析）；QQ群内公开文件（需群主同意）。<b>只处理公开内容，不读私聊。</b></p>
+      <div class="tag">◐ 半自动</div>
+    </div>
+    <div class="lyr no">
+      <div class="lt">LAYER 03 · 永不碰</div>
+      <div class="lh">教务后台 / 数智安农登录态</div>
+      <p>含成绩、学籍、课表等个人数据。<b>技术上能绕过登录，但合规上不能碰。</b>这是红线，不是能力问题。</p>
+      <div class="tag">✕ 明确不做</div>
+    </div>
+  </div>
+
+  <!-- 平台表 -->
+  <div class="sec">平台矩阵 <small>每个载体干什么，边界在哪</small></div>
+  <div class="tbl">
+    <table>
+      <thead>
+        <tr><th>平台 / 载体</th><th>角色</th><th>当前状态</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="name">微信小程序<small>学生端主形态</small></td>
+          <td><span class="st yes">推送出口</span></td>
+          <td class="why2"><b>源码已完成</b>（原生，20 个文件）</td>
+          <td class="why2">通知列表 / 详情+溯源 / 订阅设置三页。导入开发者工具即可运行。</td>
+        </tr>
+        <tr>
+          <td class="name">网页版 Demo<small>答辩演示端</small></td>
+          <td><span class="st yes">演示出口</span></td>
+          <td class="why2"><b>八页已完成</b></td>
+          <td class="why2">双击即开，不需安装任何环境。含主链路、浓缩溯源、理解层、数据源边界、总览页等。</td>
+        </tr>
+        <tr>
+          <td class="name">后端服务<small>定时聚合 + 理解层</small></td>
+          <td><span class="st half">规划中</span></td>
+          <td class="why2"><i>待部署</i></td>
+          <td class="why2">规划跑在学校云资源上：定时任务聚合公开页 → 调大模型抽取字段 → 写入通知库。</td>
+        </tr>
+        <tr>
+          <td class="name">大模型算力<small>理解层调用</small></td>
+          <td><span class="st half">可申请</span></td>
+          <td class="why2"><i>学校提供</i></td>
+          <td class="why2">学校为参赛队开放算力申请通道，理解层不必自费。这也是"能落地"的实证。</td>
+        </tr>
+        <tr>
+          <td class="name">教务系统 / 数智安农后台<small>登录态内部系统</small></td>
+          <td><span class="st no">永不接入</span></td>
+          <td class="why2">——</td>
+          <td class="why2"><i>红线</i> · 含个人数据，需登录鉴权。唯一正当路径是<b>赢下比赛后由学校接入</b>。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <h3>为什么"数据源"这件事要说这么细</h3>
+    <p>1. <b>评委一定会问"你的数据从哪来"</b>：大多数队伍答"我们爬取各类信息"，答完就完了。我们把"哪条能做、哪条需授权、哪条不能碰"全摊开——<b>边界感本身就是成熟度</b>。</p>
+    <p>2. <b>"聚合"和"爬取"是两个不同的词</b>：爬取暗示越权抓取；聚合指明只处理公开信息。用词背后是对合规的理解。</p>
+    <p>3. <b>公开源足够支撑实用性</b>：学校所有面向学生的通知，本来就发布在公开页上。我们只是把它们聚起来，让该看到的人看到。</p>
+  </div>
+
+  <div class="note" style="border-left-color:var(--accent)">
+    <h3>平台选择的现实约束（对着官方提交办法说）</h3>
+    <p><b>官方要求</b>：作品若交"可访问链接"，链接必须公网可达，失效视为未有效提交。</p>
+    <p><b>我们的现状</b>：小程序 + 网页版为自写代码（原创代码类），当前在本地运行 → 落在<b>路径 2</b>，须交完整 5 分钟演示视频，且<b>答辩现场必须能当场跑起来</b>。</p>
+    <p><b>升级机会</b>：一旦后端部署到公网或学校云资源，即可升到<b>路径 1</b>，额外提交一个"评委点开就能看"的链接——<b>可访问的实物，比只有视频更有说服力</b>。</p>
+  </div>
+
+  <div class="note danger">
+    <h3>两条红线，答辩时可直接指着讲</h3>
+    <p>1. <b>不碰登录态系统</b>：教务后台、数智安农账号内数据一律不接。学校 2026 年 10 月刚发过《弱口令及账号权限专项排查整治》通知，此时宣称"爬教务后台"是反向踩雷。</p>
+    <p>2. <b>不碰私域数据</b>：课表、成绩、学籍、一卡通，全部排除在数据源之外。学生画像只来自<b>学生自己主动填写</b>的部分。</p>
+  </div>
+
+  <a class="back" href="inspect.html">← 返回 Demo 索引</a>
+</div>
+</body>
+</html>

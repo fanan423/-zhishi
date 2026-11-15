@@ -1,0 +1,268 @@
+/* 办事日历 —— 数字安农风格（跟随主题变量） */
+
+/* ---- 月份切换条 ---- */
+.mbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(160deg, var(--brand-2), var(--brand));
+  border-radius: 20rpx;
+  padding: 18rpx 22rpx;
+  box-shadow: 0 8rpx 22rpx rgba(0, 101, 62, 0.2);
+}
+.mbar .mnav {
+  width: 60rpx;
+  height: 60rpx;
+  line-height: 56rpx;
+  text-align: center;
+  font-size: 40rpx;
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+}
+.mbar .mlab {
+  text-align: center;
+  flex: 1;
+}
+.mbar .ml {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 1rpx;
+}
+.mbar .mtoday {
+  display: block;
+  font-size: 20rpx;
+  color: rgba(255, 255, 255, 0.82);
+  margin-top: 6rpx;
+}
+
+/* ---- 日历网格 ---- */
+.calbox {
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 20rpx;
+  padding: 20rpx 16rpx;
+  margin-top: 16rpx;
+  box-shadow: var(--shadow);
+}
+.wkrow {
+  display: flex;
+}
+.wkrow .wk {
+  flex: 1;
+  text-align: center;
+  font-size: 21rpx;
+  color: var(--txt-3);
+  font-weight: 600;
+  padding-bottom: 12rpx;
+}
+.wkrow .wkend { color: var(--gold-ink); }
+
+.crow {
+  display: flex;
+}
+.cell {
+  flex: 1;
+  height: 88rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 12rpx;
+  margin: 2rpx;
+}
+.cell.blank { background: transparent; }
+.cell .cd {
+  font-size: 25rpx;
+  color: var(--txt-2);
+  font-weight: 500;
+}
+.cell.has .cd { color: var(--txt); font-weight: 700; }
+.cell.past .cd { color: var(--txt-3); }
+
+/* 有事项的日期底色 */
+.cell.has.lv-now  { background: rgba(192, 57, 43, 0.14); }
+.cell.has.lv-hot  { background: rgba(192, 57, 43, 0.10); }
+.cell.has.lv-soon { background: var(--gold-soft); }
+.cell.has.lv-plan { background: var(--brand-soft); }
+
+.cell .cdot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  margin-top: 4rpx;
+  background: var(--brand);
+}
+.cell.has.lv-now .cdot  { background: var(--alert); }
+.cell.has.lv-hot .cdot  { background: var(--alert); }
+.cell.has.lv-soon .cdot { background: var(--gold); }
+.cell.has.lv-plan .cdot { background: var(--brand); }
+
+.cell .ccnt {
+  position: absolute;
+  top: 2rpx;
+  right: 8rpx;
+  font-size: 17rpx;
+  font-weight: 700;
+  color: var(--txt-3);
+}
+
+/* 今天高亮 */
+.cell.today {
+  border: 2rpx solid var(--brand);
+}
+.cell.today .cd { color: var(--brand); font-weight: 800; }
+
+/* 选中 */
+.cell.sel {
+  background: var(--brand);
+}
+.cell.sel .cd { color: #FFFFFF; }
+.cell.sel.has.lv-now, .cell.sel.has.lv-hot { background: var(--alert); }
+.cell.sel .cdot { background: #FFFFFF; }
+.cell.sel .ccnt { color: rgba(255, 255, 255, 0.9); }
+
+/* ---- 图例 ---- */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18rpx;
+  margin-top: 16rpx;
+  padding: 0 6rpx;
+}
+.legend .lg {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: 20rpx;
+  color: var(--txt-3);
+}
+.legend .dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+}
+.legend .dot.now, .legend .dot.hot { background: var(--alert); }
+.legend .dot.soon { background: var(--gold); }
+.legend .dot.plan { background: var(--brand); }
+
+.sumline {
+  font-size: 23rpx;
+  color: var(--txt-2);
+  line-height: 1.6;
+  margin-top: 16rpx;
+  padding: 16rpx 20rpx;
+  background: var(--brand-soft);
+  border-radius: 14rpx;
+}
+
+/* ---- 条目列表 ---- */
+.ibox {
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 18rpx;
+  padding: 6rpx 24rpx;
+  box-shadow: var(--shadow);
+}
+.irow {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--border-soft);
+  position: relative;
+}
+.irow:last-child { border-bottom: none; }
+.irow::before {
+  content: '';
+  position: absolute;
+  left: -14rpx;
+  top: 24rpx;
+  bottom: 24rpx;
+  width: 6rpx;
+  border-radius: 3rpx;
+  background: var(--border);
+}
+.irow.lv-hi::before { background: var(--alert); }
+.irow.lv-md::before { background: var(--gold); }
+.irow.lv-lo::before { background: var(--brand); }
+.irow .imid { flex: 1; min-width: 0; }
+.irow .ititle {
+  font-size: 26rpx;
+  color: var(--txt);
+  line-height: 1.45;
+}
+.irow .imeta {
+  font-size: 20rpx;
+  color: var(--txt-3);
+  margin-top: 6rpx;
+}
+.irow .idd {
+  font-size: 20rpx;
+  font-weight: 700;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  flex-shrink: 0;
+  color: var(--txt-2);
+  background: var(--border-soft);
+}
+
+/* ---- 通用 ---- */
+.sec {
+  font-size: 26rpx;
+  color: var(--brand);
+  font-weight: 700;
+  letter-spacing: 1rpx;
+  margin: 30rpx 0 14rpx;
+  display: flex;
+  align-items: center;
+}
+.sec .secsub {
+  font-size: 21rpx;
+  color: var(--txt-3);
+  font-weight: 400;
+  margin-left: 10rpx;
+}
+.empty {
+  text-align: center;
+  color: var(--txt-3);
+  font-size: 24rpx;
+  padding: 40rpx 20rpx;
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 18rpx;
+}
+.acts {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin: 28rpx 0 10rpx;
+}
+.ab {
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  padding: 22rpx 0;
+  border: 1rpx solid var(--border);
+  background: var(--surface);
+  color: var(--txt);
+  line-height: 1.2;
+}
+.ab.primary {
+  background: linear-gradient(160deg, var(--brand-2), var(--brand));
+  color: #FFFFFF;
+  border: none;
+  font-weight: 600;
+  box-shadow: 0 6rpx 18rpx rgba(0, 101, 62, 0.22);
+}
+.foot {
+  margin-top: 36rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--border);
+  font-size: 21rpx;
+  color: var(--txt-3);
+  line-height: 1.8;
+}
+.foot .hl { color: var(--brand); font-weight: 600; }

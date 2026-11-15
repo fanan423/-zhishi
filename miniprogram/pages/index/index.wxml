@@ -1,0 +1,232 @@
+<view class="screen theme-{{theme}}">
+<view class="wrap">
+
+  <!-- 顶部品牌 -->
+  <view class="mhead">
+    <view class="lg"><view class="sun"></view><text class="aa">AAU</text><view class="book"></view><text class="y">1928</text></view>
+    <view class="bx">
+      <view class="t1">知时 · 数字安农信息雷达</view>
+      <view class="t2">安徽农业大学公开通知 · 聚合 · 浓缩 · 溯源</view>
+    </view>
+    <view class="bell" wx:if="{{stats.matched}}">{{stats.matched}} 条</view>
+  </view>
+
+  <!-- 搜索入口 -->
+  <view class="sentry" bindtap="goSearch">
+    <text class="seic">🔍</text>
+    <text class="setx">搜索通知｜转专业 · 奖学金 · 竞赛 · 考试</text>
+    <text class="sego">›</text>
+  </view>
+
+  <!-- 当前身份 -->
+  <view class="idbar {{identityIncomplete ? 'warn' : ''}}" bindtap="goMe">
+    <text class="idlab">当前身份</text>
+    <text class="idval">{{identitySummary}}</text>
+    <text class="idedit">{{identityIncomplete ? '完善 ›' : '修改 ›'}}</text>
+  </view>
+
+  <!-- 数据源状态条 -->
+  <view class="srcbar">
+    <text class="sdot {{source}}"></text>
+    <text class="stx">数据源：{{sourceLabel}}<text wx:if="{{lastSyncText}}"> · {{lastSyncText}}</text> · {{stats.realCnt}} 条来自安农官网</text>
+    <text class="sref" bindtap="onRefreshTap">刷新</text>
+  </view>
+
+  <!-- ============ 今日头条（合并原先三张重复卡：紧急提示 / 推送小结 / 问知时一句话） ============ -->
+  <view class="hero tone-{{hero.tone}}" wx:if="{{hero}}" bindtap="heroTap">
+    <view class="hero-hd">
+      <text class="hero-k">今日头条</text>
+      <text class="hero-badge" wx:if="{{hero.badge}}">{{hero.badge}}</text>
+      <text class="hero-idx lv-{{index.level}}">知时指数 {{index.score}}</text>
+    </view>
+
+    <!-- 一句话结论：全由数据派生，只在此处出现一次 -->
+    <view class="hero-line">{{hero.line}}</view>
+
+    <!-- 最要紧的那一条：级别 + 标题 + 来源 -->
+    <block wx:if="{{hero.hasLead}}">
+      <view class="hero-lead">
+        <text class="hero-lv {{hero.lead.pushLevel}}">{{hero.lead.pushLevelIcon}} {{hero.lead.pushLevelLabel}}</text>
+        <text class="hero-new" wx:if="{{hero.lead.isNew}}">新</text>
+        <text class="hero-title">{{hero.lead.title}}</text>
+      </view>
+      <view class="hero-meta">{{hero.lead.source}}<text wx:if="{{hero.lead.site}}"> · {{hero.lead.site}}</text><text wx:if="{{hero.lead.countdown !== null}}" class="hcd {{hero.lead.countdown < 0 ? 'exp' : (hero.lead.countdown <= 3 ? 'now' : 'far')}}">{{hero.lead.countdown < 0 ? '已过期' : '剩 ' + hero.lead.countdown + ' 天'}}</text></view>
+    </block>
+    <view class="hero-hint" wx:else>{{hero.hint}}</view>
+
+    <view class="hero-ft">
+      <text class="hero-act" catchtap="heroAction">{{hero.action.text}}</text>
+      <text class="hero-sub" wx:if="{{hero.hasLead}}">共 {{hero.total}} 条与你有关<text wx:if="{{hero.newCount}}"> · {{hero.newCount}} 条新收录</text></text>
+    </view>
+  </view>
+
+  <!-- 知时指数 + 简报摘要（点进简报）—— 与头条并存，但收敛为一条细条 -->
+  <view class="idxwrap lv-{{index.level}}" bindtap="goDigest">
+    <view class="idl">
+      <view class="idl1">今日知时指数</view>
+      <view class="idl2">{{briefLine}}</view>
+    </view>
+    <view class="idr">
+      <view class="idn">{{index.score}}</view>
+      <view class="idg">看简报 ›</view>
+    </view>
+  </view>
+
+  <!-- 快捷入口 -->
+  <view class="quick">
+    <view class="qb" bindtap="goAsk">
+      <text class="qbi">💬</text>
+      <text class="qbt">问知时</text>
+      <text class="qbs">一问一答</text>
+    </view>
+    <view class="qb" bindtap="goCalendar">
+      <text class="qbi">📅</text>
+      <text class="qbt">办事日历</text>
+      <text class="qbs">哪天忙</text>
+    </view>
+    <view class="qb" bindtap="goTimeline">
+      <text class="qbi">🕒</text>
+      <text class="qbt">时间轴</text>
+      <text class="qbs">{{stats.urgent + soon.length}} 件待办</text>
+    </view>
+    <view class="qb" bindtap="goDigest">
+      <text class="qbi">📋</text>
+      <text class="qbt">今日简报</text>
+      <text class="qbs">一句话读完</text>
+    </view>
+  </view>
+
+  <!-- 统计条 -->
+  <view class="stat">
+    <view class="it"><view class="n">{{stats.matched}}</view><view class="l">命中你</view></view>
+    <view class="it"><view class="n {{stats.urgent > 0 ? 'red' : ''}}">{{stats.urgent}}</view><view class="l">3天内</view></view>
+    <view class="it"><view class="n">{{stats.tagCnt}}</view><view class="l">标签</view></view>
+    <view class="it"><view class="n">{{stats.siteCnt}}</view><view class="l">来源站点</view></view>
+  </view>
+
+  <!-- 视图切换 -->
+  <view class="vsw">
+    <view class="vsb {{viewMode === 'feed' ? 'on' : ''}}" data-m="feed" bindtap="switchView">推送流<text class="vsb-n" wx:if="{{readStats.unread}}">{{readStats.unread}}</text></view>
+    <view class="vsb {{viewMode === 'tag' ? 'on' : ''}}" data-m="tag" bindtap="switchView">按标签</view>
+    <view class="vsb lk" wx:if="{{readStats.hidden}}" bindtap="goHidden">已删除 {{readStats.hidden}}</view>
+  </view>
+
+  <!-- ============ 推送流（梯度卡片：中卡 / 小卡归档） ============ -->
+  <block wx:if="{{viewMode === 'feed'}}">
+    <block wx:if="{{majorCards.length > 0 || minorCards.length > 0}}">
+
+      <!-- 中卡：三天内要办的，信息全、显眼 -->
+      <block wx:if="{{majorCards.length > 0}}">
+        <view class="sec red">🔴 三天内要办 · {{majorCards.length}} 条<text class="secwarn">会打扰你</text></view>
+        <view class="pc major lv-{{item.pushLevel}} {{item.read ? 'read' : ''}}"
+              wx:for="{{majorCards}}" wx:key="id"
+              data-id="{{item.id}}" bindtap="goDetail" bindlongpress="onCardLongPress">
+          <view class="prow">
+            <text class="plv {{item.pushLevel}}">{{item.pushLevelIcon}} {{item.pushLevelLabel}}</text>
+            <text class="pnew" wx:if="{{item.isNew}}">新</text>
+            <text class="pdot" wx:if="{{!item.read}}" data-id="{{item.id}}" catchtap="toggleRead">未读</text>
+            <text class="prank">#{{item.rank}}</text>
+          </view>
+          <view class="ptitle">{{item.title}}</view>
+          <view class="pmeta"><text>{{item.source}}</text><text wx:if="{{item.site}}"> · {{item.site}}</text>
+            <text wx:if="{{item.countdown !== null}}" class="pcd {{item.countdown < 0 ? 'exp' : (item.countdown <= 3 ? 'now' : 'far')}}">{{item.countdown < 0 ? '已过期' : '剩 ' + item.countdown + ' 天'}}</text>
+          </view>
+          <view class="pd1" wx:if="{{item.digestOne}}">{{item.digestOne}}</view>
+          <view class="ptags">
+            <text class="tg">{{item.event}}</text>
+            <text class="tg g" wx:if="{{item.real && item.url}}">✓ 可核对原文</text>
+            <text class="tg o" wx:if="{{item.real && !item.url}}">真实采集</text>
+            <text class="tg s">推送分 {{item.pushScore}}</text>
+            <text class="tg r" wx:if="{{item.read}}">✓ 已读</text>
+          </view>
+        </view>
+      </block>
+
+      <!-- 小卡：一周内 / 长期 —— 默认收起成一行标题，点开才看全 -->
+      <block wx:if="{{minorCards.length > 0}}">
+        <view class="sec">🟡 一周内 · 长期归档 · {{minorCards.length}} 条<text class="secsub">静默进流</text></view>
+        <block wx:if="{{minorOpen}}">
+          <view class="pc minor lv-{{item.pushLevel}} {{item.read ? 'read' : ''}}"
+                wx:for="{{minorCards}}" wx:key="id"
+                data-id="{{item.id}}" bindtap="goDetail" bindlongpress="onCardLongPress">
+            <view class="mrow">
+              <text class="mico">{{item.pushLevelIcon}}</text>
+              <view class="mmid">
+                <view class="mtitle">{{item.title}}</view>
+                <view class="mmeta">{{item.source}}<text wx:if="{{item.countdown !== null}}"> · {{item.countdown < 0 ? '已过期' : '剩 ' + item.countdown + ' 天'}}</text><text wx:else> · {{item.publish}}</text></view>
+              </view>
+              <text class="mdot" wx:if="{{!item.read}}"></text>
+              <text class="mnew" wx:if="{{item.isNew}}">新</text>
+            </view>
+          </view>
+        </block>
+        <view class="more" wx:if="{{!minorOpen}}" bindtap="toggleMinor">展开这 {{minorCards.length}} 条较远的通知 ›</view>
+        <view class="more" wx:if="{{minorOpen}}" bindtap="toggleMinor">收起 ›</view>
+      </block>
+    </block>
+
+    <!-- 空态：无卡片时二选一 -->
+    <block wx:if="{{majorCards.length === 0 && minorCards.length === 0}}">
+      <view class="empty" wx:if="{{!hasInterests}}">
+        <view>还没有关注任何标签</view>
+        <view style="margin-top:10rpx">去「我的订阅」勾选你关心的几类通知</view>
+        <view class="ebtn" bindtap="goMe">去设置订阅 ›</view>
+      </view>
+      <view class="empty" wx:else>
+        <view>当前身份下暂无匹配通知</view>
+        <view style="margin-top:10rpx">可能是你的身份筛选收窄了范围，可去「我的订阅」调整</view>
+        <view class="ebtn" bindtap="goMe">调整身份与订阅 ›</view>
+      </view>
+    </block>
+  </block>
+
+  <!-- ============ 按标签分组 ============ -->
+  <block wx:else>
+    <block wx:if="{{groups.length > 0}}">
+      <view class="sec">按标签推送 · {{groups.length}} 组 · 点标题展开</view>
+      <view class="grp" wx:for="{{groups}}" wx:for-item="g" wx:key="tag">
+        <view class="ghd" data-t="{{g.tag}}" bindtap="toggleGroup">
+          <text class="gico">{{g.icon}}</text>
+          <view class="gmid">
+            <view class="gk">{{g.tag}}</view>
+            <view class="gd">{{g.desc}}</view>
+          </view>
+          <text class="gurg" wx:if="{{g.urgent}}">紧急</text>
+          <text class="gnum">{{g.count}} 条</text>
+          <text class="garrow">{{openTag === g.tag ? '▾' : '▸'}}</text>
+        </view>
+
+        <block wx:if="{{openTag === g.tag}}">
+          <view class="mc {{item.level}}"
+                wx:for="{{g.items}}" wx:key="id"
+                data-id="{{item.id}}" bindtap="goDetail">
+            <view class="r1">
+              <view class="tt">{{item.title}}</view>
+              <view class="dd" wx:if="{{item.countdown !== null}}">剩 {{item.countdown}} 天</view>
+            </view>
+            <view class="sr">{{item.source}} · {{item.publish}}<text wx:if="{{item.deadline}}"> · 截止 {{item.deadline}}</text></view>
+            <view class="d1" wx:if="{{item.digestOne}}">{{item.digestOne}}</view>
+            <view class="tags">
+              <text class="tg">{{item.event}}</text>
+              <text class="tg g" wx:if="{{item.real && item.url}}">✓ 可核对原文</text>
+              <text class="tg o" wx:if="{{item.real && !item.url}}">真实采集</text>
+              <text class="tg o" wx:if="{{(item.digestPoints || []).length}}">{{item.digestPoints.length}} 句可溯源</text>
+            </view>
+            <view class="go">📌 看浓缩与原文出处 ›</view>
+          </view>
+        </block>
+      </view>
+    </block>
+    <view class="empty" wx:else>
+      <view>订阅的标签下暂无通知</view>
+      <view style="margin-top:10rpx">去「我的订阅」调整关注项</view>
+    </view>
+  </block>
+
+  <view class="foot">
+    <view><text class="hl">数据来源：</text>安徽农业大学公网公开通知页（学院 / 教务处 / 图书馆 / 学工），等同于「人工翻官网」的自动化，不涉及教务后台、不取任何私域数据。</view>
+    <view style="margin-top:8rpx">每句浓缩都挂原文出处，可点进详情核对。本项目为「农芯智」AI 智能体创新大赛参赛作品。</view>
+  </view>
+
+</view>
+</view>

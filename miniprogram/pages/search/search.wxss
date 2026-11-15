@@ -1,0 +1,123 @@
+/* 搜索页 —— 数字安农风格（跟随主题变量） */
+
+/* ---- 搜索框 ---- */
+.sbox {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 18rpx;
+  padding: 0 20rpx;
+  height: 84rpx;
+  margin-bottom: 18rpx;
+  box-shadow: var(--shadow);
+}
+.sic { font-size: 30rpx; margin-right: 14rpx; opacity: 0.55; }
+.sin {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--txt);
+  height: 84rpx;
+}
+.sph { color: var(--txt-3); font-size: 26rpx; }
+.scl {
+  font-size: 26rpx;
+  color: var(--txt-3);
+  padding: 10rpx 6rpx 10rpx 16rpx;
+}
+
+/* ---- 标签横滚 ---- */
+.tscroll { white-space: nowrap; margin-bottom: 22rpx; }
+.trow { display: inline-flex; gap: 12rpx; padding-bottom: 4rpx; }
+.tchip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: var(--txt-2);
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 30rpx;
+  padding: 10rpx 22rpx;
+  flex-shrink: 0;
+}
+.tchip.on {
+  color: var(--on-brand);
+  background: linear-gradient(135deg, var(--brand-2), var(--brand));
+  border-color: transparent;
+  font-weight: 600;
+}
+.tnum { font-size: 19rpx; margin-left: 8rpx; opacity: 0.75; }
+
+/* ---- 热词 / 历史 ---- */
+.wchips { display: flex; flex-wrap: wrap; gap: 14rpx; margin-bottom: 26rpx; }
+.wchip {
+  font-size: 25rpx;
+  color: var(--txt);
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 12rpx;
+  padding: 10rpx 22rpx;
+}
+.wchip.his { color: var(--txt-3); }
+
+.hdcl { float: right; font-size: 21rpx; color: var(--alert); }
+
+/* ---- 标签浏览列表 ---- */
+.browselist { margin-bottom: 20rpx; }
+.brow {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 18rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 14rpx;
+  box-shadow: var(--shadow);
+}
+.bico { font-size: 36rpx; margin-right: 20rpx; }
+.bmid { flex: 1; min-width: 0; }
+.bk { font-size: 28rpx; font-weight: 600; color: var(--txt); }
+.bd { font-size: 21rpx; color: var(--txt-3); margin-top: 2rpx; }
+.bnum { font-size: 22rpx; color: var(--brand); flex-shrink: 0; font-weight: 500; }
+
+/* ---- 结果头 ---- */
+.rhead { font-size: 24rpx; color: var(--txt-2); margin-bottom: 18rpx; }
+.hl2 { color: var(--brand); font-size: 32rpx; font-weight: 700; }
+.rftag { color: var(--brand); }
+.rfreal { color: var(--brand); }
+
+/* ---- 结果高亮 ---- */
+.mhl {
+  color: var(--gold-ink);
+  background: var(--gold-soft);
+  border-radius: 4rpx;
+  padding: 0 3rpx;
+  font-weight: 700;
+}
+
+.d1 { font-size: 25rpx; color: var(--txt-2); line-height: 1.65; margin-top: 12rpx; }
+
+/* 原文命中片段 */
+.snip {
+  margin-top: 14rpx;
+  background: var(--surface-2);
+  border-left: 4rpx solid var(--brand);
+  border-radius: 10rpx;
+  padding: 14rpx 16rpx;
+}
+.snl { font-size: 19rpx; color: var(--brand); display: block; margin-bottom: 6rpx; }
+.snt { font-size: 23rpx; color: var(--txt-2); line-height: 1.7; }
+.ell { color: var(--txt-3); }
+
+/* 命中来源说明 */
+.whyhit {
+  margin-top: 12rpx;
+  font-size: 21rpx;
+  color: var(--txt-2);
+  line-height: 1.6;
+  background: var(--brand-soft);
+  border-left: 3rpx solid var(--brand);
+  border-radius: 0 8rpx 8rpx 0;
+  padding: 10rpx 14rpx;
+}
+.whyhit .whl { color: var(--brand); font-weight: 600; }

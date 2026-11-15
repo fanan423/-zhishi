@@ -1,0 +1,25 @@
+{
+  "_说明": "这是「知时·智能体」的用户画像文件。改这里 = 告诉智能体你是谁、关心什么。改完保存，下次跑自动生效。",
+  "_用法": "node tools/agent.js --llm --profile tools/agent_profile.json",
+
+  "identityType": "本科",
+  "grade": "2025级",
+  "college": "工学院",
+  "campus": "长江西路校区",
+  "major": "",
+
+  "interests": [
+    "学科竞赛",
+    "奖助学金",
+    "考试安排",
+    "转专业"
+  ],
+
+  "keywords": [
+    "正大杯",
+    "农芯智"
+  ],
+
+  "advance": "3,1",
+  "channel": "小程序服务通知 + 群内播报"
+}

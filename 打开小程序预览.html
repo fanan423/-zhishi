@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>知时 · 打开小程序预览</title>
+<style>
+  :root{--brand:#00653E;--brand2:#0A7A4C;--gold:#F3AE00;}
+  body{background:#F4F7F4;color:#1B2A22;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;text-align:center}
+  .b{max-width:560px;padding:40px}
+  .crest{width:78px;height:78px;border-radius:50%;margin:0 auto 22px;position:relative;
+    background:linear-gradient(135deg,var(--brand2),var(--brand));overflow:hidden;
+    box-shadow:0 10px 28px rgba(0,101,62,.35)}
+  /* 双圆形内环（依《安徽农业大学章程》第 75 条：校徽整体双圆形） */
+  .crest::before{content:'';position:absolute;inset:5px;border-radius:50%;
+    border:1.8px solid rgba(255,255,255,.5);z-index:2;pointer-events:none}
+  .crest::after{content:'';position:absolute;left:0;right:0;bottom:0;height:24px;
+    background:repeating-linear-gradient(90deg,rgba(255,255,255,.24) 0 5px,transparent 5px 10px);
+    border-top:2px solid rgba(255,255,255,.34)}
+  .crest .sun{position:absolute;top:11px;right:13px;width:13px;height:13px;border-radius:50%;background:var(--gold)}
+  .crest .aa{position:absolute;left:0;right:0;top:14px;z-index:1;font-size:23px;font-weight:800;color:#fff;
+    text-align:center;letter-spacing:.5px}
+  .crest .book{position:absolute;left:50%;top:40px;transform:translateX(-50%);width:32px;height:3px;
+    border-radius:0 0 3px 3px;background:rgba(255,255,255,.5);z-index:2}
+  .crest .y{position:absolute;left:0;right:0;top:44px;z-index:3;text-align:center;
+    font-size:10px;font-weight:700;color:rgba(255,255,255,.82);letter-spacing:1.2px}
+  h1{font-size:23px;margin:0 0 10px;letter-spacing:.4px}
+  p{color:#5C6B62;font-size:14px;line-height:1.85}
+  a{display:inline-block;margin-top:24px;padding:14px 36px;border-radius:12px;
+    background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;
+    font-weight:700;text-decoration:none;font-size:15px;box-shadow:0 8px 22px rgba(0,101,62,.28)}
+  .s{font-size:12px;color:#93A096;margin-top:18px;line-height:1.9}
+  .vi{display:flex;gap:12px;justify-content:center;margin-top:14px;font-size:11.5px;color:#93A096}
+  .vi i{width:12px;height:12px;border-radius:4px;display:inline-block;vertical-align:-2px;margin-right:4px}
+</style>
+</head>
+<body>
+<div class="b">
+  <div class="crest"><span class="sun"></span><span class="aa">AAU</span><span class="book"></span><span class="y">1928</span></div>
+  <h1>知时 · 数字安农信息雷达</h1>
+  <p>小程序界面预览正在打开…<br>如果没有自动跳转，点下面按钮。</p>
+  <a href="小程序预览.html">打开小程序预览 →</a>
+  <div class="vi">
+    <span><i style="background:#00653E"></i>安农绿</span>
+    <span><i style="background:#F3AE00"></i>麦穗金</span>
+    <span><i style="background:#E77844"></i>朝阳橙红</span>
+  </div>
+  <div class="s">双击本文件即可预览 · 无需安装任何软件 · 支持浅色 / 深色双主题</div>
+</div>
+<script>
+  location.replace("小程序预览.html");
+</script>
+</body>
+</html>

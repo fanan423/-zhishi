@@ -1,0 +1,2148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>知时 · 安农校园信息雷达</title>
+<style>
+:root{
+  --bg:#F4F7F4; --surface:#FFFFFF;
+  --border:#DCE5DC; --border-soft:#EDF2ED;
+  --brand:#00653E; --brand-2:#0A7A4C; --brand-soft:rgba(0,101,62,.10);
+  --gold:#F3AE00; --gold-ink:#8A6000; --gold-soft:rgba(243,174,0,.16);
+  --alert:#E77844; --alert-soft:rgba(231,120,68,.12); --alert-ink:#B04A1C;
+  --txt:#1B2A22; --txt-2:#5C6B62; --txt-3:#93A096;
+  --shadow:0 1px 3px rgba(27,42,34,.06); --card-shadow:0 2px 8px rgba(27,42,34,.06);
+}
+.theme-dark{
+  --bg:#0C1A14; --surface:#122A20; --border:#23473A; --border-soft:#1B3A2E;
+  --brand:#2FBF82; --brand-2:#23A06B; --brand-soft:rgba(47,191,130,.14);
+  --gold:#F3B51E; --gold-ink:#F3C95A; --gold-soft:rgba(243,181,30,.18);
+  --alert:#F0854F; --alert-soft:rgba(240,133,79,.16); --alert-ink:#F6A87C;
+  --txt:#E8F1EC; --txt-2:#A7BCB1; --txt-3:#7E968A;
+  --shadow:0 1px 4px rgba(0,0,0,.30); --card-shadow:0 2px 10px rgba(0,0,0,.34);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:linear-gradient(160deg,#E9EFE9,#F4F7F4 60%,#E6EDE6);
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  color:var(--txt);line-height:1.6;min-height:100vh;display:flex;
+  align-items:flex-start;justify-content:center;padding:24px 12px 40px}
+body.theme-dark{background:linear-gradient(160deg,#081410,#0C1A14 60%,#081410)}
+
+.phone{width:390px;max-width:100%;height:844px;max-height:calc(100vh - 44px);
+  background:var(--bg);border-radius:36px;position:relative;overflow:hidden;
+  box-shadow:0 24px 70px rgba(6,40,26,.22),0 0 0 10px #0F1A15,0 0 0 12px #26332C;
+  display:flex;flex-direction:column}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:148px;height:26px;
+  background:#0F1A15;border-radius:0 0 15px 15px;z-index:60}
+.navbar{padding:33px 16px 11px;background:var(--brand);color:#fff;display:flex;
+  align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;z-index:50}
+.navbar .nb-t{font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:8px}
+.navbar .crest{width:28px;height:28px;border-radius:50%;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#0A7A4C,#00653E);flex-shrink:0}
+.navbar .crest::before{content:'';position:absolute;inset:2px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.5);z-index:2;pointer-events:none}
+.navbar .crest::after{content:'';position:absolute;left:0;right:0;bottom:0;height:9px;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.24) 0 2px,transparent 2px 4px);
+  border-top:1px solid rgba(255,255,255,.3)}
+.navbar .crest .sun{position:absolute;top:4px;right:5px;width:5px;height:5px;border-radius:50%;background:#F3AE00}
+.navbar .crest .aa{position:absolute;left:0;right:0;top:4px;text-align:center;font-size:10px;font-weight:700;color:#fff;z-index:1}
+.navbar .crest .book{position:absolute;left:50%;top:17px;transform:translateX(-50%);width:12px;height:1.5px;
+  border-radius:0 0 1px 1px;background:rgba(255,255,255,.55);z-index:2}
+.navbar .tbtn{font-size:11.5px;font-weight:600;background:rgba(255,255,255,.16);border:none;
+  color:#fff;border-radius:20px;padding:5px 11px}
+.screen{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg)}
+.screen::-webkit-scrollbar{width:0}
+.wrap{padding:18px 16px 96px;font-family:inherit}
+
+.sec{font-size:13.5px;color:var(--brand);font-weight:700;letter-spacing:.5px;margin:19px 0 10px;
+  display:flex;align-items:center}
+.sec::before{content:'';width:4px;height:15px;border-radius:2px;
+  background:linear-gradient(180deg,var(--gold),var(--brand));margin-right:8px}
+.sec .secsub{font-size:11.5px;color:var(--txt-3);font-weight:400;margin-left:5px}
+.sec.red{color:var(--alert)} .sec.red::before{background:var(--alert)}
+.empty{text-align:center;color:var(--txt-3);font-size:14px;padding:46px 16px}
+.foot{margin-top:24px;padding-top:15px;border-top:1px solid var(--border);font-size:11.5px;
+  color:var(--txt-3);line-height:1.8}
+.foot .hl{color:var(--brand);font-weight:600}
+button{font-family:inherit;cursor:pointer}
+
+.ovc{background:linear-gradient(160deg,var(--brand-2),var(--brand));border-radius:18px;
+  padding:20px;color:#fff;box-shadow:0 8px 22px rgba(0,101,62,.22)}
+.ovc .ovl{font-size:12.5px;color:rgba(255,255,255,.8)}
+.ovc .ovn{font-size:34px;font-weight:800;line-height:1.2;margin-top:2px}
+.ovc .ovu{font-size:14.5px;font-weight:500;margin-left:4px}
+.ovc .ovs{font-size:12.5px;color:rgba(255,255,255,.88);margin-top:8px;padding-top:8px;
+  border-top:1px solid rgba(255,255,255,.2)}
+.ovc .ovhl{font-weight:700}
+
+.stat{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:14px 0;box-shadow:var(--shadow)}
+.stat .it{flex:1;text-align:center}
+.stat .it+.it{border-left:1px solid var(--border-soft)}
+.stat .n{font-size:22px;font-weight:800;color:var(--brand)}
+.stat .n.red{color:var(--alert)}
+.stat .l{font-size:11.5px;color:var(--txt-3);margin-top:1px}
+
+.ncard{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:14px 15px;margin-bottom:12px;box-shadow:var(--card-shadow);position:relative;
+  overflow:hidden;cursor:pointer}
+.ncard:active{transform:scale(.995)}
+.ncard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--brand)}
+.ncard.hi::before{background:var(--alert)} .ncard.md::before{background:var(--gold)}
+.ncard .r1{display:flex;justify-content:space-between;align-items:flex-start;gap:9px}
+.ncard .tt{flex:1;font-size:15px;font-weight:600;line-height:1.42}
+.ncard .dd{font-size:12.5px;font-weight:700;padding:3px 9px;border-radius:7px;white-space:nowrap;
+  flex-shrink:0;color:#fff;background:var(--alert)}
+.ncard.md .dd{color:var(--gold-ink);background:var(--gold-soft)}
+.ncard.lo .dd{color:var(--brand);background:var(--brand-soft)}
+.ncard .sr{font-size:11.5px;color:var(--txt-3);margin-top:5px}
+.ncard .dgo{font-size:13.5px;color:var(--txt-2);line-height:1.6;margin-top:9px}
+.ncard .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.ncard .tg{font-size:11.5px;padding:2px 9px;border-radius:6px;color:var(--brand);background:var(--brand-soft)}
+.ncard .tg.gold{color:var(--gold-ink);background:var(--gold-soft)}
+.ncard .entry{font-size:12px;color:var(--brand);background:var(--brand-soft);border-radius:8px;
+  padding:7px 10px;margin-top:9px;line-height:1.5}
+.src{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;padding:2px 9px;border-radius:7px;font-weight:600}
+.src.veri{color:var(--brand);background:var(--brand-soft)}
+.src.real{color:var(--gold-ink);background:var(--gold-soft)}
+.src.demo{color:var(--txt-2);background:var(--border-soft)}
+.srcline{margin:13px 0;font-size:11.5px;color:var(--brand);background:var(--brand-soft);
+  border-radius:9px;padding:9px 11px;line-height:1.5;word-break:break-all}
+.srcline .lbl{font-weight:700}
+.srcline .cp{float:right;font-weight:700;margin-left:8px}
+
+.mhead{display:flex;align-items:center;gap:12px;padding-bottom:13px;border-bottom:1px solid var(--border)}
+.mhead .ava{width:52px;height:52px;border-radius:14px;flex-shrink:0;background:linear-gradient(135deg,var(--brand-2),var(--brand));
+  color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(0,101,62,.22)}
+.mhead .bt{flex:1;min-width:0} .mhead .bt .t1{font-size:17px;font-weight:700}
+.mhead .bt .t2{font-size:12px;color:var(--txt-2);margin-top:2px}
+
+.frow{display:flex;justify-content:space-between;align-items:center;padding:13px 2px;
+  border-bottom:1px solid var(--border-soft)}
+.frow:last-child{border-bottom:none}
+.frow .fk{font-size:14px;color:var(--txt-2);flex-shrink:0}
+.frow .fv{font-size:14px;color:var(--txt);text-align:right;display:flex;align-items:center;gap:5px;max-width:66%}
+.frow select{font-family:inherit;font-size:14px;color:var(--txt);text-align:right;background:transparent;
+  border:none;outline:none;max-width:180px;cursor:pointer;appearance:none;text-align-last:right}
+.frow input[type=text]{font-family:inherit;font-size:14px;color:var(--txt);text-align:right;
+  background:transparent;border:none;outline:none;width:150px}
+.frow .arrow{color:var(--brand);font-weight:700}
+
+.chips{display:flex;flex-wrap:wrap;gap:9px;padding:5px 0}
+.chip{font-size:13px;padding:7px 14px;border-radius:22px;background:var(--surface);
+  border:1px solid var(--border);color:var(--txt-2);display:inline-flex;align-items:center;gap:5px}
+.chip.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand);font-weight:600}
+.chip .cn{font-size:11px;background:var(--brand);color:#fff;border-radius:9px;padding:0 5px;min-width:15px;text-align:center}
+.cops{display:flex;gap:16px;font-size:12.5px;color:var(--brand);font-weight:600;padding:6px 0 2px}
+.hint{font-size:12px;color:var(--txt-3);line-height:1.7;padding-top:6px}
+.hint .reach{color:var(--brand);font-weight:700}
+.hint .reachw{color:var(--alert-ink);font-weight:700}
+
+/* ---- 我的关键词（自定义订阅） ---- */
+.kwin{display:flex;align-items:center;gap:10px;padding:8px 0 6px}
+.kwin input{flex:1;height:38px;padding:0 14px;font-size:13.5px;border-radius:20px;
+  border:1px solid var(--border);background:var(--bg);color:var(--txt);font-family:inherit}
+.kwadd{flex-shrink:0;font-size:13px;font-weight:700;color:#fff;cursor:pointer;
+  background:linear-gradient(135deg,var(--brand-2),var(--brand));padding:9px 20px;border-radius:20px}
+.kwchips{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0 6px}
+.kwchip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:6px 6px 6px 13px;
+  border-radius:20px;background:var(--brand-soft);border:1px solid var(--brand);color:var(--brand)}
+.kwchip.empty{background:var(--surface);border-color:var(--border);color:var(--txt-3)}
+.kwchip .kwt{font-weight:700}
+.kwchip .kwn{font-size:11px;opacity:.72}
+.kwchip .kwhot{font-size:11px;background:var(--alert);color:#fff;padding:1px 6px;border-radius:10px}
+.kwchip .kwx{font-size:16px;line-height:1;cursor:pointer;opacity:.55;padding:0 6px 0 2px}
+.kwchip .kwx:hover{opacity:1}
+.kwsug{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:2px 0 8px}
+.kwsug-l{font-size:12px;color:var(--txt-3)}
+.kwsug-w{font-size:12.5px;color:var(--brand);background:var(--brand-soft);padding:5px 12px;
+  border-radius:16px;cursor:pointer}
+.kwsug-w:hover{background:var(--brand);color:#fff}
+
+.acts{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.ab{font-size:14.5px;font-weight:700;border-radius:12px;padding:13px 0;border:1px solid var(--border);
+  background:var(--surface);color:var(--txt)}
+.ab.primary{background:linear-gradient(135deg,var(--brand-2),var(--brand));color:#fff;border:none;
+  box-shadow:0 4px 14px rgba(0,101,62,.20)}
+.ab.dis{background:var(--border-soft);color:var(--txt-3)}
+
+.bhead{display:flex;align-items:center;gap:11px;padding-bottom:13px;border-bottom:1px solid var(--border);margin-bottom:13px}
+.bhead .lg{width:46px;height:46px;border-radius:50%;position:relative;overflow:hidden;flex-shrink:0;
+  background:linear-gradient(135deg,var(--brand-2),var(--brand));box-shadow:0 4px 12px rgba(0,101,62,.22)}
+.bhead .lg::before{content:'';position:absolute;inset:3px;border-radius:50%;
+  border:1.1px solid rgba(255,255,255,.5);z-index:2;pointer-events:none}
+.bhead .lg::after{content:'';position:absolute;left:0;right:0;bottom:0;height:12px;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.22) 0 3px,transparent 3px 7px);
+  border-top:1px solid rgba(255,255,255,.3)}
+.bhead .lg .sun{position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.bhead .lg .aa{position:absolute;left:0;right:0;top:7px;text-align:center;font-size:13px;font-weight:700;color:#fff;z-index:1}
+.bhead .lg .book{position:absolute;left:50%;top:24px;transform:translateX(-50%);width:20px;height:2px;
+  border-radius:0 0 2px 2px;background:rgba(255,255,255,.55);z-index:2}
+.bhead .lg .y{position:absolute;left:0;right:0;top:27px;z-index:3;text-align:center;
+  font-size:6px;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.5px}
+.bhead .t1{font-size:17px;font-weight:700} .bhead .t2{font-size:11.5px;color:var(--txt-2);margin-top:1px}
+
+.sumcard{background:linear-gradient(160deg,var(--brand-2),var(--brand));border-radius:18px;padding:18px;
+  color:#fff;margin-bottom:13px;box-shadow:0 8px 22px rgba(0,101,62,.2)}
+.sumcard.lv-high{background:linear-gradient(160deg,#F08A4B,var(--alert))}
+.sumcard.lv-mid{background:linear-gradient(160deg,#E8A317,var(--gold))}
+.sumlb{font-size:11.5px;color:rgba(255,255,255,.78);letter-spacing:.5px;margin-bottom:7px}
+.sumtx{font-size:15px;color:#fff;line-height:1.6;font-weight:500}
+.sumidx{display:flex;align-items:baseline;gap:8px;margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.22)}
+.sumidx .sin{font-size:11.5px;color:rgba(255,255,255,.78)}
+.sumidx .siv{font-size:26px;font-weight:800;line-height:1} .sumidx .sil{font-size:12.5px;color:rgba(255,255,255,.9)}
+
+.trust{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.tr1{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.trl{font-size:13.5px;font-weight:500} .trv{font-size:14.5px;font-weight:700;color:var(--brand)}
+.trbar{height:8px;border-radius:4px;background:var(--border-soft);overflow:hidden}
+.trfill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--brand))}
+.trust-high .trfill{background:linear-gradient(90deg,var(--brand-2),var(--brand))}
+.trmsg{font-size:12.5px;color:var(--txt-2);margin-top:8px}
+.trsub{font-size:11.5px;color:var(--txt-3);margin-top:5px;line-height:1.6}
+.trnote{margin-top:7px;padding-top:7px;border-top:1px dashed var(--border);font-size:11.5px}
+
+.bin{margin-bottom:15px}
+.binh{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;margin-bottom:8px;cursor:pointer}
+.binh .bdot{width:9px;height:9px;border-radius:50%;background:var(--txt-3);flex-shrink:0}
+.binh.now .bdot{background:var(--alert);box-shadow:0 0 0 3px var(--alert-soft)}
+.binh .bcnt{font-size:11.5px;color:var(--txt-3);font-weight:400}
+.binh .bcar{margin-left:auto;color:var(--txt-3);font-size:12.5px}
+
+.icard{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:12px 14px;
+  margin-bottom:12px;box-shadow:var(--card-shadow);cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.icard.now{border-left:4px solid var(--alert);background:var(--alert-soft)}
+.icard.hi{border-left:4px solid var(--alert)}
+.icard .ii{flex:1;min-width:0}
+.icard .it{font-size:14.5px;font-weight:600;line-height:1.45}
+.icard .is{font-size:11.5px;color:var(--txt-3);margin-top:4px}
+.icard .id{font-size:12.5px;font-weight:700;color:#fff;background:var(--alert);border-radius:7px;padding:2px 8px;white-space:nowrap;flex-shrink:0}
+.icard .id.md{color:var(--gold-ink);background:var(--gold-soft)}
+
+/* 详情 */
+.dhead .dt{font-size:18px;font-weight:700;line-height:1.4}
+.dhead .dm{display:flex;flex-wrap:wrap;gap:9px;font-size:12px;color:var(--txt-3);margin-top:9px}
+.dhead .fl{display:flex;justify-content:space-between;align-items:center;margin-top:11px}
+.star{font-size:13.5px;color:var(--txt-2);font-weight:600}
+.star.on{color:var(--gold)}
+.kv{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:5px 14px;margin-bottom:5px;box-shadow:var(--shadow)}
+.kv .kr{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-soft);font-size:13.5px}
+.kv .kr:last-child{border-bottom:none}
+.kv .kr .kk{color:var(--txt-2);flex-shrink:0} .kv .kr .vv{color:var(--txt);text-align:right;font-weight:500}
+.pt{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:14px;margin-bottom:5px;box-shadow:var(--shadow)}
+.pt .ptx{font-size:14.5px;line-height:1.65;color:var(--txt)}
+.pt .pquote{font-size:12px;color:var(--txt-2);background:var(--brand-soft);border-left:3px solid var(--brand);
+  border-radius:0 7px 7px 0;padding:7px 10px;margin-top:9px;line-height:1.6}
+.pt .pquote .qb{color:var(--brand);font-weight:700;font-size:11.5px}
+.rawbox{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:14px;
+  font-size:12.5px;color:var(--txt-2);line-height:1.8;box-shadow:var(--shadow)}
+.rawbox mark{background:var(--gold-soft);color:var(--gold-ink);padding:0 2px;border-radius:3px}
+.relcard{border:1px solid var(--border);border-radius:13px;padding:14px;margin-bottom:5px;background:var(--surface);box-shadow:var(--shadow)}
+.relcard .rh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.relcard .rt{font-size:14.5px;font-weight:700}
+.relcard .rb{font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:7px}
+.relcard.rel-ok .rb{color:var(--brand);background:var(--brand-soft)}
+.relcard.rel-warn .rb{color:var(--gold-ink);background:var(--gold-soft)}
+.relcard.rel-no .rb{color:var(--alert-ink);background:var(--alert-soft)}
+.relcard .rl{font-size:13px;color:var(--txt-2);line-height:1.6}
+.relrow{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-soft)}
+.relrow .rs{font-size:13.5px;flex-shrink:0;font-weight:700}
+.relrow .rs.ok{color:var(--brand)} .relrow .rs.warn{color:var(--gold-ink)} .relrow .rs.no{color:var(--alert)}
+.relrow .rk{font-size:13px;line-height:1.6}
+.relrow .rk .rl2{color:var(--txt-3);font-size:11.5px}
+.stepitem{display:flex;gap:9px;padding:11px 0;border-bottom:1px solid var(--border-soft);cursor:pointer}
+.stepitem:last-child{border-bottom:none}
+.stepitem .cb{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:12.5px;color:#fff;margin-top:1px}
+.stepitem.done .cb{background:var(--brand);border-color:var(--brand)}
+.stepitem.done .st{color:var(--txt-3);text-decoration:line-through}
+.stepitem .st{font-size:14px;line-height:1.5}
+.stepitem .sd{font-size:11.5px;color:var(--txt-3);margin-top:2px}
+.stepbar{height:6px;border-radius:3px;background:var(--border-soft);margin:13px 0 4px;overflow:hidden}
+.stepfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--brand-2),var(--brand))}
+
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:70px;background:var(--surface);
+  border-top:1px solid var(--border);display:flex;z-index:55;padding-bottom:8px}
+.tb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  font-size:11.5px;color:var(--txt-3);cursor:pointer}
+.tb .i{font-size:19px;line-height:1}
+.tb.on{color:var(--brand);font-weight:700}
+
+.toast{position:absolute;left:50%;bottom:96px;transform:translateX(-50%) translateY(10px);
+  background:rgba(20,30,25,.9);color:#fff;font-size:13.5px;padding:10px 18px;border-radius:11px;
+  z-index:90;opacity:0;transition:.25s;pointer-events:none;max-width:80%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ============ 主动推送 ============ */
+.ovc .pushline{font-size:12px;color:rgba(255,255,255,.92);margin-top:8px;padding-top:8px;
+  border-top:1px dashed rgba(255,255,255,.28);line-height:1.55}
+.pushbar{display:flex;align-items:center;gap:8px;margin-top:11px;padding:12px 15px;border-radius:12px;
+  background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)}
+.pushbar .pbdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--brand)}
+.pushbar.alert .pbdot{background:var(--alert);animation:pulse 1.6s infinite}
+.pushbar.new .pbdot{background:var(--gold)}
+.pushbar .pbt{flex:1;font-size:12px;color:var(--txt-2);line-height:1.5}
+.pushbar.alert .pbt{color:var(--alert-ink);font-weight:600}
+.pushbar .pblink{font-size:12px;color:var(--brand);font-weight:700;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(1.35)}}
+
+.sec .secwarn{font-size:11px;font-weight:700;color:#fff;background:var(--alert);
+  padding:1px 7px;border-radius:6px;margin-left:7px}
+
+.pushcard{padding-top:12px}
+.pushcard .prow{display:flex;align-items:center;gap:7px}
+.pushcard .plv{font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:7px;
+  display:inline-flex;align-items:center;gap:3px}
+.pushcard .plv.now{color:#fff;background:var(--alert)}
+.pushcard .plv.hot{color:#fff;background:var(--alert)}
+.pushcard .plv.soon{color:var(--gold-ink);background:var(--gold-soft)}
+.pushcard .plv.plan{color:var(--brand);background:var(--brand-soft)}
+.pushcard .plv.far{color:var(--txt-2);background:var(--border-soft)}
+.pushcard .pnew{font-size:11px;font-weight:700;color:#fff;background:var(--brand);
+  padding:2px 8px;border-radius:6px}
+.pushcard .prank{margin-left:auto;font-size:11.5px;color:var(--txt-3);font-weight:600}
+.pushcard .sr{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pushcard .cdc{font-size:11px;font-weight:700;padding:2px 9px;border-radius:7px;white-space:nowrap}
+.pushcard .cdc.now{color:#fff;background:var(--alert)}
+.pushcard .cdc.far{color:var(--gold-ink);background:var(--gold-soft)}
+.pushcard .cdc.exp{color:var(--txt-3);background:var(--border-soft)}
+.ncard .tg.score{color:var(--txt-3);background:var(--border-soft)}
+
+.tgl{width:44px;height:25px;border-radius:14px;background:var(--border);position:relative;
+  display:inline-block;flex-shrink:0;transition:.2s;cursor:pointer}
+.tgl .tgld{position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.22);transition:.2s}
+.tgl.on{background:var(--brand)}
+.tgl.on .tgld{left:22px}
+
+/* ============ 问知时 ============ */
+.hcard{border-radius:18px;padding:17px 18px;margin-bottom:14px;cursor:pointer;
+  background:linear-gradient(160deg,var(--brand-2),var(--brand));
+  box-shadow:0 4px 14px rgba(0,101,62,.20)}
+.hcard.tone-alert{background:linear-gradient(160deg,#C0392B,#8E2418);box-shadow:0 4px 14px rgba(192,57,43,.22)}
+.hcard .hq{display:flex;align-items:center;gap:7px}
+.hcard .hqi{font-size:15px}
+.hcard .hqt{font-size:14px;color:rgba(255,255,255,.88);font-weight:500}
+.hcard .ha{font-size:16px;font-weight:600;color:#fff;line-height:1.6;margin-top:8px}
+.hcard .hmeta{font-size:12.5px;color:rgba(255,255,255,.86);margin-top:10px;padding-top:9px;
+  border-top:1px solid rgba(255,255,255,.22)}
+.hcard .hmeta b{font-weight:700;color:#fff}
+
+/* 分区右侧的动作链接（如"推送设置 ›"） */
+.sec .seclink{margin-left:auto;font-size:11.5px;color:var(--brand);font-weight:600;cursor:pointer}
+
+/* "展开其余 N 条"按钮：首屏只摊 3 条，其余收起来 */
+.morebtn{display:block;width:100%;margin:12px 0 4px;padding:12px;border-radius:12px;
+  background:var(--surface);border:1px dashed var(--border);color:var(--brand);
+  font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.morebtn:active{background:var(--brand-soft)}
+
+.askstat{display:flex;gap:8px;margin-bottom:13px}
+.askstat .as{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:13px;
+  padding:12px 8px;text-align:center;box-shadow:var(--shadow)}
+.askstat .asn{display:block;font-size:21px;font-weight:800;color:var(--brand);line-height:1.2}
+.askstat .asl{display:block;font-size:11.5px;color:var(--txt-3);margin-top:3px}
+
+.acard{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:17px;
+  margin-top:10px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.acard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--brand)}
+.acard.tone-alert::before{background:var(--alert)}
+.acard.tone-warn::before{background:var(--gold)}
+.acard.tone-calm::before{background:var(--border)}
+.acard .aq{font-size:13px;color:var(--txt-3);font-weight:500}
+.acard .aa{font-size:16px;font-weight:600;color:var(--txt);line-height:1.65;margin-top:7px}
+.acard .abasis{display:flex;gap:8px;background:var(--brand-soft);border-radius:11px;
+  padding:11px 13px;margin-top:11px}
+.acard .abl{font-size:12.5px;font-weight:700;color:var(--brand);flex-shrink:0}
+.acard .abt{font-size:12.5px;color:var(--txt-2);line-height:1.7}
+.acard .mlist{margin-top:13px;padding-top:11px;border-top:1px dashed var(--border)}
+.acard .mt{font-size:13.5px;font-weight:700;color:var(--brand);margin-bottom:8px}
+.acard .mrow{display:flex;gap:7px;padding:6px 0}
+.acard .mdot{color:var(--brand);font-size:13.5px}
+.acard .mbody{flex:1;min-width:0}
+.acard .mname{display:block;font-size:14px;color:var(--txt);line-height:1.5}
+.acard .mfrom{display:block;font-size:11.5px;color:var(--brand);margin-top:3px;cursor:pointer}
+.acard .ilist{margin-top:13px;padding-top:11px;border-top:1px dashed var(--border)}
+.acard .it{font-size:13.5px;font-weight:700;color:var(--txt-2);margin-bottom:8px}
+.acard .irow{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border-soft);cursor:pointer}
+.acard .irow:last-child{border-bottom:none}
+.acard .imid{flex:1;min-width:0}
+.acard .ititle{font-size:14px;color:var(--txt);line-height:1.45}
+.acard .imeta{font-size:11.5px;color:var(--txt-3);margin-top:3px}
+.acard .idd{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:6px;flex-shrink:0;
+  color:var(--txt-2);background:var(--border-soft)}
+.acard .idd.lv-hi{color:#fff;background:var(--alert)}
+.acard .idd.lv-md{color:var(--gold-ink);background:var(--gold-soft)}
+.acard .imore{font-size:12px;color:var(--txt-3);margin-top:8px}
+.acard .iempty{font-size:12.5px;color:var(--txt-3);margin-top:11px;padding-top:10px;border-top:1px dashed var(--border)}
+
+.qgroup{margin-bottom:4px}
+.qgroup .ghead{display:flex;align-items:center;gap:6px;margin:13px 0 6px}
+.qgroup .gi{font-size:13.5px}
+.qgroup .gl{font-size:13.5px;font-weight:700;color:var(--brand);letter-spacing:.5px}
+.qlist{background:var(--surface);border:1px solid var(--border);border-radius:13px;
+  overflow:hidden;box-shadow:var(--shadow)}
+.qrow{display:flex;align-items:center;gap:9px;padding:12px 14px;border-bottom:1px solid var(--border-soft);cursor:pointer}
+.qrow:last-child{border-bottom:none}
+.qrow.on{background:var(--brand-soft)}
+.qrow .qbody{flex:1;min-width:0}
+.qrow .qq{display:block;font-size:14px;color:var(--txt);font-weight:500}
+.qrow .qh{display:block;font-size:11.5px;color:var(--txt-3);margin-top:3px}
+.qrow .qa{font-size:12.5px;color:var(--brand);font-weight:600;flex-shrink:0}
+.qrow.on .qa{color:var(--txt-3)}
+
+/* ============ 办事日历 ============ */
+.mbar{display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(160deg,var(--brand-2),var(--brand));border-radius:16px;
+  padding:11px 14px;box-shadow:0 4px 13px rgba(0,101,62,.18)}
+.mbar .mnav{width:34px;height:34px;line-height:32px;text-align:center;font-size:22px;color:#fff;
+  background:rgba(255,255,255,.16);border-radius:50%;cursor:pointer}
+.mbar .mlab{text-align:center;flex:1}
+.mbar .ml{display:block;font-size:17px;font-weight:700;color:#fff;letter-spacing:1px}
+.mbar .mtoday{display:block;font-size:11.5px;color:rgba(255,255,255,.82);margin-top:3px;cursor:pointer}
+
+.calbox{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:12px 9px;margin-top:10px;box-shadow:var(--shadow)}
+.wkrow{display:flex}
+.wkrow .wk{flex:1;text-align:center;font-size:12px;color:var(--txt-3);font-weight:600;padding-bottom:7px}
+.wkrow .wkend{color:var(--gold-ink)}
+.crow{display:flex}
+.cell{flex:1;height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;border-radius:8px;margin:1px;cursor:pointer}
+.cell.blank{background:transparent;cursor:default}
+.cell .cd{font-size:14px;color:var(--txt-2);font-weight:500}
+.cell.has .cd{color:var(--txt);font-weight:700}
+.cell.past .cd{color:var(--txt-3)}
+.cell.has.lv-now{background:rgba(192,57,43,.14)}
+.cell.has.lv-hot{background:rgba(192,57,43,.10)}
+.cell.has.lv-soon{background:var(--gold-soft)}
+.cell.has.lv-plan{background:var(--brand-soft)}
+.cell .cdot{width:5px;height:5px;border-radius:50%;margin-top:2px;background:var(--brand)}
+.cell.has.lv-now .cdot,.cell.has.lv-hot .cdot{background:var(--alert)}
+.cell.has.lv-soon .cdot{background:var(--gold)}
+.cell .ccnt{position:absolute;top:1px;right:4px;font-size:9.5px;font-weight:700;color:var(--txt-3)}
+.cell.today{border:1.5px solid var(--brand)}
+.cell.today .cd{color:var(--brand);font-weight:800}
+.cell.sel{background:var(--brand)}
+.cell.sel .cd{color:#fff}
+.cell.sel.has.lv-now,.cell.sel.has.lv-hot{background:var(--alert)}
+.cell.sel .cdot{background:#fff}
+.cell.sel .ccnt{color:rgba(255,255,255,.9)}
+
+.legend{display:flex;flex-wrap:wrap;gap:11px;margin-top:10px;padding:0 4px}
+.legend .lg{display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--txt-3)}
+.legend .dot{width:8px;height:8px;border-radius:50%}
+.legend .dot.now,.legend .dot.hot{background:var(--alert)}
+.legend .dot.soon{background:var(--gold)}
+.legend .dot.plan{background:var(--brand)}
+.sumline{font-size:13px;color:var(--txt-2);line-height:1.6;margin-top:10px;
+  padding:12px 15px;background:var(--brand-soft);border-radius:11px}
+
+.irow2{display:flex;align-items:center;gap:9px;padding:11px 0;border-bottom:1px solid var(--border-soft);cursor:pointer}
+.irow2:last-child{border-bottom:none}
+.irow2 .imid{flex:1;min-width:0}
+.irow2 .ititle{font-size:14px;color:var(--txt);line-height:1.45}
+.irow2 .imeta{font-size:11.5px;color:var(--txt-3);margin-top:3px}
+.irow2 .idd{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:6px;flex-shrink:0;
+  color:var(--txt-2);background:var(--border-soft)}
+.irow2 .idd.lv-hi{color:#fff;background:var(--alert)}
+.irow2 .idd.lv-md{color:var(--gold-ink);background:var(--gold-soft)}
+
+/* ================================================================
+ * ★ 智能体区块（与小程序 digest / me 页同构）
+ * 三态颜色：绿=连上服务端 / 灰=本地模式 / 橙=配了却没连上
+ * ================================================================ */
+.agentbox{
+  background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--txt-3);
+  border-radius:13px;padding:15px 15px 13px;margin-bottom:8px;box-shadow:var(--shadow);
+}
+.agentbox.on{border-left-color:#17A05A;
+  background:linear-gradient(180deg,rgba(23,160,90,0.05),var(--surface))}
+.agentbox.warn{border-left-color:#E08A16;
+  background:linear-gradient(180deg,rgba(224,138,22,0.06),var(--surface))}
+.agentbox.off{border-left-color:var(--txt-3)}
+
+.aghead{display:flex;align-items:center;padding-bottom:11px;border-bottom:1px dashed var(--border)}
+.agdot{width:11px;height:11px;border-radius:50%;margin-right:9px;flex-shrink:0;background:var(--txt-3)}
+.agentbox.on .agdot{background:#17A05A;box-shadow:0 0 0 4px rgba(23,160,90,0.16)}
+.agentbox.warn .agdot{background:#E08A16;box-shadow:0 0 0 4px rgba(224,138,22,0.16)}
+.aglab{flex:1;font-size:13.5px;font-weight:600;color:var(--txt)}
+.agentbox.on .aglab{color:#17A05A}
+.agentbox.warn .aglab{color:var(--gold-ink)}
+.agvia{font-size:11.5px;color:var(--txt-3);background:var(--border-soft);border-radius:8px;padding:3px 9px}
+
+.agwarn{margin-top:11px;font-size:12px;line-height:1.65;color:var(--gold-ink);
+  background:rgba(224,138,22,0.09);border:1px solid rgba(224,138,22,0.28);
+  border-radius:9px;padding:9px 11px}
+.agwarnr{display:block;margin-top:4px;font-size:12px;color:var(--txt-3)}
+.agloading{margin-top:13px;font-size:12.5px;color:var(--txt-3);text-align:center;padding:16px 0}
+
+.agtl,.agsl{font-size:12px;font-weight:600;color:var(--txt-2);margin:13px 0 8px}
+.agsl{color:var(--txt-3);font-weight:400}
+
+.agnotify{background:linear-gradient(180deg,rgba(0,101,62,0.05),rgba(0,101,62,0.01));
+  border:1px solid rgba(0,101,62,0.16);border-radius:10px;padding:12px 12px 10px;
+  margin-bottom:9px;cursor:pointer}
+.agnr1{display:flex;align-items:flex-start}
+.agnt{flex:1;font-size:14px;font-weight:600;color:var(--txt);line-height:1.5;margin-right:10px}
+.agnd{font-size:12px;font-weight:600;color:#fff;border-radius:7px;padding:3px 9px;flex-shrink:0;
+  white-space:nowrap;background:linear-gradient(135deg,var(--brand-2),var(--brand))}
+.agnsr{font-size:12px;color:var(--txt-3);margin-top:6px}
+.agnrs{font-size:12px;color:var(--brand);margin-top:7px;line-height:1.55;
+  background:rgba(0,101,62,0.06);border-radius:7px;padding:6px 9px}
+.agnone{font-size:12px;color:var(--txt-2);line-height:1.6;margin-top:7px}
+
+.agsitem{display:flex;align-items:center;padding:9px 2px;border-bottom:1px solid var(--border-soft);cursor:pointer}
+.agsitem:last-child{border-bottom:none}
+.agst{flex:1;font-size:12.5px;color:var(--txt-2);overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;margin-right:10px}
+.agsd{font-size:12px;color:var(--txt-3);flex-shrink:0}
+.agem{text-align:center;font-size:12.5px;color:var(--txt-3);padding:22px 0}
+
+.agmeta{margin-top:12px;padding-top:10px;border-top:1px dashed var(--border);
+  font-size:11.5px;color:var(--txt-3);line-height:1.85}
+.agmeta span{display:block}
+
+.agacts{display:flex;gap:9px;margin-top:12px}
+.agbtn{flex:1;text-align:center;font-size:12.5px;color:var(--brand);background:var(--surface);
+  border:1px solid var(--border);border-radius:9px;padding:11px 0;cursor:pointer}
+.agbtn.primary{color:#fff;background:linear-gradient(135deg,var(--brand-2),var(--brand));
+  border-color:transparent;font-weight:600}
+
+@media (max-width:430px){
+  body{padding:0}
+  .phone{height:100vh;max-height:100vh;border-radius:0;box-shadow:none;width:100%}
+  .notch{display:none} .navbar{padding-top:14px}
+}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="notch"></div>
+  <div class="navbar">
+    <div class="nb-t"><span class="crest"><span class="sun"></span><span class="aa">AAU</span><span class="book"></span></span><span id="nbTitle">知时 · 信息雷达</span></div>
+    <button class="tbtn" id="themeBtn">☀️ 浅色</button>
+  </div>
+  <div class="screen" id="screen"></div>
+  <div class="tabbar" id="tabbar">
+    <div class="tb on" data-tab="radar"><span class="i">📡</span>雷达</div>
+    <div class="tb" data-tab="timeline"><span class="i">🕒</span>时间轴</div>
+    <div class="tb" data-tab="digest"><span class="i">📋</span>简报</div>
+    <div class="tb" data-tab="mine"><span class="i">👤</span>我的</div>
+  </div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/*__DATA__*/
+</script>
+<script>
+/*__AGENT__*/
+</script>
+<script>
+/*__CORE__*/
+</script>
+<script>
+/* ================================================================
+ * 知时 · 单文件应用外壳
+ * 依赖：window.ZS_DATA（同源数据）、window.ZS（同源算法）
+ * ================================================================ */
+(function(){
+'use strict';
+var DATA = window.ZS_DATA, CORE = window.ZS;
+/* 倒计时实时刷新（与小程序 store.refreshCountdowns 同源）：
+ * 打包数据的 countdown 是编制时刻的定值，这里按 deadline 与"今天"现算，
+ * 保证"今天截止"的条目一定顶在今天，不会因为日子前移被错排到明天。 */
+var NOTICES = CORE.refreshCountdowns(DATA.NOTICES || []);
+
+/* ---------- 身份体系（与小程序 utils/identity.js 同源） ---------- */
+var IDENTITY_TYPES = [
+  {key:'本科生', icon:'🎒'}, {key:'研究生', icon:'🔬'}, {key:'教职工', icon:'🧑‍🏫'}
+];
+var GRADES = ['2026级 · 大一','2025级 · 大一','2024级 · 大二','2023级 · 大三','2022级 · 大四',
+  '研究生 · 研一','研究生 · 研二','研究生 · 研三','在职教职工'];
+var COLLEGES = ['信息与人工智能学院','经济管理学院','农学院','林学与园林学院',
+  '动物科技学院','茶与食品科技学院','生命科学学院','资源与环境学院',
+  '工学院','理学院','外国语学院','人文社会科学学院'];
+var CAMPUSES = ['长江西路校区','经开区校区','南校区'];
+
+/* ---------- 本地存储（画像 / 收藏 / 办事进度 / 主题） ---------- */
+var LS = {
+  get:function(k,d){ try{ var v=localStorage.getItem('zhishi_'+k); return v?JSON.parse(v):d; }catch(e){ return d; } },
+  set:function(k,v){ try{ localStorage.setItem('zhishi_'+k, JSON.stringify(v)); }catch(e){} }
+};
+var DEFAULT_PROFILE = {
+  identityType:'本科生', grade:'2025级 · 大一', college:'信息与人工智能学院',
+  major:'', campus:'长江西路校区',
+  interests: CORE.TAGS.slice(0,4).map(function(t){return t.key;}),
+  keywords: [],
+  advance:'截止前 7 天 / 3 天 / 1 天',
+  channel:'小程序服务通知 + 群内播报'
+};
+function getProfile(){
+  var p = LS.get('profile', null);
+  if(!p) return Object.assign({}, DEFAULT_PROFILE);
+  var m = Object.assign({}, DEFAULT_PROFILE, p);
+  if(!Array.isArray(m.interests) || !m.interests.length) m.interests = DEFAULT_PROFILE.interests.slice();
+  /* keywords：旧数据可能没有 → 补空数组；并统一清洗（与小程序 store.fillProfile 同源） */
+  m.keywords = CORE.sanitizeKeywords(m.keywords);
+  return m;
+}
+var PROFILE = getProfile();
+function saveProfile(p){ PROFILE = p; LS.set('profile', p); }
+
+/* 关键词订阅的推荐词候选：都是安农通知里真实出现、且固定标签盖不住的具体名词。
+ * 只把"池里真命中"的推给用户（命中 0 条的剔除）。
+ * ★ 与小程序 pages/me/me.js 的 KW_SUGGEST_CANDIDATES 同源，改动需两端同步。 */
+var KEYWORD_SUGGEST = [
+  '正大杯', '挑战杯', '数学建模', '蓝桥杯', '节能减排', '大学生创新创业',
+  '四六级', '普通话', '计算机等级', '教资', '志愿服务', '社会实践',
+  '招聘会', '考研', '保研', '交换生'
+];
+
+/* 「这条与我有关吗」—— 与小程序 store.isRelevant 同口径：
+ * 命中订阅标签 OR 命中自定义关键词，且过身份/学院过滤（各花入各眼）。
+ * 之所以抽成一个函数：旧代码把 interests.indexOf(n.event)>=0 抄了 5 遍，
+ * 加了"关键词订阅"后若不一处处改，就会出现"某页看得到、某页看不到"的分裂。 */
+function isRelevant(n, profile){
+  var p = profile || PROFILE;
+  var interests = p.interests || [];
+  var byTag = interests.indexOf(n.event) >= 0;
+  var byKw = CORE.hitKeyword(n, p);
+  if(!byTag && !byKw) return false;
+  return passesIdentity(n, p);
+}
+
+/* ---------- 计算倒计时（按今天实时算，与自查系统口径一致） ---------- */
+function daysUntil(deadline){
+  if(!deadline) return null;
+  var d = new Date(String(deadline).slice(0,10)+'T00:00:00');
+  if(isNaN(d.getTime())) return null;
+  var now = new Date(), today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((d - today)/86400000);
+}
+/* 给每条通知挂实时倒计时与出处状态 */
+function decorateAll(){
+  NOTICES.forEach(function(n){
+    var cd = daysUntil(n.deadline);
+    n._cd = (typeof cd === 'number') ? cd : null;
+    n._srcState = (n.real && n.url) ? 'veri' : (n.real ? 'real' : 'demo');
+    n._srcLabel = n._srcState==='veri' ? '✓ 可核对原文'
+      : n._srcState==='real' ? '真实采集' : '演示样例';
+  });
+}
+/* 紧急度：hi（3天内/过期）/ md（一周内）/ lo（更远/长期） */
+function levelOf(n){
+  var cd = n._cd;
+  if(cd === null) return 'lo';
+  if(cd < 0) return 'lo';
+  if(cd <= 3) return 'hi';
+  if(cd <= 7) return 'md';
+  return 'lo';
+}
+function levelLabel(n){
+  var cd = n._cd;
+  if(cd === null) return '长期有效';
+  if(cd < 0) return '已过期';
+  if(cd === 0) return '今天';
+  return 'D-'+cd;
+}
+/* 身份匹配与 miniprogram/utils/identity.js 完全同源 ——
+   注意：这里不"逐关键词命中就判死"。原文写「本科生、研究生」是并列接收范围，
+   两类都该收到；早期实现把它错判成"只给研究生"，把本科生漏了。 */
+function matchAudience(aud, p){
+  var a = String(aud||''); if(!a) return true;
+  p = p || {};
+
+  var isBen  = /本科/.test(a);
+  var isGrad = /研究生|硕士|博士/.test(a);
+  var isStaffOnly = /教职工|教师|在职/.test(a) && !isBen && !isGrad;
+  var myType = String(p.identityType||'');
+  var mineGrad = /研究生|硕士|博士/.test(myType);
+
+  if(isStaffOnly){
+    if(myType !== '教职工') return false;
+  } else if(isBen && isGrad){
+    /* 并列 = 全校学生都收，谁都不排除 */
+    if(myType === '教职工') return false;
+  } else if(isGrad && !isBen){
+    if(!mineGrad) return false;
+  } else if(isBen && !isGrad){
+    if(mineGrad || myType === '教职工') return false;
+  }
+
+  var GK = [['2025级','2025级 · 大一'],['2026级','2026级 · 大一'],
+    ['2024级','2024级 · 大二'],['2023级','2023级 · 大三'],['2022级','2022级 · 大四']];
+  var hits = GK.filter(function(g){ return a.indexOf(g[0])>=0; });
+  var myGrade = String(p.grade||'');
+  if(hits.length){
+    var ok = hits.some(function(g){ return myGrade.indexOf(g[0])>=0 || myGrade===g[1]; });
+    if(!ok) return false;
+  } else if(/大一/.test(a) && /新生/.test(a)){
+    if(/\d{4}级/.test(myGrade) && myGrade.indexOf('大一')<0) return false;
+  } else if(/毕业生|大四/.test(a) && !/就业|招聘/.test(a)){
+    if(/\d{4}级/.test(myGrade) && myGrade.indexOf('大四')<0 && myGrade.indexOf('研')<0) return false;
+  }
+
+  return true;
+}
+function passesIdentity(n, p){
+  var aud = (n.audience && n.audience!=='原文未明确说明') ? n.audience : (n.title||'');
+  return matchAudience(aud, p);
+}
+
+/* ---------- 状态 ---------- */
+var STATE = { tab:'radar', detailId:null, sub:'main', theme: LS.get('theme','light') };
+
+/* ★ 智能体状态缓存：远端调用是异步的，而 render() 是同步的。
+ * 所以采用"先渲染缓存值 → 异步拉取 → 回来后重渲染"的经典节奏，
+ * 避免把 render 改成异步（那会牵动所有调用点，风险不值当）。 */
+var AGENT = {
+  ready: false,        // 是否已至少拉到一次
+  loading: false,
+  result: null,        // digest() 的返回
+  status: null,        // status() 的返回
+  err: '',
+  cfgOpen: false       // "改地址"面板是否展开
+};
+function loadAgentData(){
+  if(!window.ZS_AGENT || AGENT.loading) return;
+  AGENT.loading = true;
+  AGENT.err = '';
+  var needRender = (STATE.tab==='digest' || STATE.sub==='push');
+  if(needRender) render();
+
+  window.ZS_AGENT.status().then(function(st){
+    AGENT.status = st;
+    return window.ZS_AGENT.digest({ useLLM:true });
+  }).then(function(r){
+    AGENT.result = r; AGENT.ready = true; AGENT.loading = false;
+    if(STATE.tab==='digest' || STATE.sub==='push') render();
+  }).catch(function(e){
+    AGENT.err = (e && e.message) || '智能体清单获取失败';
+    AGENT.loading = false;
+    if(STATE.tab==='digest' || STATE.sub==='push') render();
+  });
+}
+var FAV = LS.get('favorites', []);
+var DONE = LS.get('steps', {});
+
+function $(sel){ return document.querySelector(sel); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function toast(msg){
+  var t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._tm); t._tm = setTimeout(function(){ t.classList.remove('show'); }, 1600);
+}
+function summary(){
+  var parts = [];
+  if(PROFILE.identityType) parts.push(PROFILE.identityType);
+  if(PROFILE.grade) parts.push(PROFILE.grade.split('·').pop().trim());
+  if(PROFILE.college) parts.push(PROFILE.college);
+  return parts.join(' · ');
+}
+
+/* ================================================================
+ * 推送状态：哪些 id 已经推给用户看过了（决定 isNew）
+ * ================================================================ */
+function readPushState(){
+  var s = LS.get('pushState', null);
+  if(s && Array.isArray(s.pushedIds)) return s;
+  return { pushedIds:[], lastPushAt:0, pushCount:0 };
+}
+function markPushed(ids){
+  var s = readPushState(), set = {};
+  (s.pushedIds||[]).forEach(function(x){ set[x]=1; });
+  (ids||[]).forEach(function(x){ set[x]=1; });
+  LS.set('pushState', {
+    pushedIds:Object.keys(set).slice(-500),
+    lastPushAt:Date.now(),
+    pushCount:(s.pushCount||0)+1
+  });
+}
+function markPushedAllReset(){ LS.set('pushState', { pushedIds:[], lastPushAt:Date.now(), pushCount:0 }); }
+
+/* ================================================================
+ * 微信服务通知状态（与小程序 utils/wxnotify.js 同源口径）
+ * 网页版无微信订阅消息 API，一律走"演示模式"：完整走交互与登记，如实标注不真发。
+ * ================================================================ */
+function readWxState(){
+  var s = LS.get('wxnotifyState', null);
+  if(s && typeof s === 'object') return s;
+  return { granted:false, subscribeCount:0, lastAt:0, advance:'3,1', types:[], sends:0, lastSendAt:0, demo:true };
+}
+function writeWxState(s){ LS.set('wxnotifyState', s); }
+/* 把通知池喂给同源推送引擎，得到带理由/评分/是否新收录的推送卡片 */
+function buildPushCards(){
+  var st = readPushState();
+  return CORE.buildPush(NOTICES, {
+    profile: PROFILE,
+    seenIds: st.pushedIds || [],
+    limit: 60
+  });
+}
+/* 问知时：今日一问（与小程序 ask.headline 同源策略） */
+function askHeadline(){
+  return CORE.askHeadline({
+    notices: NOTICES,
+    profile: PROFILE,
+    pushResult: buildPushCards()
+  });
+}
+
+/* ================================================================
+ * 视图：雷达（主动推送）
+ * ================================================================ */
+function viewRadar(){
+  var interests = PROFILE.interests || [];
+  var P = buildPushCards();
+  var cards = P.cards;
+  var total = P.total;
+  var urgent = P.hotCount;
+  var newCnt = P.newCount;
+
+  var h = '';
+
+  /* 头条：一张卡说清"最要紧的一件事" + 总量
+   * —— 原「今日一问卡」「推送总览卡」「推送小结条」三张合一张，首屏不再堆三层。 */
+  var HL = askHeadline();
+  h += '<div class="hcard tone-'+HL.tone+'" onclick="APP.goSub(\'ask\')">'
+    + '<div class="hq"><span class="hqi">💬</span><span class="hqt">问知时 · '+esc(HL.q)+'</span></div>'
+    + '<div class="ha">'+esc(HL.answer)+'</div>'
+    + '<div class="hmeta">共 '+total+' 条与你有关'
+    + (urgent? ' · <b>'+urgent+' 条 3 天内要办</b>' : '')
+    + (newCnt? ' · '+newCnt+' 条新收录' : '') + '</div>'
+    + '</div>';
+
+  if(!cards.length){
+    h += '<div class="empty">还没有匹配的通知<br><span style="font-size:12px">去「我的」勾选关注标签试试</span></div>';
+    h += appFoot();
+    return h;
+  }
+
+  /* 推送流：首屏只摊开"最要紧的 3 条"，其余折叠 —— 一屏看完，不刷屏 */
+  var OPEN = 3;
+  h += '<div class="sec">🔔 最要紧的先看<span class="secsub">· 已按你的档案排序</span>'
+    + '<span class="seclink" onclick="APP.goSub(\'push\')">推送设置 ›</span></div>';
+  cards.slice(0, OPEN).forEach(function(n){ h += pushCard(n); });
+
+  var rest = cards.slice(OPEN);
+  if(rest.length){
+    h += '<div id="moreWrap" style="display:none">';
+    rest.forEach(function(n){ h += pushCard(n); });
+    h += '</div>';
+    h += '<button class="morebtn" id="moreBtn" onclick="APP.toggleMore()">'
+      + '展开其余 '+rest.length+' 条 ∨</button>';
+  }
+
+  h += appFoot();
+  return h;
+}
+
+/* 展开/收起"其余推送" */
+function toggleMore(){
+  var w = document.getElementById('moreWrap');
+  var b = document.getElementById('moreBtn');
+  if(!w || !b) return;
+  var open = w.style.display !== 'none';
+  w.style.display = open ? 'none' : 'block';
+  var n = w.querySelectorAll('.ncard').length;
+  b.textContent = open ? ('展开其余 '+n+' 条 ∨') : '收起 ∧';
+}
+
+function noticeCard(n){
+  var lv = levelOf(n);
+  var cls = lv==='hi'?'hi':(lv==='md'?'md':'lo');
+  var h = '<div class="ncard '+cls+'" onclick="APP.openDetail(\''+n.id+'\')">';
+  h += '<div class="r1"><div class="tt">'+esc(n.title)+'</div><div class="dd">'+levelLabel(n)+'</div></div>';
+  h += '<div class="sr">'+esc(n.source||'')+(n.site?(' · '+esc(n.site)):'')+' · '+esc(n.publish||'')+'</div>';
+  if(n.digestOne) h += '<div class="dgo">'+esc(n.digestOne)+'</div>';
+  if(n.entry) h += '<div class="entry">📍 '+esc(n.entry)+'</div>';
+  h += '<div class="tags"><span class="tg">'+esc(n.event)+'</span>'
+    + '<span class="src '+n._srcState+'">'+n._srcLabel+'</span></div>';
+  h += '</div>';
+  return h;
+}
+
+/* 推送卡片：一屏能扫。只留两行 —— 级别+标题 / 来源+倒计时。
+ * 为什么推、原文摘要(digestOne)、标签、推送分都收进详情页，不在列表里堆。 */
+function pushCard(n){
+  var cls = n.pushLevel==='now' ? 'hi' : (n.pushLevel==='hot' ? 'hi' : (n.pushLevel==='soon' ? 'md' : 'lo'));
+  var h = '<div class="ncard '+cls+' pushcard" onclick="APP.openDetail(\''+n.id+'\')">';
+
+  /* 第一行：级别徽标 + 新标 + 标题 */
+  h += '<div class="prow">'
+    + '<span class="plv '+n.pushLevel+'">'+n.pushLevelIcon+' '+esc(n.pushLevelLabel)+'</span>'
+    + (n.isNew ? '<span class="pnew">新</span>' : '') + '</div>';
+  h += '<div class="tt" style="margin-top:6px">'+esc(n.title)+'</div>';
+
+  /* 来源 / 倒计时：倒计时是"要不要现在办"的关键信号，按紧急度着色 */
+  var cdtxt = (typeof n._cd==='number') ? (n._cd<0 ? '已过期' : '剩 '+n._cd+' 天') : '';
+  var cdcls = (typeof n._cd==='number' && n._cd<0) ? 'exp'
+    : (typeof n._cd==='number' && n._cd<=3) ? 'now' : 'far';
+  h += '<div class="sr">'+esc(n.source||'')
+    + (cdtxt ? '<span class="cdc '+cdcls+'">'+cdtxt+'</span>' : '')+'</div>';
+
+  h += '</div>';
+  return h;
+}
+
+/* ================================================================
+ * 视图：时间轴
+ * ================================================================ */
+function viewTimeline(){
+  var interests = PROFILE.interests || [];
+  var items = NOTICES.filter(function(n){ return isRelevant(n, PROFILE); });
+  var bins = [
+    {k:'now', label:'今天截止', test:function(cd){return cd===0;}},
+    {k:'soon', label:'三天内', test:function(cd){return cd>0&&cd<=3;}},
+    {k:'week', label:'一周内', test:function(cd){return cd>3&&cd<=7;}},
+    {k:'month', label:'本月内', test:function(cd){return cd>7&&cd<=30;}},
+    {k:'far', label:'更远 / 长期有效', test:function(cd){return cd===null||cd>30;}}
+  ];
+  var h = '';
+  var idx = CORE.getStats(NOTICES, interests);
+  h += '<div class="sec">知时指数 <span class="secsub">· 越靠前越急</span></div>';
+  var hi = items.filter(function(n){return levelOf(n)==='hi';}).length;
+  var score = Math.min(100, hi*14 + items.length*3);
+  var lvl = score>=70?'lv-high':(score>=40?'lv-mid':'');
+  h += '<div class="sumcard '+lvl+'"><div class="sumlb">当前关注范围内</div>'
+    + '<div class="sumtx">'+items.length+' 条通知，其中 '+hi+' 条 3 天内要办。</div>'
+    + '<div class="sumidx"><span class="sin">知时指数</span><span class="siv">'+score+'</span>'
+    + '<span class="sil">'+(score>=70?'要抓紧':(score>=40?'有几件要留意':'比较从容'))+'</span></div></div>';
+
+  bins.forEach(function(b){
+    var list = items.filter(function(n){ return b.test(n._cd); })
+      .sort(function(a,b2){ var ca=a._cd===null?9999:a._cd, cb=b2._cd===null?9999:b2._cd; return ca-cb; });
+    if(!list.length) return;
+    h += '<div class="bin"><div class="binh '+(b.k==='now'?'now':'')+'">'
+      + '<span class="bdot"></span>'+b.label+'<span class="bcnt">'+list.length+' 条</span></div>';
+    list.forEach(function(n){
+      h += '<div class="icard '+(levelOf(n)==='hi'?'hi':'')+'" onclick="APP.openDetail(\''+n.id+'\')">'
+        + '<div class="ii"><div class="it">'+esc(n.title)+'</div>'
+        + '<div class="is">'+esc(n.source||'')+' · 截止 '+esc(n.deadline||'长期')+'</div></div>'
+        + '<div class="id '+(levelOf(n)==='lo'?'md':'')+'">'+levelLabel(n)+'</div></div>';
+    });
+    h += '</div>';
+  });
+  if(!items.length) h += '<div class="empty">当前关注范围内暂无带截止日期的通知</div>';
+  h += appFoot();
+  return h;
+}
+
+/* ================================================================
+ * 视图：简报（自动整合）
+ * ================================================================ */
+function viewDigest(){
+  var interests = PROFILE.interests || [];
+  var items = NOTICES.filter(function(n){ return isRelevant(n, PROFILE); });
+  var must = items.filter(function(n){ return n._cd!==null && n._cd<=3; })
+    .sort(function(a,b){return a._cd-b._cd;});
+  var watch = items.filter(function(n){ return n._cd!==null && n._cd>3 && n._cd<=7; })
+    .sort(function(a,b){return a._cd-b._cd;});
+  var realCnt = NOTICES.filter(function(n){return n.real;}).length;
+  var linked = NOTICES.filter(function(n){return n.real && n.url;}).length;
+  var siteCnt = {};
+  NOTICES.forEach(function(n){ if(n.site) siteCnt[n.site]=1; });
+
+  var d = new Date(), pad=function(x){return x<10?'0'+x:''+x;};
+  var stamp = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+
+  var h = '';
+  h += '<div class="bhead"><div class="lg"><span class="sun"></span><span class="aa">AAU</span><span class="book"></span><span class="y">1928</span></div>'
+    + '<div><div class="t1">今日简报</div><div class="t2">'+stamp+' 生成 · 知时 · 数字安农信息雷达</div></div></div>';
+
+  var sents = [];
+  if(must.length) sents.push('今天起 '+must.length+' 条在三天内截止');
+  if(watch.length) sents.push('另有 '+watch.length+' 条本周到期');
+  sents.push('你关注的 '+interests.length+' 类共命中 '+items.length+' 条');
+  var hi = items.filter(function(n){return levelOf(n)==='hi';}).length;
+  var score = Math.min(100, hi*14 + items.length*3);
+  var lvl = score>=70?'lv-high':(score>=40?'lv-mid':'');
+
+  h += '<div class="sumcard '+lvl+'"><div class="sumlb">一句话总结</div>';
+  sents.forEach(function(s){ h += '<div class="sumtx">'+esc(s)+'。</div>'; });
+  h += '<div class="sumidx"><span class="sin">知时指数</span><span class="siv">'+score+'</span>'
+    + '<span class="sil">'+(score>=70?'要抓紧':(score>=40?'有几件要留意':'比较从容'))+'</span></div></div>';
+
+  if(must.length){
+    h += '<div class="sec red">⏰ 三天内要办 · '+must.length+' 件</div>';
+    must.forEach(function(n){
+      h += '<div class="icard '+(n._cd<=0?'now':'hi')+'" onclick="APP.openDetail(\''+n.id+'\')">'
+        + '<div class="ii"><div class="it">'+esc(n.title)+'</div>'
+        + '<div class="is">'+esc(n.event)+' · 截止 '+esc(n.deadline)+'</div>'
+        + (n.digestOne?'<div class="dgo" style="font-size:13px;color:var(--txt-2);margin-top:6px">'+esc(n.digestOne)+'</div>':'')
+        + (n.entry?'<div class="entry">📍 '+esc(n.entry)+'</div>':'')
+        + '</div><div class="id '+(n._cd<=0?'':'hi')+'">'+levelLabel(n)+'</div></div>';
+    });
+  }
+  if(watch.length){
+    h += '<div class="sec">📅 本周留意 · '+watch.length+' 件</div>';
+    watch.forEach(function(n){
+      h += '<div class="icard" onclick="APP.openDetail(\''+n.id+'\')"><div class="ii">'
+        + '<div class="it">'+esc(n.title)+'</div>'
+        + '<div class="is">'+esc(n.event)+' · 截止 '+esc(n.deadline)+'</div></div>'
+        + '<div class="id md">'+levelLabel(n)+'</div></div>';
+    });
+  }
+  if(!must.length && !watch.length){
+    h += '<div class="empty">今天没有临近截止的事<br><span style="font-size:12px">去看看还有哪些通知可以关注</span></div>';
+  }
+
+  h += '<div class="sec">数据可信度 <span class="secsub">· 你看到的从哪来</span></div>';
+  h += '<div class="trust trust-high"><div class="tr1"><span class="trl">真实公开源占比</span>'
+    + '<span class="trv">'+realCnt+' / '+NOTICES.length+'</span></div>'
+    + '<div class="trbar"><div class="trfill" style="width:'+Math.round(realCnt/NOTICES.length*100)+'%"></div></div>'
+    + '<div class="trmsg">绝大多数来自安农官网公开页</div>'
+    + '<div class="trsub">其中 '+linked+' 条带可核对原文链接；来源站点 '+Object.keys(siteCnt).length+' 个</div></div>';
+
+  h += viewAgentBlock();
+
+  h += '<div class="acts"><button class="ab primary" onclick="APP.copyDigest()">复制简报</button></div>';
+  h += appFoot();
+  return h;
+}
+
+/* ================================================================
+ * ★ 智能体主动送达区块（网页侧，与小程序 digest 页同构）
+ * ----------------------------------------------------------------
+ * 与上面「本地简报」的区别，必须让用户看得见：
+ *   本地简报 = 你打开页面时现算（"我来了它才想"）
+ *   智能体清单 = 服务端常驻按点自己跑（"你不来它也想"）
+ * 状态点如实标识：绿=连上服务端 / 灰=本地模式 / 橙=配了却没连上
+ * ================================================================ */
+function agentDueText(n){
+  var c = (n && typeof n.countdown === 'number') ? n.countdown : null;
+  if(c === null) return '';
+  if(c < 0) return '已过期';
+  if(c === 0) return '今天截止';
+  if(c === 1) return '明天截止';
+  if(c <= 3) return 'D-'+c;
+  return '还有 '+c+' 天';
+}
+
+function viewAgentBlock(){
+  var h = '';
+  /* 未加载 agent 客户端（HTML 未被注入该文件）→ 整块不渲染，不留空壳 */
+  if(!window.ZS_AGENT){
+    return '';
+  }
+
+  h += '<div class="sec">🤖 智能体主动送达 <span class="secsub">· 你不打开它也在跑</span></div>';
+
+  var st = AGENT.status;
+  var r = AGENT.result;
+  var mode = st ? st.mode : 'local';
+  var label = st ? st.label : '正在探测智能体服务…';
+  var cls = mode==='remote' ? 'on' : (st && st.configured ? 'warn' : 'off');
+
+  h += '<div class="agentbox '+cls+'">';
+  h += '<div class="aghead"><span class="agdot"></span><span class="aglab">'+esc(label)+'</span>'
+    + '<span class="agvia">'+(mode==='remote'?'服务端算':'本地算')+'</span></div>';
+
+  if(r && r.degraded){
+    h += '<div class="agwarn">智能体服务未连接，已降级用本地算法现算（结论口径一致，但不含大模型理解）。'
+      + (r.degradeReason ? '<span class="agwarnr">原因：'+esc(r.degradeReason)+'</span>' : '') + '</div>';
+  }
+  if(AGENT.err){
+    h += '<div class="agwarn">取清单失败：'+esc(AGENT.err)+'</div>';
+  }
+  if(AGENT.loading && !AGENT.ready){
+    h += '<div class="agloading">正在向智能体要今天的清单…</div>';
+  }
+
+  if(r && r.ok){
+    var notify = r.notify || [];
+    var silent = (r.silent || []).slice(0,3);
+    var meta = r.meta || {};
+
+    if(notify.length){
+      h += '<div class="agtl">该主动提醒你 · '+notify.length+' 件</div>';
+      notify.forEach(function(n){
+        h += '<div class="agnotify" onclick="APP.openDetail(\''+n.id+'\')">'
+          + '<div class="agnr1"><div class="agnt">'+esc(n.title)+'</div>'
+          + '<div class="agnd">'+esc(agentDueText(n))+'</div></div>'
+          + '<div class="agnsr">'+esc(n.event||'')+(n.source?' · '+esc(n.source):'')+'</div>'
+          + (n.reasonLine?'<div class="agnrs">💡 '+esc(n.reasonLine)+'</div>':'')
+          + (n.digestOne?'<div class="agnone">'+esc(n.digestOne)+'</div>':'')
+          + '</div>';
+      });
+    }
+    if(silent.length){
+      h += '<div class="agsl">静默进流 · 不打扰你（'+silent.length+' 条示例）</div>';
+      silent.forEach(function(n){
+        h += '<div class="agsitem" onclick="APP.openDetail(\''+n.id+'\')">'
+          + '<span class="agst">'+esc(n.title)+'</span><span class="agsd">'+esc(agentDueText(n))+'</span></div>';
+      });
+    }
+    if(!notify.length && !silent.length){
+      h += '<div class="agem">按你当前的订阅，今天没有需要主动送达的事。</div>';
+    }
+
+    var counts = meta.counts || {};
+    h += '<div class="agmeta">'
+      + '<span>最近计算：'+esc(meta.ranAt||'—')+'</span>'
+      + '<span>模式：'+(meta.mode==='llm'?'大模型理解 + 规则打分':'纯规则')+'</span>'
+      + (meta.model?'<span>模型：'+esc(meta.model)+'</span>':'')
+      + '<span>命中 '+(counts.matched||0)+' 条 · 打扰 '+(counts.notify||0)+' 条 · 静默 '+(counts.silent||0)+' 条</span>'
+      + (meta.elapsedMs?'<span>耗时 '+meta.elapsedMs+' ms</span>':'')
+      + '</div>';
+
+    h += '<div class="agacts">'
+      + '<div class="agbtn" onclick="APP.rerunAgent()">🔄 让它重算一遍</div>'
+      + '<div class="agbtn" onclick="APP.copyAgent()">📋 复制清单</div>'
+      + '</div>';
+  }
+  h += '</div>';
+  return h;
+}
+
+/* ================================================================
+ * 视图：我的（档案自主完善）
+ * ================================================================ */
+function viewMine(){
+  if(STATE.sub === 'selfcheck') return viewSelfcheck();
+  if(STATE.sub === 'about') return viewAbout();
+  if(STATE.sub === 'push') return viewPushSettings();
+
+  var interests = PROFILE.interests || [];
+  var reach = NOTICES.filter(function(n){ return isRelevant(n, PROFILE); }).length;
+  var reachUrgent = NOTICES.filter(function(n){
+    return isRelevant(n, PROFILE) && levelOf(n)==='hi';
+  }).length;
+  var total = NOTICES.length, realCnt = NOTICES.filter(function(n){return n.real;}).length;
+  var P = buildPushCards();
+
+  var h = '';
+  h += '<div class="mhead"><div class="ava">'+(PROFILE.identityType==='研究生'?'🔬':PROFILE.identityType==='教职工'?'🧑‍🏫':'🎒')+'</div>'
+    + '<div class="bt"><div class="t1">'+esc(summary())+'</div>'
+    + '<div class="t2">已聚合 '+total+' 条通知 · 其中 '+realCnt+' 条来自安农官网公开页</div></div></div>';
+
+  h += '<div class="sec">我的身份 <span class="secsub">· 决定哪些通知和你有关</span></div>';
+  h += '<div class="kv" style="padding:2px 14px">';
+  h += selRow('身份类型','identityType',IDENTITY_TYPES.map(function(t){return t.key;}));
+  h += selRow('年级','grade',GRADES);
+  h += selRow('学院','college',COLLEGES);
+  h += '<div class="frow"><span class="fk">专业</span>'
+    + '<input type="text" id="inMajor" value="'+esc(PROFILE.major||'')+'" placeholder="选填，如：计算机科学与技术" onchange="APP.onMajor(this.value)"></div>';
+  h += selRow('校区','campus',CAMPUSES);
+  h += '</div>';
+
+  h += '<div class="sec">关注标签 <span class="secsub">· 决定哪些通知会推给你</span></div>';
+  h += '<div class="kv"><div class="chips">';
+  CORE.TAGS.forEach(function(t){
+    var on = interests.indexOf(t.key)>=0;
+    var cnt = NOTICES.filter(function(n){return n.event===t.key;}).length;
+    h += '<span class="chip '+(on?'on':'')+'" onclick="APP.toggleTag(\''+t.key+'\')">'
+      + t.icon+' '+esc(t.key)+(cnt?'<span class="cn">'+cnt+'</span>':'')+'</span>';
+  });
+  h += '</div><div class="cops"><span onclick="APP.selectAll()">全选</span>'
+    + '<span onclick="APP.resetDefault()">恢复默认</span></div>';
+  h += '<div class="hint">已选 '+interests.length+' / '+CORE.TAGS.length+' 个标签 · 按当前身份将收到 '
+    + '<span class="reach">'+reach+'</span> 条通知'
+    + (reachUrgent?'<span class="reachw">（含 '+reachUrgent+' 条紧急）</span>':'') + '</div></div>';
+
+  /* 我的关键词：输入一个具体名词（如"正大杯"），命中即主动推给你。
+   * 与小程序 me 页同源同逻辑（CORE.matchKeyword / hitKeyword）。 */
+  var kws = PROFILE.keywords || [];
+  h += '<div class="sec">我的关键词 <span class="secsub">· 输入你在意的具体名词，命中就推给你</span></div>';
+  h += '<div class="kv">';
+  h += '<div class="hint" style="padding-top:12px;line-height:1.6">标签是"我们替你分好的类"；关键词是"你自己敲进去的词"——比如你参加了正大杯，就订「正大杯」，以后凡是有它出现的通知都会主动推给你。</div>';
+  h += '<div class="kwin"><input type="text" id="inKw" placeholder="如：正大杯 / 挑战杯 / 数学建模" onkeydown="if(event.key===\'Enter\')APP.addKeyword()">'
+    + '<span class="kwadd" onclick="APP.addKeyword()">添加</span></div>';
+  if(kws.length){
+    h += '<div class="kwchips">';
+    kws.forEach(function(kw){
+      var keys = CORE.normKeyword(kw);
+      var hits = keys ? NOTICES.filter(function(n){
+        return CORE.noticeHaystack(n).indexOf(keys)>=0 && passesIdentity(n, PROFILE);
+      }) : [];
+      var urgent = hits.filter(function(n){ return levelOf(n)==='hi'; }).length;
+      h += '<span class="kwchip '+(hits.length?'':'empty')+'">'
+        + '<span class="kwt">'+esc(kw)+'</span>'
+        + (hits.length?'<span class="kwn">'+hits.length+' 条</span>':'<span class="kwn empty">暂无命中</span>')
+        + (urgent?'<span class="kwhot">'+urgent+' 紧急</span>':'')
+        + '<span class="kwx" onclick="APP.removeKeyword(\''+esc(kw)+'\')">×</span></span>';
+    });
+    h += '</div>';
+  }
+  /* 推荐词：池里真命中、你还没订的（点了才发现空词最伤信任） */
+  var sugs = KEYWORD_SUGGEST.filter(function(w){
+    if(kws.some(function(k){return CORE.normKeyword(k)===CORE.normKeyword(w);})) return false;
+    return NOTICES.some(function(n){
+      return CORE.hitKeyword(n, {keywords:[w]}) && passesIdentity(n, PROFILE);
+    });
+  }).slice(0,8);
+  if(sugs.length){
+    h += '<div class="kwsug"><span class="kwsug-l">你可能还关心：</span>';
+    sugs.forEach(function(w){ h += '<span class="kwsug-w" onclick="APP.tapSuggest(\''+esc(w)+'\')">+ '+esc(w)+'</span>'; });
+    h += '</div>';
+  }
+  var kwReach = 0, kwUrgent = 0;
+  kws.forEach(function(kw){
+    var keys = CORE.normKeyword(kw); if(!keys) return;
+    NOTICES.forEach(function(n){
+      if(CORE.noticeHaystack(n).indexOf(keys)>=0 && passesIdentity(n, PROFILE)){
+        kwReach++; if(levelOf(n)==='hi') kwUrgent++;
+      }
+    });
+  });
+  h += '<div class="hint">' + (kws.length
+      ? '已订 '+kws.length+' / '+CORE.MAX_KEYWORDS+' 个关键词 · 按当前身份可命中 <span class="reach">'+kwReach+'</span> 条通知'
+        + (kwUrgent?'<span class="reachw">（含 '+kwUrgent+' 条紧急）</span>':'')
+      : '还没有关键词 —— 输入一个你在意的具体名词试试（最多 '+CORE.MAX_KEYWORDS+' 个）')
+    + '</div></div>';
+
+  h += '<div class="sec">提醒设置</div>';
+  h += '<div class="kv" style="padding:2px 14px">';
+  h += selRow('提前量','advance',['截止前 7 天 / 3 天 / 1 天','截止前 3 天 / 1 天','仅截止前 1 天']);
+  h += selRow('提醒方式','channel',['小程序服务通知 + 群内播报','仅小程序服务通知','仅群内播报']);
+  h += '</div>';
+
+  h += '<div class="sec">问知时 <span class="secsub">· 有问题直接问，答案带依据</span></div>';
+  h += '<div class="ncard" style="border-left:4px solid var(--brand)" onclick="APP.goSub(\'ask\')">'
+    + '<div class="r1"><div class="tt">13 个高频疑问，一问一答</div><div class="arrow" style="color:var(--brand);font-size:20px">›</div></div>'
+    + '<div class="dgo">"这周还剩几件事""先办哪个""我漏了什么""哪些是全校能报的"——每个答案都由真实字段算出，并附一行「依据」说明算法。</div></div>';
+
+  h += '<div class="sec">办事日历 <span class="secsub">· 哪天忙一目了然</span></div>';
+  h += '<div class="ncard" style="border-left:4px solid var(--brand)" onclick="APP.goSub(\'calendar\')">'
+    + '<div class="r1"><div class="tt">按月看截止日分布</div><div class="arrow" style="color:var(--brand);font-size:20px">›</div></div>'
+    + '<div class="dgo">把有截止的通知落到对应日期格子上，红橙黄绿代表紧急度，今天高亮。回答「具体哪天我忙、哪天能空出来」。</div></div>';
+
+  h += '<div class="sec">数据自查 <span class="secsub">· 每次展示前先查一遍</span></div>';
+  var linked = NOTICES.filter(function(n){return n.real && n.url;}).length;
+  h += '<div class="trust trust-high"><div class="tr1"><span class="trl">真实公开源占比</span>'
+    + '<span class="trv">'+realCnt+' / '+total+'</span></div>'
+    + '<div class="trbar"><div class="trfill" style="width:'+Math.round(realCnt/total*100)+'%"></div></div>'
+    + '<div class="trmsg">绝大多数来自安农官网公开页</div>'
+    + '<div class="trsub">其中 '+linked+' 条带可核对原文链接；共 '+total+' 条已聚合、已浓缩</div>'
+    + '<div class="trsub trnote">没链接的条目标注为「演示样例 / 真实采集」，不当真实通知使用。有链接的可点开详情复制原文地址逐字比对。</div></div>';
+  h += '<div class="ncard" style="margin-top:10px;border-left:4px solid var(--brand)" onclick="APP.goSub(\'selfcheck\')">'
+    + '<div class="r1"><div class="tt">查看数据自查报告</div><div class="arrow" style="color:var(--brand);font-size:20px">›</div></div>'
+    + '<div class="dgo">三条铁律：出处可举证 · 链接不伪造 · 引文可定位。不可靠的直接剔除，可疑的如实标注，全部留痕。</div></div>';
+
+  h += '<div class="sec">主动推送 <span class="secsub">· 决定怎么推、推多少、要不要打扰你</span></div>';
+  h += '<div class="ncard" style="border-left:4px solid var(--brand)" onclick="APP.goSub(\'push\')">'
+    + '<div class="r1"><div class="tt">推送设置与运行状态</div><div class="arrow" style="color:var(--brand);font-size:20px">›</div></div>'
+    + '<div class="dgo">'+esc(P.summary.line)
+    + '<br>可解释排序 · 每个理由都能核对 · 只有三天内截止才允许打扰。还能开启「关掉页面也提醒」的后台推送。</div></div>';
+
+  h += '<div class="sec">合规边界 <span class="secsub">· 我们只用这些</span></div>';
+  h += '<div class="kv" style="border-left:6px solid var(--gold);padding:14px">'
+    + '<div class="hint" style="font-size:12.5px">'
+    + '<div style="color:var(--txt-2)">✓ 公网公开通知页面（学院 / 教务处 / 图书馆 / 学工 · ahau.edu.cn）</div>'
+    + '<div style="color:var(--txt-2)">✓ 你主动填写的身份标签与关注标签</div>'
+    + '<div style="color:var(--alert)">✕ 不采集身份证号、学号、手机号等敏感信息</div>'
+    + '<div style="color:var(--alert)">✕ 不读取课表、成绩、学籍等任何私域数据</div>'
+    + '<div style="color:var(--alert)">✕ 不接入教务系统后台、不获取登录态</div></div></div>';
+
+  h += '<div class="acts">'
+    + '<button class="ab primary" onclick="APP.saveProfileUI()">保存我的档案</button>'
+    + '<button class="ab" onclick="APP.goSub(\'about\')">关于知时</button></div>';
+  h += appFoot();
+  return h;
+}
+
+function selRow(label, field, opts){
+  var cur = PROFILE[field];
+  var h = '<div class="frow"><span class="fk">'+label+'</span><span class="fv">'
+    + '<select onchange="APP.onSelect(\''+field+'\',this.value)">';
+  opts.forEach(function(o){
+    h += '<option value="'+esc(o)+'"'+(o===cur?' selected':'')+'>'+esc(o)+'</option>';
+  });
+  h += '</select><span class="arrow">›</span></span></div>';
+  return h;
+}
+
+/* ================================================================
+ * 视图：自查报告
+ * ================================================================ */
+function viewSelfcheck(){
+  /* 复用同源自查逻辑：与小程序 utils/selfcheck.js 同口径 */
+  var ALLOWED = ['ahau.edu.cn','jwc.ahau.edu.cn','xxb.ahau.edu.cn','zsb.ahau.edu.cn','xgb.ahau.edu.cn'];
+  function hostOf(u){ var m=String(u||'').match(/^https?:\/\/([^\/]+)/i); return m?m[1].toLowerCase():''; }
+  function hostOK(u){ var h=hostOf(u); return !!h && ALLOWED.some(function(a){return h===a||h.endsWith('.'+a);}); }
+
+  var dropped = [], issues = {}, verifiable = [];
+  NOTICES.forEach(function(n){
+    var fatal = [];
+    if(!n.real && n.url) fatal.push('R2 演示样例带链接');
+    if(n.real && n.url && !hostOK(n.url)) fatal.push('R1 链接非安农官网');
+    if(fatal.length){ dropped.push({title:n.title, why:fatal.join('；')}); return; }
+    if(n.real && !n.url) issues['真实采集但未留存原文链接'] = (issues['真实采集但未留存原文链接']||0)+1;
+    if(n.real && n.url && hostOK(n.url)) verifiable.push(n);
+  });
+  var passed = NOTICES.length - dropped.length;
+  var healthy = dropped.length === 0;
+
+  var h = '';
+  h += '<div class="sumcard '+(healthy?'':'lv-high')+'">'
+    + '<div class="sumlb">'+(healthy?'✓ 本次自查通过':'! 本次自查发现问题')+'</div>'
+    + '<div class="sumtx">'+(healthy
+      ? '没有条目因触犯三条铁律被剔除。可疑处已如实标注在下方，供你自行判断。'
+      : '已按铁律处理：不可靠的剔除、可疑的如实标注。')+'</div>'
+    + '<div class="sumidx"><span class="sin">审计</span><span class="siv">'+NOTICES.length+'</span>'
+    + '<span class="sil">条 · 放行 '+passed+' · 剔除 '+dropped.length+' · 可举证 '+verifiable.length+'</span></div></div>';
+
+  h += '<div class="sec">三条铁律 <span class="secsub">· 触犯即剔除</span></div>';
+  [['R1','出处可举证','标为真实公开数据的，必须带 ahau.edu.cn 官网链接；域名不在白名单的，直接剔除。'],
+   ['R2','链接不伪造','演示样例绝不允许带出处链接。宁可标成「演示样例」，也不假装有原文。'],
+   ['R3','引文可定位','每条浓缩要点都必须在原文里原样找到；全对不上的条目会被剔除。']].forEach(function(r){
+    h += '<div class="ncard" style="padding:12px 14px"><div class="r1" style="align-items:flex-start">'
+      + '<span style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--brand-2),var(--brand));'
+      + 'color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12.5px;flex-shrink:0">'+r[0]+'</span>'
+      + '<div style="flex:1"><div class="tt" style="font-size:14px">'+r[1]+'</div>'
+      + '<div class="dgo" style="font-size:12px;margin-top:3px">'+r[2]+'</div></div></div></div>';
+  });
+
+  h += '<div class="sec">查出的疑点 <span class="secsub">· 已如实标注，未删改</span></div>';
+  h += '<div class="kv" style="padding:14px">';
+  var ks = Object.keys(issues);
+  if(!ks.length) h += '<div class="hint" style="font-size:13px">本次无疑点</div>';
+  ks.forEach(function(k){
+    h += '<div style="font-size:13px;color:var(--alert-ink);background:var(--alert-soft);'
+      + 'border-radius:8px;padding:7px 11px;margin-bottom:6px">· '+esc(k)+'：'+issues[k]+' 条</div>';
+  });
+  h += '<div class="hint" style="font-size:11.5px;border-top:1px dashed var(--border);padding-top:8px;margin-top:4px">'
+    + '「未留存原文链接」是如实标注，不是失败——它只说明这条没存住官网地址，所以它不会被当成「可核对原文」推给你。诚实比好看重要。</div>';
+  h += '</div>';
+
+  h += '<div class="sec">被剔除的条目 <span class="secsub">· 宁缺毋滥</span></div>';
+  h += '<div class="kv" style="padding:14px"><div class="hint" style="font-size:13px">'
+    + (dropped.length ? dropped.map(function(d){ return '· '+esc(d.title)+'（'+esc(d.why)+'）'; }).join('<br>')
+       : '本次自查未剔除任何条目 —— 所有展示内容都过了三条铁律。') + '</div></div>';
+
+  h += '<div class="sec">可举证原文清单 <span class="secsub">· '+verifiable.length+' 条，点一下复制链接</span></div>';
+  h += '<div class="kv" style="padding:14px">';
+  if(!verifiable.length){
+    h += '<div class="hint" style="font-size:13px">本批数据暂无留存官网链接的条目。</div>';
+  } else {
+    verifiable.forEach(function(n){
+      h += '<div style="padding:9px 0;border-bottom:1px solid var(--border-soft)">'
+        + '<div style="font-size:13px;font-weight:600;line-height:1.5">'+esc(n.title)+'</div>'
+        + '<div style="font-size:11.5px;color:var(--txt-3);margin-top:4px">'+esc(n.source||'')
+        + ' · '+esc(n.site||'')+' · 发布于 '+esc(n.publish||'')+'</div>'
+        + '<div class="srcline" style="cursor:pointer" onclick="APP.copy(\''+esc(n.url)+'\')">🔗 '+esc(n.url)
+        + '<span class="cp">复制 ›</span></div></div>';
+    });
+  }
+  h += '</div>';
+
+  h += '<div class="acts"><button class="ab primary" onclick="APP.toast(\'重新自查完成 · 无剔除\')">重新自查</button></div>';
+  h += '<div class="foot"><div><span class="hl">这一页为什么存在：</span>如果哪条通知不可靠，我们不是偷偷删掉，'
+    + '而是把「扔掉了什么、为什么」摊开给你看。你能量、能追问、能复核——这正是「可信」和「看起来可信」的区别。</div></div>';
+  return h;
+}
+
+function viewAbout(){
+  var h = '<div class="sec">关于知时</div>';
+  h += '<div class="kv" style="padding:16px"><div style="font-size:14px;line-height:1.9;color:var(--txt-2)">'
+    + '知时把安徽农业大学分散在学院、教务处、图书馆的公开通知聚合起来，浓缩成「谁该看 · 剩几天 · 怎么办」，'
+    + '按标签分组、再按你的身份（本科生/研究生/教职工 · 年级 · 学院）筛选后推送到你面前；每句话都挂着原文出处，点一下就能核对。<br><br>'
+    + '<b style="color:var(--txt)">四项能力：</b><br>'
+    + '① 自主完善档案 —— 身份类型 / 年级 / 学院 / 专业 / 校区 + 关注标签，全由你自己选<br>'
+    + '② 按档案自动推送 —— 只推和你身份、关注相符的通知，每条都能在详情页核对「是否与我有关」<br>'
+    + '③ 自动整合信息 —— 一屏简报，把临近截止的事压成一段话<br>'
+    + '④ 贴明出处 —— 每条标「可核对原文 / 真实采集 / 演示样例」，有链接的可逐字比对<br><br>'
+    + '<b style="color:var(--txt)">主动推送引擎：</b>按可解释的分数排序（今天截止 +40、三天内 +28、点名学院 +22、'
+    + '自定关键词 +20、订阅标签 +16、新收录 +8…），只有三天内截止的才允许「打扰」，其余静默进流。排序理由可核对，不是黑箱。<br><br>'
+    + '<b style="color:var(--txt)">自定义关键词订阅：</b>除了固定的关注标签，你还可以输入任意关键词（如「正大杯」）——'
+    + '池子里凡命中该词的通知（标题 / 浓缩 / 要点 / 原文任一处出现）都会进入你的推送流并主动推送，'
+    + '理由里会如实写明「你订的关键词「正大杯」」。<br><br>'
+    + '<b style="color:var(--txt)">合规边界：</b>仅聚合 ahau.edu.cn 公网公开通知页面；'
+    + '身份信息只采集你自己选择的标签，不采集身份证号、学号、成绩、课表等任何私域或敏感数据。<br><br>'
+    + '本项目为「农芯智」AI 智能体创新大赛参赛作品。</div></div>';
+  h += '<div class="acts"><button class="ab" onclick="APP.goSub(\'main\')">‹ 返回我的</button></div>';
+  return h;
+}
+
+/* ================================================================
+ * 视图：推送设置（主动推送引擎的控制面板）
+ * ================================================================ */
+function viewPushSettings(){
+  var st = readPushState();
+  var P = buildPushCards();
+  var pool = NOTICES.length;
+  var ps = PROFILE.push || {};
+  var daemon = ps.daemonEnabled !== false;
+  var level = ps.notifyLevel || 'hot';
+
+  var h = '';
+
+  /* 运行状态 */
+  h += '<div class="sumcard"><div class="sumlb">主动推送引擎</div>'
+    + '<div class="sumtx">'+esc(P.summary.line)+'</div>'
+    + '<div class="sumidx"><span class="sin">覆盖率</span>'
+    + '<span class="siv">'+(pool?Math.round(P.total/pool*100):0)+'%</span>'
+    + '<span class="sil">全池 '+pool+' 条 → 推 '+P.total+' 条 · 打扰 '+P.hotCount+' 条</span></div></div>';
+
+  /* 应用内推送开关 */
+  h += '<div class="sec">应用内推送 <span class="secsub">· 打开 知时.html 时生效</span></div>';
+  h += '<div class="kv" style="padding:2px 14px">';
+  h += tglRow('推送总开关', 'pushOn', daemon,
+    daemon ? '已开启 —— 进入应用即自动按档案排好推送流' : '已关闭 —— 首页不再自动排序推送');
+  h += tglRow('新收录提醒', 'pushNew', ps.newBadge !== false,
+    ps.newBadge !== false ? '有新增条目时标红点并排到最前' : '不区分新旧，按紧急度排');
+  h += tglRow('计分排序', 'pushScore', ps.scoreSort !== false,
+    ps.scoreSort !== false ? '按可解释分数排（紧急+身份契合+新收录）' : '仅按倒计时排');
+  h += '</div>';
+
+  /* ★ 微信服务通知（真·触达：关掉页面也能找你） */
+  var wxst = readWxState();
+  var advKey = wxst.advance || PROFILE.advance || '3,1';
+  var reach = ZS.buildReach(NOTICES, PROFILE, advKey, { limit: 40 });
+  var wxGranted = !!wxst.granted;
+  var wxStatus = !wxGranted ? '未开启' : (wxst.demo ? '已登记 · 演示模式' : '已开启 · 真实下发');
+  var wxTip = !wxGranted
+    ? '开启后，即使不打开小程序，订阅的事项临近截止也会通过微信服务通知提醒你。'
+    : (wxst.demo
+      ? '已完成授权登记流程；待小程序后台配置订阅消息模板后自动转为真实下发，无需你重操作。'
+      : '服务端会在你订阅的事项临近截止时，通过微信服务通知送达。');
+
+  h += '<div class="sec">微信服务通知 <span class="secsub">· 关掉页面也能提醒你</span></div>';
+  h += '<div class="kv" style="padding:14px">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">'
+    + '<div><div style="font-size:12px;color:var(--txt-3)">当前状态</div>'
+    + '<div style="font-size:17px;font-weight:700;color:'+(wxGranted?(wxst.demo?'#C77700':'var(--brand)'):'var(--txt-3)')+'">'+wxStatus+'</div></div>'
+    + '<span style="font-size:11.5px;padding:3px 10px;border-radius:999px;border:1px solid var(--border);color:'+(wxst.demo?'#C77700':'var(--brand)')+'">'+(wxst.demo?'演示模式':'真实下发')+'</span>'
+    + '</div>'
+    + '<div class="hint" style="font-size:12.5px;line-height:1.7;margin-top:8px">'+esc(wxTip)+'</div>'
+    + '<div class="frow" style="margin-top:10px;border-top:1px solid var(--border-soft);padding-top:10px"><span class="fk">提前几天提醒</span><span class="fv">'
+    + '<select onchange="APP.onReachAdvance(this.value)">'
+    + '<option value="7,3,1"'+(advKey==='7,3,1'?' selected':'')+'>截止前 7 / 3 / 1 天</option>'
+    + '<option value="3,1"'+(advKey==='3,1'?' selected':'')+'>截止前 3 / 1 天（推荐）</option>'
+    + '<option value="1"'+(advKey==='1'?' selected':'')+'>仅截止前 1 天</option>'
+    + '</select><span class="arrow">›</span></span></div>'
+    + '<div class="frow"><span class="fk">送达留痕</span><span class="fv">'+(wxst.sends||0)+' 次'+((wxst.sends||0)?'':'（暂无）')+'</span></div>'
+    + '<div class="acts" style="margin-top:12px">'
+    + '<button class="ab primary" onclick="APP.enableWxNotify()">'+(wxGranted?'更新订阅授权':'开启微信服务通知')+'</button>'
+    + '<button class="ab" onclick="APP.simulateDeliver()">模拟一次主动送达</button>'
+    + '</div>'
+    + '<div class="hint" style="font-size:11.5px;margin-top:10px;line-height:1.75">'
+    + '① 通过微信官方订阅消息接口取得你的授权（必须你本人点，我们无法替你开）；② 把你订的类别和提前几天写进云端；③ 云端每天检查公开通知，临近截止就通过微信服务通知送达。'
+    + (wxst.demo ? '<b>当前未在小程序后台配置订阅消息模板，因此走完整交互但暂不真发；配置模板 ID 后自动转为真实下发，你无需重新操作。</b>' : '')
+    + '</div>'
+    + '</div>';
+
+  /* ★ 触达时间线（可演示、可复核的"主动找你"闭环） */
+  h += '<div class="sec">触达时间线 <span class="secsub">· 什么时候会主动找你</span></div>';
+  h += '<div class="kv" style="padding:14px">'
+    + '<div style="font-size:13px;color:var(--txt-2);line-height:1.7">与你相关 <b>'+reach.stats.mine+'</b> 条 · 已规划提醒 <b>'+reach.stats.scheduled+'</b> 条 · 未来 14 天内会打扰 <b style="color:var(--brand)">'+reach.stats.upcoming+'</b> 次</div>'
+    + '<div class="hint" style="font-size:12px;line-height:1.7;margin-top:6px">按你选的「'+reach.stats.advanceText+'」推演：每条通知在截止前会主动提醒几次、具体哪天提醒，全部由真实发布日与截止日算出。</div>';
+  if(reach.byDay.length){
+    h += '<div style="margin-top:12px">';
+    reach.byDay.forEach(function(day){
+      h += '<div style="display:flex;gap:12px;padding-bottom:14px">'
+        + '<div style="width:9px;height:9px;border-radius:50%;margin-top:6px;flex-shrink:0;background:'+(day.items[0].plan[0].kind==='urgent'?'#D93025':(day.items[0].plan[0].kind==='hot'?'#E8710A':'#C7A400'))+'"></div>'
+        + '<div style="flex:1;min-width:0">'
+        + '<div style="font-size:13px;font-weight:600;color:var(--txt);margin-bottom:6px">'+day.dateText+' <span style="font-size:11.5px;color:var(--txt-3);font-weight:400">'+day.items.length+' 条</span></div>';
+      day.items.forEach(function(it){
+        h += '<div style="background:var(--surface);border:1px solid var(--border-soft);border-radius:9px;padding:9px 11px;margin-bottom:7px">'
+          + '<div style="font-size:13px;color:var(--txt);line-height:1.5">'+esc(it.title)+'</div>'
+          + '<div style="font-size:11.5px;color:var(--txt-3);margin-top:5px">'+esc(it.source)+' · '+it.deadlineText+' 截止 · 剩 '+it.daysLeft+' 天</div>'
+          + '</div>';
+      });
+      h += '</div></div>';
+    });
+    h += '</div>';
+  } else {
+    h += '<div class="empty" style="padding:20px 0">当前档案下，未来两周没有需要提醒的条目</div>';
+  }
+  h += '</div>';
+
+  /* ★ 智能体服务（谁来替你盯着 —— 与小程序「我的」页同构） */
+  if(window.ZS_AGENT){
+    var ast = AGENT.status;
+    var aMode = ast ? ast.mode : 'local';
+    var aCls = aMode==='remote' ? 'on' : (ast && ast.configured ? 'warn' : 'off');
+    var aLabel = ast ? ast.label : '正在探测智能体服务…';
+    var aBase = (ast && ast.base) || window.ZS_AGENT.resolveBase() || '';
+
+    h += '<div class="sec">智能体服务 <span class="secsub">· 你不打开页面，它也在替你盯着</span></div>';
+    h += '<div class="agentbox '+aCls+'">';
+    h += '<div class="aghead"><span class="agdot"></span><span class="aglab">'+esc(aLabel)+'</span>'
+      + '<span class="agvia">'+(aMode==='remote'?'服务端算':'本地算')+'</span></div>';
+    h += '<div class="agmeta" style="border-top:none;padding-top:6px">'
+      + (aBase ? '<span>服务地址：'+esc(aBase)+'</span>'
+               : '<span>未配置服务地址 · 只在打开页面时现算</span>')
+      + (ast && ast.version && ast.version.version ? '<span>服务版本 '+esc(ast.version.version)+' · 智能体 '+esc(ast.version.agent||'')+'</span>' : '')
+      + (ast && ast.configured && !ast.reachable && ast.error ? '<span style="color:#C77700">连接失败：'+esc(ast.error)+'</span>' : '')
+      + '</div>';
+
+    h += '<div class="agacts">'
+      + '<div class="agbtn" onclick="APP.goSub(\'push\');APP.rerunAgent()">看今日清单</div>'
+      + '<div class="agbtn" onclick="APP.runAgentRemote()">'+(aMode==='remote'?'立即跑一轮':'刷新状态')+'</div>'
+      + '<div class="agbtn" onclick="APP.toggleAgentCfg()">'+(AGENT.cfgOpen?'收起':'改地址')+'</div>'
+      + '</div>';
+
+    if(AGENT.cfgOpen){
+      h += '<div style="margin-top:16px;padding-top:16px;border-top:1px dashed var(--border)">'
+        + '<input id="inAgentBase" value="'+esc(aBase)+'" placeholder="如 https://agent.example.com（留空 = 本地模式）"'
+        + ' style="width:100%;box-sizing:border-box;font-size:13px;padding:10px 12px;border-radius:10px;'
+        + 'border:1px solid var(--border);background:var(--surface);color:var(--txt)" />'
+        + '<div class="hint" style="font-size:11.5px;line-height:1.7;margin-top:9px">'
+        + '部署 tools/agent/server.js 后填地址即可切到「服务端智能体」（含大模型理解、可后台按点自跑）。'
+        + '不填则用本地算法，功能照常、结论口径一致。</div>'
+        + '<div class="agacts">'
+        + '<div class="agbtn primary" onclick="APP.saveAgentBase()">保存并探测</div>'
+        + '<div class="agbtn" onclick="APP.clearAgentBase()">清空（回本地）</div>'
+        + '</div></div>';
+    }
+    h += '</div>';
+  }
+
+  /* 打扰策略 */
+  h += '<div class="sec">打扰策略 <span class="secsub">· 什么程度才配打断你</span></div>';
+  h += '<div class="kv" style="padding:2px 14px">';
+  h += '<div class="frow"><span class="fk">打扰级别</span><span class="fv">'
+    + '<select onchange="APP.onPushLevel(this.value)">'
+    + '<option value="hot"'+(level==='hot'?' selected':'')+'>只打扰三天内（推荐）</option>'
+    + '<option value="all"'+(level==='all'?' selected':'')+'>有新就打扰</option>'
+    + '<option value="none"'+(level==='none'?' selected':'')+'>从不打扰，只静默进流</option>'
+    + '</select><span class="arrow">›</span></span></div>';
+  h += '</div>';
+  h += '<div class="kv" style="padding:14px"><div class="hint" style="font-size:12.5px;line-height:1.7">'
+    + '<b>为什么默认只打扰三天内：</b>通知权限是最贵的资源。如果每次有新条目都弹一下，'
+    + '用户一周内就会关掉通知 —— 那时再紧急的事也提醒不到了。宁可少打扰九次，也要保住第十次能打扰到你。'
+    + '</div></div>';
+
+  /* 推送留痕 */
+  h += '<div class="sec">推送留痕 <span class="secsub">· 可追问、可重置</span></div>';
+  h += '<div class="kv" style="padding:14px"><div class="hint" style="font-size:12.5px;line-height:1.85">'
+    + '累计推送批次：<b>'+st.pushCount+'</b> 次<br>'
+    + '已推记录：<b>'+(st.pushedIds||[]).length+'</b> 条 id<br>'
+    + '最近一次：<b>'+(st.lastPushAt ? fmtTs(st.lastPushAt) : '尚未推送')+'</b><br>'
+    + '<span style="color:var(--txt-3)">「新收录」就是拿这个记录比出来的 —— 推过的不会再标新，'
+    + '所以不会天天拿同一条烦你。</span></div>'
+    + '<div class="acts" style="margin-top:10px"><button class="ab" onclick="APP.resetPush()">重置推送记录（全部标为未读）</button></div>'
+    + '</div>';
+
+  /* 当前推送流预览 */
+  h += '<div class="sec">当前推送流 <span class="secsub">· 前 6 条</span></div>';
+  if(!P.cards.length){
+    h += '<div class="empty">暂无推送</div>';
+  } else {
+    P.cards.slice(0,6).forEach(function(n){ h += pushCard(n); });
+  }
+
+  h += '<div class="acts"><button class="ab primary" onclick="APP.goTab(\'radar\')">看完整推送流 ›</button>'
+    + '<button class="ab" onclick="APP.goSub(\'main\')">‹ 返回我的</button></div>';
+  h += appFoot();
+  return h;
+}
+
+function tglRow(label, key, on, desc){
+  return '<div class="frow"><span class="fk" style="flex:1">'
+    + '<span style="display:block">'+esc(label)+'</span>'
+    + '<span style="font-size:11.5px;color:var(--txt-3);display:block;line-height:1.5;margin-top:2px">'+esc(desc)+'</span>'
+    + '</span><span class="tgl '+(on?'on':'')+'" onclick="APP.togglePushFlag(\''+key+'\')">'
+    + '<span class="tgld"></span></span></div>';
+}
+
+function fmtTs(ts){
+  var d = new Date(ts), pad = function(x){return x<10?'0'+x:''+x;};
+  return (d.getMonth()+1)+'月'+d.getDate()+'日 '+pad(d.getHours())+':'+pad(d.getMinutes());
+}
+
+/* ================================================================
+ * 视图：问知时（把学生脑子里的疑问做成一问一答）
+ * ================================================================ */
+function viewAsk(){
+  var opts = { notices: NOTICES, profile: PROFILE, pushResult: buildPushCards() };
+  var groups = CORE.askQuestionGroups();
+  var HL = CORE.askHeadline(opts);
+  var opened = CORE.askAnswer(STATE.askId || 'today', opts);
+  var totalQ = CORE.askQuestions.length;
+  var relatedList = CORE.relatedNotices(NOTICES, PROFILE);
+  var related = relatedList.length;
+  var readyRate = related ? Math.round(relatedList.filter(function(n){ return typeof n.countdown==='number'; }).length / related * 100) : 0;
+
+  var h = '';
+
+  h += '<div class="hcard tone-'+HL.tone+'" onclick="APP.askGo(\''+HL.id+'\')">'
+    + '<div class="hq"><span class="hqi">💬</span><span class="hqt">问知时 · '+esc(HL.q)+'</span></div>'
+    + '<div class="ha">'+esc(HL.answer)+'</div>'
+    + (HL.more ? '<div class="hm">'+esc(HL.more)+'</div>' : '') + '</div>';
+
+  h += '<div class="askstat"><div class="as"><span class="asn">'+totalQ+'</span><span class="asl">个问题</span></div>'
+    + '<div class="as"><span class="asn">'+related+'</span><span class="asl">条和你有关</span></div>'
+    + '<div class="as"><span class="asn">'+readyRate+'%</span><span class="asl">数据完备度</span></div></div>';
+
+  if(opened){
+    h += '<div class="acard tone-'+opened.tone+'">'
+      + '<div class="aq">'+esc(opened.q)+'</div>'
+      + '<div class="aa">'+esc(opened.answer)+'</div>'
+      + '<div class="abasis"><span class="abl">依据</span><span class="abt">'+esc(opened.basis)+'</span></div>';
+
+    if(opened.materials && opened.materials.length){
+      h += '<div class="mlist"><div class="mt">要准备的材料（共 '+opened.materials.length+' 项）</div>';
+      opened.materials.forEach(function(m){
+        h += '<div class="mrow"><span class="mdot">•</span><div class="mbody">'
+          + '<span class="mname">'+esc(m.material)+'</span>'
+          + '<span class="mfrom" onclick="APP.openDetail(\''+m.id+'\')">来自：'+esc(m.from)+' ›</span>'
+          + '</div></div>';
+      });
+      h += '</div>';
+    }
+
+    if(opened.items && opened.items.length){
+      h += '<div class="ilist"><div class="it">相关条目（'+opened.itemCount+' 条）</div>';
+      opened.items.forEach(function(n){
+        h += '<div class="irow" onclick="APP.openDetail(\''+n.id+'\')">'
+          + '<div class="imid"><div class="ititle">'+esc(n.title)+'</div>'
+          + '<div class="imeta">'+esc(n.source||'')+(n.deadline?' · 截止 '+esc(n.deadline):'')+'</div></div>'
+          + '<div class="idd lv-'+levelOf(n)+'">'+levelLabel(n)+'</div></div>';
+      });
+      if(opened.itemCount > opened.items.length){
+        h += '<div class="imore">还有 '+(opened.itemCount-opened.items.length)+' 条，去雷达页推送流看全部 ›</div>';
+      }
+      h += '</div>';
+    } else if(!opened.materials){
+      h += '<div class="iempty">这条问题下没有需要处理的条目</div>';
+    }
+    h += '</div>';
+  }
+
+  h += '<div class="sec">还能问什么 <span class="secsub">· 点一下就有答案</span></div>';
+  groups.forEach(function(g){
+    h += '<div class="qgroup"><div class="ghead"><span class="gi">'+g.icon+'</span><span class="gl">'+esc(g.label)+'</span></div>'
+      + '<div class="qlist">';
+    g.questions.forEach(function(q){
+      var on = (STATE.askId||'today')===q.id;
+      h += '<div class="qrow '+(on?'on':'')+'" onclick="APP.askGo(\''+q.id+'\')">'
+        + '<div class="qbody"><span class="qq">'+esc(q.q)+'</span><span class="qh">'+esc(q.hint)+'</span></div>'
+        + '<span class="qa">'+(on?'已答':'问 ›')+'</span></div>';
+    });
+    h += '</div></div>';
+  });
+
+  h += '<div class="acts"><button class="ab primary" onclick="APP.goSub(\'calendar\')">看办事日历 ›</button>'
+    + '<button class="ab" onclick="APP.goTab(\'radar\')">回推送流</button></div>';
+  h += appFoot();
+  return h;
+}
+
+/* ================================================================
+ * 视图：办事日历（哪天忙一目了然）
+ * ================================================================ */
+function viewCalendar(){
+  var now = new Date();
+  var y = STATE.calY || now.getFullYear();
+  var m = STATE.calM || (now.getMonth()+1);
+  var cal = CORE.buildCalendar(NOTICES, y, m, PROFILE);
+
+  var selDay = STATE.calSel || 0;
+  /* 首次进入（calSel 未设）且当前展示的是今天所在月 → 默认选中今天，
+   * 让用户一进来就看到"今天有什么事"，而不是一片未选中。 */
+  if (!selDay && cal.today.y === cal.year && cal.today.m === cal.month) selDay = cal.today.d;
+  var selItems = [];
+  cal.weeks.forEach(function(w){ w.forEach(function(c){ if(!c.blank && c.day===selDay) selItems = c.items || []; }); });
+
+  var h = '';
+
+  h += '<div class="mbar"><span class="mnav" onclick="APP.calShift(-1)">‹</span>'
+    + '<div class="mlab"><span class="ml">'+cal.year+' 年 '+cal.month+' 月</span>'
+    + '<span class="mtoday" onclick="APP.calToday()">回到今天</span></div>'
+    + '<span class="mnav" onclick="APP.calShift(1)">›</span></div>';
+
+  h += '<div class="calbox"><div class="wkrow">';
+  cal.weekdays.forEach(function(w){
+    var we = (w==='六'||w==='日');
+    h += '<span class="wk'+(we?' wkend':'')+'">'+w+'</span>';
+  });
+  h += '</div>';
+  cal.weeks.forEach(function(week){
+    h += '<div class="crow">';
+    week.forEach(function(c){
+      if(c.blank){ h += '<div class="cell blank"></div>'; return; }
+      var cls = 'cell';
+      if(c.hasItem) cls += ' has lv-'+c.level;
+      if(c.isToday) cls += ' today';
+      if(c.isPast) cls += ' past';
+      if(selDay===c.day) cls += ' sel';
+      h += '<div class="'+cls+'" onclick="APP.calPick('+c.day+')">'
+        + '<span class="cd">'+c.day+'</span>'
+        + (c.hasItem?'<span class="cdot"></span>':'')
+        + (c.count>1?'<span class="ccnt">'+c.count+'</span>':'')
+        + '</div>';
+    });
+    h += '</div>';
+  });
+  h += '</div>';
+
+  h += '<div class="legend">'
+    + '<div class="lg"><span class="dot now"></span>今天/明天</div>'
+    + '<div class="lg"><span class="dot hot"></span>三天内</div>'
+    + '<div class="lg"><span class="dot soon"></span>一周内</div>'
+    + '<div class="lg"><span class="dot plan"></span>本月内</div></div>';
+
+  h += '<div class="sumline">'+esc(cal.summary)+'</div>';
+
+  var selLabel = cal.month+' 月 '+selDay+' 日 · '+(selItems.length?selItems.length+' 件要办':'没有截止事项');
+  h += '<div class="sec">'+selLabel+'</div>';
+  if(selItems.length){
+    h += '<div class="kv" style="padding:6px 14px">';
+    selItems.forEach(function(n){
+      h += '<div class="irow2" onclick="APP.openDetail(\''+n.id+'\')">'
+        + '<div class="imid"><div class="ititle">'+esc(n.title)+'</div>'
+        + '<div class="imeta">'+esc(n.source||'')+(n.deadline?' · 截止 '+esc(n.deadline):'')+'</div></div>'
+        + '<div class="idd lv-'+levelOf(n)+'">'+levelLabel(n)+'</div></div>';
+    });
+    h += '</div>';
+  } else {
+    h += '<div class="empty">这天没有截止事项，可以安排别的。</div>';
+  }
+
+  h += '<div class="acts"><button class="ab primary" onclick="APP.goSub(\'ask\')">问知时 ›</button>'
+    + '<button class="ab" onclick="APP.goTab(\'radar\')">回推送流</button></div>';
+  h += appFoot();
+  return h;
+}
+
+/* ================================================================
+ * 视图：详情（含出处 + 和我有关吗 + 办理清单）
+ * ================================================================ */
+function viewDetail(id){
+  var n = NOTICES.filter(function(x){return x.id===id;})[0];
+  if(!n) return '<div class="empty">通知不存在</div>';
+  var lv = levelOf(n);
+  var isFav = FAV.indexOf(n.id)>=0;
+
+  var h = '<div class="dhead"><div class="dt">'+esc(n.title)+'</div>'
+    + '<div class="dm"><span>'+esc(n.source||'')+'</span>'+(n.site?'<span>'+esc(n.site)+'</span>':'')
+    + '<span>'+esc(n.publish||'')+'</span><span style="color:var(--alert-ink);font-weight:700">'+levelLabel(n)+'</span></div>'
+    + '<div class="fl"><span class="star '+(isFav?'on':'')+'" onclick="APP.toggleFav(\''+n.id+'\')">'
+    + (isFav?'★ 已收藏':'☆ 收藏')+'</span>'
+    + '<span class="src '+n._srcState+'">'+n._srcLabel+'</span></div></div>';
+
+  /* 出处 */
+  if(n.real && n.url){
+    h += '<div class="srcline"><span class="lbl">🔗 原文出处（'+esc(n.site||'')+'）：</span>'
+      + esc(n.url)+'<span class="cp" onclick="APP.copy(\''+esc(n.url)+'\')">复制链接 ›</span></div>';
+  } else if(n.real){
+    h += '<div class="srcline" style="color:var(--gold-ink);background:var(--gold-soft)">'
+      + '本条为真实采集，但未留存原文链接 —— 我们如实说明，不给你编一个地址。</div>';
+  } else {
+    h += '<div class="srcline" style="color:var(--txt-2);background:var(--border-soft)">'
+      + '本条为演示样例，并非从安农官网采集，请勿当真实通知使用。</div>';
+  }
+
+  /* 和我有关吗 */
+  var relCls, relBadge, relText;
+  var aud = n.audience && n.audience!=='原文未明确说明' ? n.audience : '';
+  if(!aud){ relCls='rel-ok'; relBadge='全员可见'; relText='原文未设身份限定，按当前档案你不会被排除。'; }
+  else if(passesIdentity(n, PROFILE)){ relCls='rel-ok'; relBadge='和你有关'; relText='对照你的档案（'+esc(summary())+'），这条推给你。'; }
+  else { relCls='rel-no'; relBadge='与你无关'; relText='原文限定人群与你的档案不符，这条不会推给你。'; }
+  h += '<div class="sec">和我有关吗</div>';
+  h += '<div class="relcard '+relCls+'"><div class="rh"><span class="rt">和你有关吗</span>'
+    + '<span class="rb">'+relBadge+'</span></div><div class="rl">'+relText+'</div>'
+    + '<div class="relrow"><span class="rs '+(passesIdentity(n,PROFILE)?'ok':'no')+'">'
+    + (passesIdentity(n,PROFILE)?'✓':'✕')+'</span><div class="rk">'
+    + '<div class="rl2">适用人群</div>'+esc(aud||'未限定')+'</div></div>'
+    + '<div class="relrow"><span class="rs ok">✓</span><div class="rk">'
+    + '<div class="rl2">我的档案</div>'+esc(summary())+'</div></div></div>';
+
+  /* 关键信息 */
+  h += '<div class="sec">关键信息</div><div class="kv">';
+  [['发布单位',n.source],['截止时间',n.deadline||'长期有效'],['要带材料',n.materials],
+   ['办理入口',n.entry]].forEach(function(r){
+    h += '<div class="kr"><span class="kk">'+r[0]+'</span><span class="vv">'+esc(r[1]||'原文未明确说明')+'</span></div>';
+  });
+  h += '</div>';
+
+  /* 大模型理解（构建期离线预计算 · 如实标注「非实时调用」）
+   * 与小程序详情页同源：产物来自 tools/agent/export_llm_fields.js 注入的 n.llm，
+   * 断网可演、每条都带模型/提示词版本/引文定位等级，可逐条回原文核对。 */
+  if(n.llm && n.llm.fields){
+    var lf = n.llm.fields;
+    h += '<div class="sec">大模型理解 <span class="secsub">· 构建期离线预计算，非实时调用</span></div>';
+    h += '<div class="kv">';
+    [['事件类型',lf.event_type],['谁该看',lf.who],['要做什么',lf.what],
+     ['在哪办',lf.where],['截止时间',lf.deadline],['所需材料',lf.materials]].forEach(function(r){
+      h += '<div class="kr"><span class="kk">'+r[0]+'</span><span class="vv">'+esc(r[1]||'原文未明确说明')+'</span></div>';
+    });
+    h += '</div>';
+    if(lf.summary) h += '<div class="pt"><div class="ptx">· '+esc(lf.summary)+'</div></div>';
+    if(lf.source_quote) h += '<div class="pt"><div class="pquote"><span class="qb">模型依据原文：</span>「'+esc(lf.source_quote)+'」</div></div>';
+    h += '<div class="pt"><div class="ptx">模型 '+esc(n.llm.model||'auto')
+      + ' · 提示词 '+esc(n.llm.promptVersion||'unknown')
+      + ' · 引文定位 '+esc(n.llm.quoteMatch||'none')
+      + ' · 生成于 '+esc(String(n.llm.at||'').slice(0,10))+'</div></div>';
+  }
+
+  /* 浓缩要点（带引文） */
+  if((n.digestPoints||[]).length){
+    h += '<div class="sec">浓缩要点 <span class="secsub">· 每句都能在原文找到</span></div><div class="pt">';
+    n.digestPoints.forEach(function(p){
+      h += '<div class="ptx">· '+esc(p.text)+'</div>';
+      if(p.quote) h += '<div class="pquote"><span class="qb">原文：</span>「'+esc(p.quote)+'」</div>';
+    });
+    h += '</div>';
+  }
+
+  /* 办理清单 */
+  var steps = buildSteps(n);
+  if(steps.length){
+    var done = 0; steps.forEach(function(s){ if(DONE[n.id+'::'+s.key]) done++; });
+    h += '<div class="sec">办理清单 <span class="secsub">· 已办 '+done+'/'+steps.length+' 步</span></div>';
+    h += '<div class="pt"><div class="stepbar"><div class="stepfill" style="width:'+Math.round(done/steps.length*100)+'%"></div></div>';
+    steps.forEach(function(s){
+      var d = DONE[n.id+'::'+s.key];
+      h += '<div class="stepitem '+(d?'done':'')+'" onclick="APP.toggleStep(\''+n.id+'\',\''+s.key+'\')">'
+        + '<span class="cb">'+(d?'✓':'')+'</span><div><div class="st">'+esc(s.text)+'</div>'
+        + (s.due?'<div class="sd">'+esc(s.due)+'</div>':'')+'</div></div>';
+    });
+    h += '</div>';
+  }
+
+  /* 原文 */
+  if(n.raw){
+    h += '<div class="sec">官网原文 <span class="secsub">· 逐字摘录</span></div>';
+    h += '<div class="rawbox">'+esc(n.raw)+'</div>';
+  }
+
+  h += '<div class="acts"><button class="ab" onclick="APP.backToList()">‹ 返回列表</button></div>';
+  h += appFoot();
+  return h;
+}
+
+function buildSteps(n){
+  var out = [];
+  if(n.deadline) out.push({key:'check', text:'核对是否与自身条件相符（'+esc(n.audience||'全体')+'）', due:'截止 '+n.deadline});
+  if(n.materials) out.push({key:'mat', text:'准备材料：'+n.materials});
+  if(n.entry) out.push({key:'entry', text:'按入口提交：'+n.entry});
+  out.push({key:'submit', text:'在截止时间前完成提交/办理'});
+  out.push({key:'keep', text:'留存回执或截图，便于后续核对'});
+  return out;
+}
+
+/* ================================================================
+ * 渲染 & 交互
+ * ================================================================ */
+function appFoot(){
+  return '<div class="foot"><div><span class="hl">数据怎么来的：</span>'
+    + '聚合 ahau.edu.cn 公网公开通知页面，按你的档案筛选后推送。每句话挂着原文出处，点开可逐字核对。</div>'
+    + '<div style="margin-top:6px">仅聚合公开信息，不涉及教务后台 / 课表 / 成绩 / 学籍。</div></div>';
+}
+
+function render(){
+  var h, title;
+  if(STATE.detailId){
+    h = '<div class="wrap">'+viewDetail(STATE.detailId)+'</div>';
+    title = '通知详情';
+  } else if(STATE.sub==='ask'){
+    /* 问知时是"全屏子页"，与当前 tab 无关 —— 必须放在 tab 判断之前，
+     * 否则从雷达页点进问答会被雷达分支拦截（踩过的坑）。 */
+    h = '<div class="wrap">'+viewAsk()+'</div>'; title = '问知时 · 有问题直接问';
+  } else if(STATE.sub==='calendar'){
+    h = '<div class="wrap">'+viewCalendar()+'</div>'; title = '办事日历 · 哪天忙一目了然';
+  } else if(STATE.tab==='radar'){
+    h = '<div class="wrap">'+viewRadar()+'</div>'; title = '知时 · 信息雷达';
+  } else if(STATE.tab==='timeline'){
+    h = '<div class="wrap">'+viewTimeline()+'</div>'; title = '时间轴';
+  } else if(STATE.tab==='digest'){
+    h = '<div class="wrap">'+viewDigest()+'</div>'; title = '今日简报';
+  } else {
+    h = '<div class="wrap">'+viewMine()+'</div>';
+    title = STATE.sub==='selfcheck' ? '数据自查'
+      : (STATE.sub==='about' ? '关于知时'
+      : (STATE.sub==='push' ? '推送设置' : '我的档案'));
+  }
+  $('#screen').innerHTML = h;
+  $('#screen').scrollTop = 0;
+  $('#nbTitle').textContent = title;
+  document.title = title + ' · 知时';
+  /* tabbar 高亮：详情页 / 问答 / 日历 这类全屏子页都不高亮 */
+  var subFull = (STATE.sub==='ask' || STATE.sub==='calendar');
+  document.querySelectorAll('.tb').forEach(function(el){
+    el.classList.toggle('on', !STATE.detailId && !subFull && el.dataset.tab===STATE.tab);
+  });
+  /* 用户真的看到雷达页了 → 把当前推送流记为"已推送"
+   * 顺序很关键：必须先渲染（用旧的 isNew 状态），再标记。
+   * 若反过来，用户第一次打开时"新"标记就已经被自己抹掉了。 */
+  if(!STATE.detailId && STATE.tab==='radar'){
+    try{
+      var P = buildPushCards();
+      markPushed(P.cards.map(function(c){ return c.id; }));
+    }catch(e){}
+  }
+}
+
+/* ---------- 交互 API ---------- */
+window.APP = {
+  goTab:function(t){ STATE.tab=t; STATE.detailId=null; STATE.sub='main'; render();
+    if(t==='digest' && (!AGENT.ready || !AGENT.result)) loadAgentData(); },
+  goSub:function(s){ STATE.sub=s; STATE.detailId=null; render();
+    if(s==='push' && !AGENT.status) loadAgentData(); },
+  openDetail:function(id){ STATE.detailId=id; render(); },
+  backToList:function(){ STATE.detailId=null; render(); },
+  /* 首屏只摊 3 条，其余展开/收起 */
+  toggleMore:function(){ toggleMore(); },
+
+  onSelect:function(field,val){ PROFILE[field]=val; PROFILE=Object.assign({},PROFILE); render(); },
+  onMajor:function(val){ PROFILE.major=val; PROFILE=Object.assign({},PROFILE); render(); },
+  toggleTag:function(key){
+    var list=(PROFILE.interests||[]).slice();
+    var i=list.indexOf(key);
+    if(i>=0){ if(list.length===1){ toast('至少保留一项关注'); return; } list.splice(i,1); }
+    else list.push(key);
+    PROFILE.interests=list; PROFILE=Object.assign({},PROFILE); render();
+  },
+  selectAll:function(){ PROFILE.interests=CORE.TAGS.map(function(t){return t.key;}); PROFILE=Object.assign({},PROFILE); render(); },
+  resetDefault:function(){ PROFILE.interests=DEFAULT_PROFILE.interests.slice(); PROFILE=Object.assign({},PROFILE); render(); },
+  saveProfileUI:function(){ saveProfile(PROFILE); toast('档案已保存 · 推送已按新档案更新'); render(); },
+
+  /* ---- 我的关键词（自定义订阅） ---- */
+  addKeyword:function(){
+    var el = document.getElementById('inKw');
+    var raw = el ? String(el.value||'').replace(/\s+/g,'') : '';
+    if(!raw){ toast('请输入关键词'); return; }
+    if(raw.length>20){ toast('关键词最多 20 个字'); return; }
+    var cur = (PROFILE.keywords||[]).slice();
+    var dup = cur.some(function(k){ return CORE.normKeyword(k)===CORE.normKeyword(raw); });
+    if(dup){ toast('这个词已经订过了'); return; }
+    if(cur.length >= CORE.MAX_KEYWORDS){ toast('最多订阅 '+CORE.MAX_KEYWORDS+' 个关键词'); return; }
+    cur.push(raw);
+    PROFILE.keywords = CORE.sanitizeKeywords(cur);
+    PROFILE = Object.assign({}, PROFILE);
+    saveProfile(PROFILE);
+    toast('已订阅「'+raw+'」');
+    render();
+  },
+  tapSuggest:function(w){
+    var cur = (PROFILE.keywords||[]).slice();
+    if(cur.some(function(k){ return CORE.normKeyword(k)===CORE.normKeyword(w); })){ toast('这个词已经订过了'); return; }
+    if(cur.length >= CORE.MAX_KEYWORDS){ toast('最多订阅 '+CORE.MAX_KEYWORDS+' 个关键词'); return; }
+    cur.push(w);
+    PROFILE.keywords = CORE.sanitizeKeywords(cur);
+    PROFILE = Object.assign({}, PROFILE);
+    saveProfile(PROFILE);
+    toast('已订阅「'+w+'」');
+    render();
+  },
+  removeKeyword:function(kw){
+    var cur = (PROFILE.keywords||[]).slice();
+    var i = -1;
+    for(var j=0;j<cur.length;j++){ if(CORE.normKeyword(cur[j])===CORE.normKeyword(kw)){ i=j; break; } }
+    if(i<0) return;
+    cur.splice(i,1);
+    PROFILE.keywords = CORE.sanitizeKeywords(cur);
+    PROFILE = Object.assign({}, PROFILE);
+    saveProfile(PROFILE);
+    toast('已取消订阅');
+    render();
+  },
+
+  toggleFav:function(id){
+    var i=FAV.indexOf(id);
+    if(i>=0) FAV.splice(i,1); else FAV.push(id);
+    LS.set('favorites', FAV); toast(i>=0?'已取消收藏':'已收藏'); render();
+  },
+  toggleStep:function(id,key){
+    var k=id+'::'+key; DONE[k]=!DONE[k]; LS.set('steps', DONE); render();
+  },
+
+  /* ---- 推送设置 ---- */
+  togglePushFlag:function(key){
+    PROFILE.push = PROFILE.push || {};
+    var cur = PROFILE.push[key];
+    /* pushOn 对应 daemonEnabled，其余默认 true */
+    var def = (key === 'pushOn') ? true : true;
+    PROFILE.push[key] = (cur === undefined ? def : cur) ? false : true;
+    PROFILE = Object.assign({}, PROFILE);
+    saveProfile(PROFILE);
+    toast(PROFILE.push[key] ? '已开启' : '已关闭');
+    render();
+  },
+  onPushLevel:function(v){
+    PROFILE.push = PROFILE.push || {};
+    PROFILE.push.notifyLevel = v;
+    PROFILE = Object.assign({}, PROFILE);
+    saveProfile(PROFILE);
+    toast(v==='hot' ? '只打扰三天内' : (v==='all' ? '有新就打扰' : '从不打扰'));
+    render();
+  },
+  resetPush:function(){
+    markPushedAllReset();
+    toast('推送记录已重置 · 全部标记为新');
+    render();
+  },
+
+  /* ---- ★ 微信服务通知（真·触达） ---- */
+  enableWxNotify:function(){
+    var st = readWxState();
+    st.granted = true;
+    st.demo = true;
+    st.types = ['deadline','newnotice'];
+    st.subscribeCount = (st.subscribeCount||0) + 1;
+    st.lastAt = Date.now();
+    writeWxState(st);
+    toast('已登记 · 演示模式（模板配置后自动转真实下发）');
+    render();
+  },
+  onReachAdvance:function(v){
+    var st = readWxState();
+    st.advance = v;
+    writeWxState(st);
+    PROFILE.advance = (v==='7,3,1' ? '截止前 7 天 / 3 天 / 1 天' : (v==='3,1' ? '截止前 3 天 / 1 天' : '仅截止前 1 天'));
+    PROFILE = Object.assign({}, PROFILE);
+    saveProfile(PROFILE);
+    toast('改为 '+(v==='1'?'仅截止前 1 天':(v==='3,1'?'截止前 3 / 1 天':'截止前 7 / 3 / 1 天')));
+    render();
+  },
+  simulateDeliver:function(){
+    var st = readWxState();
+    st.sends = (st.sends||0) + 1;
+    st.lastSendAt = Date.now();
+    writeWxState(st);
+    toast('已记录 1 次送达留痕');
+    render();
+  },
+
+  /* ---- 问知时 ---- */
+  askGo:function(id){ STATE.askId = id; STATE.sub='ask'; STATE.detailId=null; render(); },
+
+  /* ---- 办事日历 ---- */
+  calShift:function(d){
+    var now = new Date();
+    var y = STATE.calY || now.getFullYear();
+    var m = STATE.calM || (now.getMonth()+1);
+    var s = CORE.shiftMonth(y, m, d);
+    STATE.calY = s.year; STATE.calM = s.month;
+    /* 翻到的新月份：若含今天则选中今天，否则清空选中 */
+    STATE.calSel = (now.getFullYear()===s.year && now.getMonth()+1===s.month) ? now.getDate() : 0;
+    render();
+  },
+  calToday:function(){
+    var now = new Date();
+    STATE.calY = now.getFullYear(); STATE.calM = now.getMonth()+1; STATE.calSel = now.getDate();
+    render();
+  },
+  calPick:function(d){ STATE.calSel = d; render(); },
+  copy:function(text){
+    try{
+      var ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      toast('原文链接已复制');
+    }catch(e){ toast('复制失败，请手动选择'); }
+  },
+  copyDigest:function(){
+    var interests=PROFILE.interests||[];
+    var items=NOTICES.filter(function(n){ return isRelevant(n, PROFILE); });
+    var must=items.filter(function(n){return n._cd!==null && n._cd<=3;});
+    var s='【知时 · 今日简报】'+summary()+'\n';
+    if(must.length) s+='三天内要办 '+must.length+' 件：\n';
+    must.forEach(function(n){ s+='· '+n.title+'（'+levelLabel(n)+'，截止 '+n.deadline+'）\n'; });
+    s+='共 '+items.length+' 条与你有关；每条均可溯源到安农官网原文。';
+    APP.copy(s);
+  },
+  toast:toast
+};
+
+/* ---- ★ 智能体动作（页面按钮调这些） ---- */
+APP.rerunAgent = function(){
+  if(!window.ZS_AGENT){ toast('智能体客户端未加载'); return; }
+  AGENT.ready = false; AGENT.result = null; AGENT.err = '';
+  loadAgentData();
+  toast('正在让智能体重算…');
+};
+APP.copyAgent = function(){
+  var r = AGENT.result;
+  var list = (r && r.notify) || [];
+  if(!list.length){ toast('当前没有要主动送达的条目'); return; }
+  var d = new Date(), pad=function(x){return x<10?'0'+x:''+x;};
+  var s = '【知时 · 智能体主动送达】'+d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())
+        + ' '+pad(d.getHours())+':'+pad(d.getMinutes())+'\n\n';
+  list.forEach(function(n,i){
+    s += (i+1)+'. '+n.title+'\n';
+    var due = agentDueText(n);
+    if(due || n.deadline) s += '   '+due+(n.deadline?' · 截止 '+n.deadline:'')+'\n';
+    if(n.reasonLine) s += '   为什么推给你：'+n.reasonLine+'\n';
+    if(n.url) s += '   原文：'+n.url+'\n';
+    s += '\n';
+  });
+  s += '—— 由知时智能体按你的订阅自动筛出，仅聚合公开通知';
+  APP.copy(s);
+};
+APP.saveAgentBase = function(){
+  if(!window.ZS_AGENT){ toast('智能体客户端未加载'); return; }
+  var el = document.getElementById('inAgentBase');
+  var v = el ? String(el.value||'').trim() : '';
+  window.ZS_AGENT.setBase(v);
+  AGENT.ready = false; AGENT.result = null; AGENT.status = null; AGENT.err = '';
+  loadAgentData();
+  toast(!v ? '已切回本地模式' : '地址已保存，正在探测…');
+};
+APP.clearAgentBase = function(){
+  if(!window.ZS_AGENT) return;
+  window.ZS_AGENT.setBase('');
+  AGENT.ready = false; AGENT.result = null; AGENT.status = null; AGENT.err = '';
+  loadAgentData();
+  toast('已切回本地模式');
+};
+APP.toggleAgentCfg = function(){
+  AGENT.cfgOpen = !AGENT.cfgOpen;
+  render();
+};
+APP.runAgentRemote = function(){
+  if(!window.ZS_AGENT){ toast('智能体客户端未加载'); return; }
+  var st = AGENT.status;
+  if(!st || !st.reachable){ toast('本地模式：打开简报页即可看到最新清单'); return; }
+  window.ZS_AGENT.remoteImpl.saveProfile(PROFILE).catch(function(){})
+    .then(function(){ return window.ZS_AGENT.remoteImpl.run({}); })
+    .then(function(){ toast('已触发一轮计算'); AGENT.ready=false; loadAgentData(); })
+    .catch(function(e){ toast('触发失败：'+((e&&e.message)||'')); });
+};
+
+/* ================================================================
+ * ★ 智能体桥（给 web/zhishi-agent.js 用）
+ * ----------------------------------------------------------------
+ * zhishi-agent.js 是独立文件，拿不到本闭包里的 PROFILE / NOTICES /
+ * push 状态。这里把"它需要的三样东西"以只读形式暴露出去：
+ *   profile()  → 当前画像
+ *   notices()  → 当前通知池（已现算倒计时）
+ *   pushState()→ 已推送 id（供"新收录"标记）
+ * 注意：只暴露**读取**入口，写入仍走 APP.saveProfile —— 单一事实来源不被破坏。
+ * 若 agent 客户端未加载（HTML 未被注入该文件），APP 里那几个入口会自动隐藏。
+ * ================================================================ */
+window.ZS_AGENT_BRIDGE = {
+  profile: function(){ return PROFILE; },
+  notices: function(){ return NOTICES; },
+  pushState: function(){ try{ return readPushState(); }catch(e){ return {}; } }
+};
+
+/* ---------- 主题 ---------- */
+function applyTheme(){
+  document.body.classList.toggle('theme-dark', STATE.theme==='dark');
+  $('#themeBtn').textContent = STATE.theme==='dark' ? '🌙 深色' : '☀️ 浅色';
+}
+$('#themeBtn').addEventListener('click', function(){
+  STATE.theme = STATE.theme==='dark'?'light':'dark';
+  LS.set('theme', STATE.theme); applyTheme();
+  toast(STATE.theme==='dark'?'已切换到深色':'已切换到浅色');
+});
+$('#tabbar').addEventListener('click', function(e){
+  var el = e.target.closest('.tb'); if(!el) return;
+  APP.goTab(el.dataset.tab);
+});
+
+/* ---------- 启动 ---------- */
+decorateAll();
+PROFILE = getProfile();
+applyTheme();
+render();
+console.log('[知时] 已启动 · 数据同源 · 共 ' + NOTICES.length + ' 条通知');
+
+/* ★ 首屏顺手探测一次智能体服务（不阻塞渲染；可用则页面上会亮绿点）。
+ * 即便用户没配置服务，这一步也会在 ~0ms 内落到"本地模式"，无副作用。 */
+if(window.ZS_AGENT){
+  loadAgentData();
+  console.log('[知时] 智能体客户端已加载 · 当前模式：' + (window.ZS_AGENT.isConfigured()?'远端':'本地'));
+} else {
+  console.log('[知时] 未加载智能体客户端（web/zhishi-agent.js）· 仅本地能力');
+}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>知时 · UI 简洁版预览</title>
+<style>
+  :root{
+    --bg:#F7F8F7; --surface:#FFFFFF; --surface-2:#F2F5F2;
+    --border:#E4E9E4; --border-soft:#EEF2EE;
+    --brand:#0A6B4B; --brand-soft:rgba(10,107,75,.08);
+    --gold:#E5A21B; --gold-soft:rgba(229,162,27,.12); --gold-ink:#8A6000;
+    --alert:#D9633B; --alert-soft:rgba(217,99,59,.10); --alert-ink:#A9431D;
+    --txt:#1A2420; --txt-2:#5E6B64; --txt-3:#98A49C;
+    --on-brand:#FFFFFF; --radius:16px;
+  }
+  body.dark{
+    --bg:#101613; --surface:#18211C; --surface-2:#141C17;
+    --border:#2A3730; --border-soft:#212C25;
+    --brand:#4CC79A; --brand-soft:rgba(76,199,154,.13);
+    --gold:#E8B23B; --gold-soft:rgba(232,178,59,.16); --gold-ink:#EFCB72;
+    --alert:#F0855B; --alert-soft:rgba(240,133,91,.15); --alert-ink:#F6AE8C;
+    --txt:#E7EDE9; --txt-2:#A6B6AC; --txt-3:#7C8E83; --on-brand:#08130E;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#EDEFF0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    color:var(--txt);padding:32px 20px 60px;line-height:1.6;transition:.2s}
+  body.dark{background:#0B100D}
+  .top{max-width:1060px;margin:0 auto 26px;display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .top h1{font-size:22px;font-weight:600;letter-spacing:.5px}
+  .top p{font-size:13px;color:var(--txt-3);margin-top:5px}
+  .sw{margin-left:auto;font-size:13px;padding:8px 16px;border-radius:999px;
+    border:1px solid var(--border);background:var(--surface);color:var(--txt-2);cursor:pointer}
+  .stage{max-width:1060px;margin:0 auto;display:flex;gap:22px;flex-wrap:wrap;justify-content:center}
+  .phone{width:310px;background:var(--bg);border:1px solid var(--border);border-radius:28px;
+    overflow:hidden;display:flex;flex-direction:column}
+  .nav{background:var(--brand);color:var(--on-brand);text-align:center;font-size:14px;
+    font-weight:600;padding:13px 0}
+  .tabs{display:flex;background:var(--surface);border-top:1px solid var(--border-soft);
+    border-bottom:1px solid var(--border-soft);margin-top:auto}
+  .tabs div{flex:1;text-align:center;font-size:11px;padding:11px 0;color:var(--txt-3)}
+  .tabs div.on{color:var(--brand);font-weight:600}
+  .scr{padding:18px 16px 22px;flex:1}
+  .lab{font-size:11px;color:var(--txt-3);letter-spacing:1px;text-transform:uppercase;
+    margin-bottom:10px;text-align:center}
+
+  /* 组件：与 app.wxss v2 一一对应 */
+  .mhead{display:flex;align-items:center;padding-bottom:14px;margin-bottom:14px;
+    border-bottom:1px solid var(--border-soft)}
+  .lg{width:32px;height:32px;border-radius:8px;background:var(--brand);color:var(--on-brand);
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:10px}
+  .mhead .t1{font-size:15px;font-weight:600}
+  .mhead .t2{font-size:11px;color:var(--txt-3);margin-top:2px}
+  .bell{margin-left:auto;font-size:11px;color:var(--brand);background:var(--brand-soft);
+    border-radius:999px;padding:3px 9px}
+  .sentry{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border-soft);
+    border-radius:var(--radius);padding:11px 13px;font-size:12px;color:var(--txt-3);margin-bottom:12px}
+  .sentry span:last-child{margin-left:auto;color:var(--brand)}
+  .hero{background:var(--brand);color:var(--on-brand);border-radius:var(--radius);
+    padding:16px;margin-bottom:12px}
+  .hero .k{font-size:11px;opacity:.8;letter-spacing:1px}
+  .hero .line{font-size:15px;font-weight:600;line-height:1.5;margin:8px 0 12px}
+  .hero .lead{font-size:12px;opacity:.92;border-top:1px solid rgba(255,255,255,.25);padding-top:10px}
+  .hero .act{display:inline-block;font-size:11px;background:rgba(255,255,255,.16);
+    border-radius:8px;padding:5px 10px;margin-top:10px}
+  .sec{font-size:12px;font-weight:600;margin:20px 0 10px;display:flex;align-items:center}
+  .sec small{font-size:11px;color:var(--txt-3);font-weight:400;margin-left:6px}
+  .card{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius);
+    padding:14px;margin-bottom:10px}
+  .card.hi{border-color:rgba(217,99,59,.35)}
+  .card .r1{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .card .tt{font-size:13.5px;font-weight:600;line-height:1.5}
+  .dd{font-size:10.5px;padding:2px 7px;border-radius:6px;white-space:nowrap;
+    color:var(--brand);background:var(--brand-soft)}
+  .dd.hi{color:var(--alert-ink);background:var(--alert-soft)}
+  .dd.md{color:var(--gold-ink);background:var(--gold-soft)}
+  .sr{font-size:11px;color:var(--txt-3);margin-top:8px}
+  .why{font-size:11.5px;color:var(--txt-2);background:var(--surface-2);
+    border-radius:8px;padding:8px 10px;margin-top:10px}
+  .tg{display:inline-block;font-size:10.5px;color:var(--txt-2);background:var(--surface-2);
+    border-radius:6px;padding:2px 7px;margin:10px 6px 0 0}
+  .go{font-size:11.5px;color:var(--brand);font-weight:500;margin-top:10px}
+  .stat{display:flex;background:var(--surface);border:1px solid var(--border-soft);
+    border-radius:var(--radius);padding:13px 0;margin-bottom:14px}
+  .stat div{flex:1;text-align:center}
+  .stat div+div{border-left:1px solid var(--border-soft)}
+  .stat b{display:block;font-size:19px;font-weight:600;color:var(--brand)}
+  .stat span{font-size:10.5px;color:var(--txt-3)}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--brand);
+    background:var(--brand-soft);border-radius:999px;padding:5px 11px;margin-bottom:12px}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--brand)}
+  .btnrow{display:flex;gap:8px;margin-top:12px}
+  .ab{flex:1;text-align:center;font-size:11.5px;padding:9px 0;border-radius:var(--radius);
+    background:var(--surface);border:1px solid var(--border);color:var(--txt-2)}
+  .ab.primary{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+  .chip{display:inline-block;font-size:11.5px;padding:6px 13px;border-radius:999px;
+    background:var(--surface);border:1px solid var(--border);color:var(--txt-2);margin:0 6px 8px 0}
+  .chip.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand);font-weight:600}
+  .kv{display:flex;justify-content:space-between;font-size:12px;padding:9px 0;
+    border-bottom:1px solid var(--border-soft)}
+  .kv span{color:var(--txt-3)}
+  .foot{font-size:10.5px;color:var(--txt-3);text-align:center;margin-top:18px;line-height:1.8}
+  .note{max-width:1060px;margin:26px auto 0;font-size:12px;color:var(--txt-3);text-align:center;line-height:1.9}
+</style>
+<!-- KPI 由 tools/sync_promo_kpi.js 从 web/zhishi-data.js 现算同步，基准 2026-11-15；勿手改 -->
+</head>
+<body>
+<div class="top">
+  <div>
+    <h1>知时 · UI 简洁版</h1>
+    <p>去渐变 / 去投影 / 去装饰图标 · 统一 16rpx 圆角与细线 · 绿色只用于状态与可点元素</p>
+  </div>
+  <button class="sw" onclick="document.body.classList.toggle('dark')">切换深色</button>
+</div>
+
+<div class="stage">
+  <!-- 雷达首页 -->
+  <div class="phone">
+    <div class="nav">知时 · 数字安农信息雷达</div>
+    <div class="scr">
+      <div class="lab">雷达 · 首页</div>
+      <div class="mhead">
+        <div class="lg">AAU</div>
+        <div><div class="t1">知时 · 信息雷达</div><div class="t2">公开通知 · 聚合 · 浓缩 · 溯源</div></div>
+        <div class="bell">12 条</div>
+      </div>
+      <div class="sentry">搜索通知｜转专业 · 奖学金 · 竞赛<span>›</span></div>
+      <div class="hero">
+        <div class="k">今日头条</div>
+        <div class="line">有 1 条三天内要办，共 12 条与你有关</div>
+        <div class="lead">关于 2026 年转专业工作的通知 · 教务处</div>
+        <div class="act">去看简报 ›</div>
+      </div>
+      <div class="stat">
+        <div><b>12</b><span>与你有关</span></div>
+        <div><b>1</b><span>三天内</span></div>
+        <div><b data-kpi="real">124</b><span>通知池</span></div>
+      </div>
+      <div class="sec">三天内要办 <small>会打扰你</small></div>
+      <div class="card hi">
+        <div class="r1"><div class="tt">关于 2026 年转专业申请截止的通知</div><span class="dd hi">剩 2 天</span></div>
+        <div class="sr">教务处 · 长江西路校区</div>
+        <div class="why">为什么推给你：关注「转专业」+ 截止临近</div>
+        <div class="go">看浓缩与原文出处 ›</div>
+      </div>
+      <div class="card">
+        <div class="r1"><div class="tt">第一届「农芯智」AI 智能体创新大赛</div><span class="dd md">剩 6 天</span></div>
+        <div class="sr">团委 · 12 月 3 日前报名</div>
+        <span class="tg">学科竞赛</span><span class="tg">可核对原文</span>
+      </div>
+      <div class="foot">仅使用公开通知数据 · 不读取任何校内私域数据</div>
+    </div>
+    <div class="tabs"><div class="on">雷达</div><div>时间轴</div><div>简报</div><div>订阅</div></div>
+  </div>
+
+  <!-- 简报 -->
+  <div class="phone">
+    <div class="nav">今日简报</div>
+    <div class="scr">
+      <div class="lab">简报 · 智能体主动送达</div>
+      <div class="pill"><span class="dot"></span>已连接智能体服务 · 服务端算</div>
+      <div class="card">
+        <div class="r1"><div class="tt">今日主动送达清单</div><span class="dd">规则模式</span></div>
+        <div class="sr">池 <span data-kpi="real">124</span> · 入库 149 · 命中 12 · 打扰 1 · 静默 11</div>
+        <div class="why">口径：有 1 条三天内要办，共 12 条与你有关</div>
+        <div class="btnrow"><div class="ab primary">让它重算一遍</div><div class="ab">复制清单</div></div>
+      </div>
+      <div class="sec">该主动提醒你 <small>1 件</small></div>
+      <div class="card hi">
+        <div class="r1"><div class="tt">转专业申请截止</div><span class="dd hi">剩 2 天</span></div>
+        <div class="sr">教务处 · 匹配 92 分</div>
+        <div class="why">凭什么推：关注转专业 · 截止临近 · 面向 2025 级</div>
+      </div>
+      <div class="sec">静默进流 <small>不打扰，但已备好</small></div>
+      <div class="card">
+        <div class="tt">关于开展期中教学检查的通知</div>
+        <div class="sr">教务处 · 无截止</div>
+        <span class="tg">考试安排</span><span class="tg">可核对原文</span>
+      </div>
+      <div class="card">
+        <div class="tt">图书馆冬季开放时间调整</div>
+        <div class="sr">图书馆 · 长期有效</div>
+        <span class="tg">校园服务</span>
+      </div>
+      <div class="foot">静默也是设计的一部分</div>
+    </div>
+    <div class="tabs"><div>雷达</div><div>时间轴</div><div class="on">简报</div><div>订阅</div></div>
+  </div>
+
+  <!-- 订阅 -->
+  <div class="phone">
+    <div class="nav">我的订阅</div>
+    <div class="scr">
+      <div class="lab">订阅 · 画像与智能体</div>
+      <div class="sec" style="margin-top:0">智能体服务 <small>你不打开它也在跑</small></div>
+      <div class="card">
+        <div class="pill" style="margin-bottom:8px"><span class="dot"></span>已连接智能体服务</div>
+        <div class="sr">服务版本 1.0.0 · 本机 127.0.0.1:8787</div>
+        <div class="btnrow"><div class="ab primary">立即跑一轮</div><div class="ab">改地址</div></div>
+      </div>
+      <div class="sec">关注事项</div>
+      <div>
+        <span class="chip on">转专业</span><span class="chip on">学科竞赛</span>
+        <span class="chip on">奖助学金</span><span class="chip">考试安排</span>
+        <span class="chip">校园服务</span><span class="chip">就业信息</span>
+      </div>
+      <div class="sec">我的画像</div>
+      <div class="card">
+        <div class="kv"><span>身份</span>本科生</div>
+        <div class="kv"><span>年级</span>2025 级 · 大一</div>
+        <div class="kv"><span>学院</span>信息与人工智能学院</div>
+        <div class="kv"><span>校区</span>长江西路校区</div>
+        <div class="kv" style="border:none"><span>提醒节奏</span>截止前 7 / 3 / 1 天</div>
+      </div>
+      <div class="btnrow"><div class="ab primary">保存画像</div></div>
+      <div class="foot">画像只用于本地匹配 · 不上传任何私域数据</div>
+    </div>
+    <div class="tabs"><div>雷达</div><div>时间轴</div><div>简报</div><div class="on">订阅</div></div>
+  </div>
+</div>
+
+<div class="note">静态样式预览示意（非小程序截图）：三屏分别对应雷达首页 / 简报 / 订阅页的新视觉。<br>实际工程已同步改好，编译后即为该风格；点右上角可看深色主题。</div>
+</body>
+</html>

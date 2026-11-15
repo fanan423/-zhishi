@@ -1,0 +1,129 @@
+<view class="screen theme-{{theme}}">
+<view class="wrap">
+
+  <!-- 页头 -->
+  <view class="mhead">
+    <view class="lg"><view class="sun"></view><text class="aa">AAU</text><view class="book"></view><text class="y">1928</text></view>
+    <view class="bx">
+      <view class="t1">数据自查</view>
+      <view class="t2">我们凭什么让你信 · 每次展示前先自己查一遍</view>
+    </view>
+  </view>
+
+  <!-- 结论卡 -->
+  <view class="verdict {{healthy ? 'ok' : 'bad'}}">
+    <view class="vh">
+      <text class="vicon">{{healthy ? '✓' : '!'}}</text>
+      <text class="vt">{{healthy ? '本次自查通过' : '本次自查发现问题'}}</text>
+    </view>
+    <view class="vs">
+      {{healthy ? '没有条目因触犯三条铁律被剔除。可疑处已如实标注在下方，供你自行判断。' : '已按铁律处理：不可靠的剔除、可疑的如实标注。详情见下。'}}
+    </view>
+    <view class="vmeta">自查时间 {{stamp}}</view>
+  </view>
+
+  <!-- 关键指标 -->
+  <view class="stat">
+    <view class="it">
+      <view class="n">{{stat.total}}</view>
+      <view class="l">审计条目</view>
+    </view>
+    <view class="it">
+      <view class="n">{{stat.passed}}</view>
+      <view class="l">放行</view>
+    </view>
+    <view class="it">
+      <view class="n red" wx:if="{{stat.dropped > 0}}">{{stat.dropped}}</view>
+      <view class="n" wx:else>{{stat.dropped}}</view>
+      <view class="l">剔除</view>
+    </view>
+    <view class="it">
+      <view class="n">{{stat.verifiable}}</view>
+      <view class="l">可举证原文</view>
+    </view>
+  </view>
+
+  <!-- 三条铁律 -->
+  <view class="sec">三条铁律 <text class="secsub">· 触犯即剔除</text></view>
+  <view class="rulecard" wx:for="{{rules}}" wx:key="code">
+    <view class="rtag">{{item.code}}</view>
+    <view class="rbody">
+      <view class="rt">{{item.t}}</view>
+      <view class="rd">{{item.d}}</view>
+    </view>
+  </view>
+
+  <!-- 自纠说明 -->
+  <view class="sec">自动纠正 <text class="secsub">· 不是删掉就算了</text></view>
+  <view class="box">
+    <view class="arl" wx:for="{{infoLines}}" wx:key="*this">{{item}}</view>
+    <view class="arl" wx:if="{{infoLines.length === 0}}">本次无需自动纠正</view>
+    <view class="arnote">
+      倒计时按今天实时重算（数据是编制时刻写的定值，日子在前行），不报警、只刷新；
+      原文过短的条目会提示你去看官网原文，不硬凑结论。
+    </view>
+  </view>
+
+  <!-- 问题清单 -->
+  <block wx:if="{{issueLines.length > 0}}">
+    <view class="sec">查出的疑点 <text class="secsub">· 已如实标注，未删改</text></view>
+    <view class="box">
+      <view class="arl warn" wx:for="{{issueLines}}" wx:key="*this">{{item}}</view>
+      <view class="arnote">
+        「未留存原文链接」是如实标注，不是失败——它只说明这条我们没存住官网地址，
+        所以它**不会**被当成"可核对原文"推给你。诚实比好看重要。
+      </view>
+    </view>
+  </block>
+
+  <!-- 被剔除条目 -->
+  <view class="sec">被剔除的条目 <text class="secsub">· 宁缺毋滥</text></view>
+  <view class="box">
+    <block wx:if="{{dropped.length > 0}}">
+      <view class="dcard" wx:for="{{dropped}}" wx:key="id">
+        <view class="dt">{{item.title || item.id}}</view>
+        <view class="dwhy">剔除原因：{{item.why}}</view>
+      </view>
+    </block>
+    <view class="dnone" wx:else>本次自查未剔除任何条目 —— 所有展示内容都过了三条铁律。</view>
+  </view>
+
+  <!-- 可举证原文清单 -->
+  <view class="sec">可举证原文清单 <text class="secsub">· {{verifiableList.length}} 条，点标题复制官网链接</text></view>
+  <view class="box">
+    <block wx:if="{{verifiableList.length > 0}}">
+      <view class="vcard" wx:for="{{verifiableList}}" wx:key="id">
+        <view class="vt1" data-url="{{item.url}}" bindtap="copyUrl">{{item.title}}</view>
+        <view class="vsr">{{item.source}} · {{item.site}} · 发布于 {{item.publish}}</view>
+        <view class="vu" data-url="{{item.url}}" bindtap="copyUrl">🔗 {{item.url}}</view>
+        <view class="vgo" data-id="{{item.id}}" catchtap="goDetail">查看详情与原文比对 ›</view>
+      </view>
+    </block>
+    <view class="dnone" wx:else>
+      本批数据暂无留存官网链接的条目。没链接的已明确标为「演示样例 / 未留存链接」，不当真实通知使用。
+    </view>
+  </view>
+
+  <!-- 审计留痕 -->
+  <block wx:if="{{history.length > 0}}">
+    <view class="sec">审计留痕 <text class="secsub">· 最近 {{history.length}} 次</text></view>
+    <view class="box">
+      <view class="hrow" wx:for="{{history}}" wx:key="time">
+        <text class="ht">{{item.time}}</text>
+        <text class="hx">{{item.txt}}</text>
+      </view>
+    </view>
+    <view class="hint">留痕只记"查了几条、扔了几条"，条目本身一旦被剔除就不再展示——你不用怀疑我们偷偷塞了什么。</view>
+  </block>
+
+  <view class="acts">
+    <button class="ab primary" bindtap="rerun">重新自查</button>
+  </view>
+
+  <view class="foot">
+    <view><text class="hl">这一页为什么存在：</text>如果哪条通知不可靠，我们不是偷偷删掉，而是把"扔掉了什么、为什么"摊开给你看。你能量、能追问、能复核。</view>
+    <view style="margin-top:8rpx">这正是「可信」和「看起来可信」的区别。</view>
+  </view>
+
+</view>
+</view>

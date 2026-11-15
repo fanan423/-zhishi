@@ -1,0 +1,319 @@
+/* 问知时 —— 数字安农风格（跟随主题变量） */
+
+/* ---- 今日一问大卡 ---- */
+.hcard {
+  border-radius: 22rpx;
+  padding: 30rpx;
+  background: linear-gradient(160deg, var(--brand-2), var(--brand));
+  box-shadow: 0 8rpx 24rpx rgba(0, 101, 62, 0.22);
+  margin-bottom: 18rpx;
+}
+.hcard.tone-alert {
+  background: linear-gradient(160deg, #C0392B, #8E2418);
+  box-shadow: 0 8rpx 24rpx rgba(192, 57, 43, 0.24);
+}
+.hcard.tone-new {
+  background: linear-gradient(160deg, #1F7A5A, var(--brand));
+}
+.hcard .hq {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+.hcard .hqi { font-size: 28rpx; }
+.hcard .hqt {
+  font-size: 25rpx;
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 500;
+}
+.hcard .ha {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+  line-height: 1.6;
+  margin-top: 16rpx;
+}
+.hcard .hm {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.86);
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.22);
+}
+
+/* ---- 数据自评条 ---- */
+.statbar {
+  display: flex;
+  gap: 12rpx;
+  margin-bottom: 10rpx;
+}
+.statbar .sti {
+  flex: 1;
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 16rpx;
+  padding: 20rpx 12rpx;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.statbar .stn {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 800;
+  color: var(--brand);
+  line-height: 1.2;
+}
+.statbar .stl {
+  display: block;
+  font-size: 20rpx;
+  color: var(--txt-3);
+  margin-top: 6rpx;
+}
+
+/* ---- 答案卡 ---- */
+.acard {
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-top: 16rpx;
+  box-shadow: var(--card-shadow);
+  position: relative;
+  overflow: hidden;
+}
+.acard::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 8rpx;
+  background: var(--brand);
+}
+.acard.tone-alert::before { background: var(--alert); }
+.acard.tone-warn::before { background: var(--gold); }
+.acard.tone-busy::before { background: var(--brand); }
+.acard.tone-new::before { background: var(--brand); }
+.acard.tone-calm::before { background: var(--border); }
+.acard.tone-ok::before { background: var(--brand); }
+
+.acard .aq {
+  font-size: 24rpx;
+  color: var(--txt-3);
+  font-weight: 500;
+}
+.acard .aa {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--txt);
+  line-height: 1.65;
+  margin-top: 12rpx;
+}
+
+/* 依据 */
+.acard .abasis {
+  display: flex;
+  gap: 12rpx;
+  background: var(--brand-soft);
+  border-radius: 14rpx;
+  padding: 18rpx 20rpx;
+  margin-top: 18rpx;
+}
+.acard .abl {
+  font-size: 21rpx;
+  font-weight: 700;
+  color: var(--brand);
+  flex-shrink: 0;
+}
+.acard .abt {
+  font-size: 21rpx;
+  color: var(--txt-2);
+  line-height: 1.7;
+}
+
+/* 材料清单 */
+.mlist {
+  margin-top: 20rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx dashed var(--border);
+}
+.mlist .mt {
+  font-size: 23rpx;
+  font-weight: 700;
+  color: var(--brand);
+  margin-bottom: 12rpx;
+}
+.mlist .mrow {
+  display: flex;
+  gap: 10rpx;
+  padding: 10rpx 0;
+}
+.mlist .mdot { color: var(--brand); font-size: 24rpx; }
+.mlist .mbody { flex: 1; min-width: 0; }
+.mlist .mname {
+  display: block;
+  font-size: 25rpx;
+  color: var(--txt);
+  line-height: 1.5;
+}
+.mlist .mfrom {
+  display: block;
+  font-size: 20rpx;
+  color: var(--brand);
+  margin-top: 6rpx;
+}
+
+/* 相关条目 */
+.ilist {
+  margin-top: 20rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx dashed var(--border);
+}
+.ilist .it {
+  font-size: 23rpx;
+  font-weight: 700;
+  color: var(--txt-2);
+  margin-bottom: 12rpx;
+}
+.ilist .irow {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid var(--border-soft);
+}
+.ilist .irow:last-child { border-bottom: none; }
+.ilist .imid { flex: 1; min-width: 0; }
+.ilist .ititle {
+  font-size: 25rpx;
+  color: var(--txt);
+  line-height: 1.45;
+}
+.ilist .imeta {
+  font-size: 20rpx;
+  color: var(--txt-3);
+  margin-top: 6rpx;
+}
+.ilist .idd {
+  font-size: 20rpx;
+  font-weight: 700;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  flex-shrink: 0;
+  color: var(--txt-2);
+  background: var(--border-soft);
+}
+.ilist .idd.lv-hi { color: #FFFFFF; background: var(--alert); }
+.ilist .idd.lv-md { color: var(--gold-ink); background: var(--gold-soft); }
+.ilist .imore {
+  font-size: 21rpx;
+  color: var(--txt-3);
+  margin-top: 12rpx;
+}
+.iempty {
+  font-size: 22rpx;
+  color: var(--txt-3);
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx dashed var(--border);
+}
+
+/* ---- 问题目录 ---- */
+.qgroup { margin-bottom: 6rpx; }
+.qgroup .ghead {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin: 22rpx 0 10rpx;
+}
+.qgroup .gi { font-size: 24rpx; }
+.qgroup .gl {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: var(--brand);
+  letter-spacing: 0.5rpx;
+}
+.qlist {
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.qrow {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 22rpx 24rpx;
+  border-bottom: 1rpx solid var(--border-soft);
+}
+.qrow:last-child { border-bottom: none; }
+.qrow.on { background: var(--brand-soft); }
+.qrow .qbody { flex: 1; min-width: 0; }
+.qrow .qq {
+  display: block;
+  font-size: 26rpx;
+  color: var(--txt);
+  font-weight: 500;
+}
+.qrow .qh {
+  display: block;
+  font-size: 20rpx;
+  color: var(--txt-3);
+  margin-top: 6rpx;
+}
+.qrow .qa {
+  font-size: 22rpx;
+  color: var(--brand);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.qrow.on .qa { color: var(--txt-3); }
+
+/* ---- 通用 ---- */
+.sec {
+  font-size: 26rpx;
+  color: var(--brand);
+  font-weight: 700;
+  letter-spacing: 1rpx;
+  margin: 32rpx 0 12rpx;
+  display: flex;
+  align-items: center;
+}
+.sec .secsub {
+  font-size: 21rpx;
+  color: var(--txt-3);
+  font-weight: 400;
+  margin-left: 10rpx;
+}
+.acts {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin: 28rpx 0 10rpx;
+}
+.ab {
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  padding: 22rpx 0;
+  border: 1rpx solid var(--border);
+  background: var(--surface);
+  color: var(--txt);
+  line-height: 1.2;
+}
+.ab.primary {
+  background: linear-gradient(160deg, var(--brand-2), var(--brand));
+  color: #FFFFFF;
+  border: none;
+  font-weight: 600;
+  box-shadow: 0 6rpx 18rpx rgba(0, 101, 62, 0.22);
+}
+.foot {
+  margin-top: 36rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--border);
+  font-size: 21rpx;
+  color: var(--txt-3);
+  line-height: 1.8;
+}
+.foot .hl { color: var(--brand); font-weight: 600; }

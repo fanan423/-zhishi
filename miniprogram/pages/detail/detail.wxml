@@ -1,0 +1,253 @@
+<view class="screen theme-{{theme}}">
+<view class="wrap" wx:if="{{notice}}">
+
+  <!-- 标题区 -->
+  <view class="hd {{notice.level}}">
+    <view class="ht">
+      <text wx:for="{{titleSegs}}" wx:for-item="sg" wx:key="index"
+            class="{{sg.hl ? 'mhl' : ''}}">{{sg.text}}</text>
+      <text class="badge badge-real" wx:if="{{srcState === 'verifiable'}}">✓ 真实公开源 · 可核对</text>
+      <text class="badge badge-warn" wx:elif="{{srcState === 'real-nolink'}}">真实采集 · 未留存链接</text>
+      <text class="badge badge-demo" wx:else>演示样例 · 非真实通知</text>
+    </view>
+    <view class="hs">{{notice.source}}{{notice.site ? ' · ' + notice.site : ''}} · 发布于 {{notice.publish}}</view>
+    <view class="hc">
+      <text class="cn" wx:if="{{notice.countdown !== null && notice.countdown >= 0}}">剩 {{notice.countdown}} 天</text>
+      <text class="cn exp" wx:if="{{notice.countdown !== null && notice.countdown < 0}}">已结束</text>
+      <text class="cd" wx:if="{{notice.deadline}}">截止 {{notice.deadline}}</text>
+    </view>
+
+    <!-- 溯源率：本页最硬的可信度指标 -->
+    <view class="trate" wx:if="{{traceTotal > 0}}">
+      <text class="trn">{{traceable}}/{{traceTotal}}</text>
+      <text class="trt">条要点可在原文中原样定位</text>
+    </view>
+
+    <!-- 收藏 / 已读 / 删除 -->
+    <view class="acts">
+      <view class="fav {{favorited ? 'on' : ''}}" bindtap="toggleFav">
+        {{favorited ? '★ 已收藏' : '☆ 收藏'}}
+      </view>
+      <view class="fav {{isRead ? 'on' : ''}}" bindtap="toggleRead">
+        {{isRead ? '✓ 已读' : '● 未读'}}
+      </view>
+      <view class="fav" wx:if="{{isHidden}}" bindtap="restoreNotice">↩ 找回</view>
+      <view class="fav del" wx:else bindtap="removeNotice">🗑 删除</view>
+    </view>
+  </view>
+
+  <!-- 关键信息卡：先把最要紧的几条拎出来 -->
+  <view class="kcard">
+    <view class="krow" wx:for="{{keyCard}}" wx:key="k">
+      <text class="kk">{{item.k}}</text>
+      <text class="kv">{{item.v}}</text>
+    </view>
+  </view>
+
+  <!-- 你在搜的词 -->
+  <view class="qbar" wx:if="{{query}}">
+    <text class="qk">搜索「{{query}}」</text>
+    <text class="qq" bindtap="searchTag">看「{{notice.event}}」全部 ›</text>
+  </view>
+
+  <!-- ============ 和我有关吗 ============ -->
+  <view class="relcard rel-{{rel.level}}" wx:if="{{rel}}">
+    <view class="relh">
+      <view class="rell">
+        <text class="reldot"></text>
+        <text class="relt">和我有关吗</text>
+      </view>
+      <text class="relbadge">{{rel.label}}</text>
+    </view>
+
+    <view class="relline">{{rel.reasonLine}}</view>
+
+    <!-- 逐条对照表：官方措辞 → 你的情况 -->
+    <view class="relrows" wx:if="{{rel.reasons.length > 0}}">
+      <view class="relrow" wx:for="{{rel.reasons}}" wx:key="key">
+        <text class="relst relst-{{item.state}}">
+          {{item.state === 'ok' ? '✓' : (item.state === 'no' ? '✗' : '?')}}
+        </text>
+        <view class="relbx">
+          <view class="relrk">
+            <text class="relk">{{item.label}}</text>
+            <text class="relmine">{{item.mine}}</text>
+            <text class="relarrow">↔</text>
+            <text class="relneed">{{item.need}}</text>
+          </view>
+          <view class="relnote">{{item.note}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="relhint">
+      判定依据：你填的身份（{{notice.event}} 之外还需看年级/学院）+ 原文写明的条件。
+      <text class="rellink" bindtap="gotoMe">身份填错了？去改 ›</text>
+    </view>
+  </view>
+
+  <!-- ============ 要办什么（清单） ============ -->
+  <view class="stepcard" wx:if="{{steps.length > 0}}">
+    <view class="steph">
+      <view class="stepl">
+        <text class="stept">要办什么</text>
+        <text class="stepc">{{stepDone}} / {{stepTotal}}</text>
+      </view>
+      <text class="stepall" wx:if="{{allDone}}">全部办完 🎉</text>
+      <text class="stepreset" wx:else bindtap="resetSteps">重置</text>
+    </view>
+
+    <view class="stepbar"><view class="stepfill" style="width:{{stepTotal ? (stepDone * 100 / stepTotal) : 0}}%"></view></view>
+
+    <view class="stepitem {{item.done ? 'done' : ''}} {{item.kind}}"
+          wx:for="{{steps}}" wx:key="key"
+          data-k="{{item.key}}" bindtap="toggleStep">
+      <text class="stepbox">{{item.done ? '☑' : '☐'}}</text>
+      <text class="steptx">{{item.text}}</text>
+    </view>
+
+    <view class="stepcopy" bindtap="copySteps">复制清单发给同学 ›</view>
+  </view>
+
+  <!-- 四要素 -->
+  <view class="facts">
+    <view class="fx" wx:for="{{factList}}" wx:key="k">
+      <view class="fk">{{item.k}}</view>
+      <view class="fv">{{item.v}}</view>
+    </view>
+    <view class="fx wide">
+      <view class="fk">抽取方式</view>
+      <view class="fv">
+        {{notice.real ? '本地理解层（规则）抽取 · 要素完整度 ' : '演示数据 · 完整度 '}}{{notice.confidence * 100}}%
+        <text class="warn" wx:if="{{notice.confidence < 0.5}}">（要素不全，建议直接看原文）</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- AI 理解：默认展示构建期离线大模型产物；联网重新理解为可选增强 -->
+  <view class="aicard" wx:if="{{aiReady}}">
+    <view class="aihd">
+      <text class="ait">🤖 {{aiSource === 'offline' ? 'AI 理解 · 离线预计算' : 'AI 现场理解'}}</text>
+      <text class="ais">{{aiSource === 'offline' ? '构建期由大模型读原文抽取，断网也能演示' : '云端大模型读这条原文，实时重抽一遍要素'}}</text>
+    </view>
+
+    <button class="aibtn" bindtap="aiUnderstand" loading="{{aiRunning}}" disabled="{{aiRunning}}">
+      {{aiRunning ? '模型正在读原文…' : (aiSource === 'offline' ? '联网重新理解（可选）' : '让 AI 现在读一遍')}}
+    </button>
+
+    <view class="aiout" wx:if="{{aiResult}}">
+      <view class="air">
+        <text class="aik">谁该看</text><text class="aiv">{{aiResult.who}}</text>
+      </view>
+      <view class="air">
+        <text class="aik">要做什么</text><text class="aiv">{{aiResult.what}}</text>
+      </view>
+      <view class="air">
+        <text class="aik">在哪办</text><text class="aiv">{{aiResult.where}}</text>
+      </view>
+      <view class="air">
+        <text class="aik">截止时间</text><text class="aiv">{{aiResult.deadline}}</text>
+      </view>
+      <view class="air">
+        <text class="aik">所需材料</text><text class="aiv">{{aiResult.materials}}</text>
+      </view>
+      <view class="air" wx:if="{{aiResult.summary}}">
+        <text class="aik">模型摘要</text><text class="aiv">{{aiResult.summary}}</text>
+      </view>
+      <view class="aiq" wx:if="{{aiResult.quote}}">📌 模型依据原文：「{{aiResult.quote}}」</view>
+      <view class="ainote" wx:if="{{aiSource === 'offline'}}">以上为构建期大模型预计算结果（非实时调用）。模型 {{aiResult.model}} · 提示词 {{aiResult.promptVersion}} · 引文定位 {{aiResult.quoteMatch}}；未命中处如实写「原文未明确说明」。</view>
+      <view class="ainote" wx:else>以上为模型当场从原文抽取，未命中处如实写「原文未明确说明」。</view>
+    </view>
+
+    <view class="aiwarn" wx:if="{{aiError}}">{{aiError}}</view>
+  </view>
+
+  <!-- 视图切换 -->
+  <view class="tabs">
+    <view class="tb {{tab === 'digest' ? 'on' : ''}}" data-tab="digest" bindtap="switchTab">✨ 浓缩</view>
+    <view class="tb {{tab === 'raw' ? 'on' : ''}}" data-tab="raw" bindtap="switchTab">📄 原文（出处）</view>
+  </view>
+
+  <!-- ============ 浓缩视图 ============ -->
+  <block wx:if="{{tab === 'digest'}}">
+    <view class="one">
+      <view class="ol">一句话读懂</view>
+      {{notice.digestOne}}
+    </view>
+
+    <view class="sec">要点 · 每句都挂着原文出处</view>
+
+    <view class="pt {{activeIdx === index ? 'on' : ''}}"
+          wx:for="{{notice.digestPoints}}" wx:key="text"
+          data-idx="{{index}}" bindtap="tapPoint">
+      <view class="pn">要点 {{index + 1}}</view>
+      <view class="pm">{{item.text}}</view>
+      <view class="ps" wx:if="{{activeIdx === index}}">
+        📌 原文出处：<text class="pq">「{{item.quote}}」</text>
+      </view>
+      <view class="pj" data-idx="{{index}}" catchtap="jumpToRaw">去原文核对 ›</view>
+    </view>
+
+    <view class="tip" wx:if="{{traceable === traceTotal}}">
+      <text class="tg2">✅ 全部要点已定位到原文</text>
+      本页 {{traceTotal}} 条要点，每一条都能在下方原文里原样找到（黄色高亮）。这不是"AI 说什么你就信什么"，而是每句话都能自己核对。
+    </view>
+    <view class="tip warnbox" wx:else>
+      <text class="tg2">⚠ 有 {{traceTotal - traceable}} 条要点未能在原文中定位</text>
+      可能是原文格式差异导致。我们宁可标出来，也不假装 100% 准确——点「原文」自己看一眼最稳。
+    </view>
+  </block>
+
+  <!-- ============ 原文视图 ============ -->
+  <block wx:if="{{tab === 'raw'}}">
+    <view class="rawbar">
+      <view class="rb1">📄 原文（聚合自公开页面）</view>
+      <view class="rbtn" bindtap="toggleAll">{{rawFocused ? '取消高亮' : '全部高亮'}}</view>
+    </view>
+
+    <view class="raw">
+      <text wx:for="{{quotedRaw}}" wx:key="index"
+            class="q {{item.hl ? 'hl' : ''}} {{item.idx === activeIdx ? 'on' : ''}} {{rawFocused ? 'allon' : ''}}"
+            data-idx="{{item.idx}}"
+            bindtap="tapQuote">{{item.text}}</text>
+    </view>
+
+    <view class="rawmeta">
+      <text>来源：{{notice.source}}{{notice.site ? ' · ' + notice.site : ''}} · 发布于 {{notice.publish}}</text>
+      <text>字数：{{notice.raw.length}} 字</text>
+    </view>
+
+    <view class="srcline" wx:if="{{notice.real && notice.url}}" bindtap="copySource">
+      🔗 原文出处（{{notice.site || '安农官网'}}）：{{notice.url}}
+      <text class="scopy">点击复制 ›</text>
+    </view>
+    <view class="srcline srcline-warn" wx:elif="{{notice.real}}" bindtap="copySource">
+      ⚠ 本条未留存原文链接 · 请到官网按标题检索
+      <text class="scopy">查看说明 ›</text>
+    </view>
+    <view class="srcline srcline-demo" wx:else bindtap="copySource">
+      ⚠ 演示样例 · 非真实通知，无原文链接
+      <text class="scopy">查看说明 ›</text>
+    </view>
+
+    <view class="tip">
+      绿色为当前聚焦句，黄色为 AI 引用过的句子。点黄色句可跳回对应要点核对——**出处就在这里**。
+    </view>
+  </block>
+
+  <!-- 操作 -->
+  <view class="acts">
+    <button class="ab primary" bindtap="setRemind">收藏并提醒</button>
+    <button class="ab" bindtap="copyEntry">复制办理信息</button>
+    <button class="ab" bindtap="openSource">查看来源</button>
+  </view>
+
+  <view class="sharehint">右上角「···」可把这条通知转发给同学 / 分享到朋友圈</view>
+
+  <view class="foot">
+    <view><text class="hl">合规：</text>本页原文仅来自公网公开通知页面，不涉及教务系统后台与任何私域数据。</view>
+    <view style="margin-top:8rpx">浓缩结果由理解层产出，每句话挂原文出处；抽不到的字段写「原文未明确说明」，不做推测性补全。</view>
+  </view>
+
+</view>
+</view>

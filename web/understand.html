@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>理解层拆解 · AI 如何读懂一条通知 | 知时</title>
+<style>
+  :root{
+    --bg:#0f1115;--panel:#171a21;--panel2:#1e222b;--line:#2a2f3a;
+    --text:#e8eaed;--sub:#9aa4b2;--accent:#4dd6a8;--accent2:#5b9cf8;
+    --warn:#f5a524;--danger:#f2565b;--radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(1200px 600px at 20% -10%,#1a2432 0%,var(--bg) 55%);
+    color:var(--text);font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.7;min-height:100vh;padding:28px 20px 60px}
+  .wrap{max-width:1080px;margin:0 auto}
+  h1{font-size:21px;letter-spacing:.5px}
+  .sub{font-size:13px;color:var(--sub);margin-top:4px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .card h2{font-size:14px;margin-bottom:12px;color:var(--accent);letter-spacing:.5px}
+  .raw{font-size:13px;line-height:1.9;color:#c8d0db;white-space:pre-wrap;
+    background:var(--panel2);border-radius:10px;padding:14px;border:1px solid var(--line);
+    max-height:420px;overflow-y:auto}
+  .hl{background:rgba(245,165,36,.18);border-radius:4px;padding:0 3px;color:#ffd28a;transition:.3s}
+  .hl.on{background:rgba(77,214,168,.22);color:#a6f0d4}
+
+  .step{margin-bottom:12px}
+  .step .lab{font-size:11.5px;color:var(--sub);letter-spacing:.5px;margin-bottom:5px}
+  .step .val{font-size:13.5px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:9px;padding:10px 13px;min-height:42px;transition:.35s;opacity:.4}
+  .step .val.on{opacity:1;border-color:rgba(77,214,168,.5);
+    background:linear-gradient(90deg,rgba(77,214,168,.08),var(--panel2))}
+  .step .val b{color:var(--accent)}
+  .conf{font-size:12px;color:var(--sub);margin-top:8px}
+  .conf b{color:var(--warn)}
+
+  .ctrl{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;
+    border-radius:10px;padding:10px 16px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--text);transition:.2s}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+  button.primary{background:linear-gradient(135deg,var(--accent),#38b98f);color:#07120d;border:none}
+  button:disabled{opacity:.45;cursor:not-allowed}
+
+  .arrow{text-align:center;font-size:22px;color:var(--accent);margin:8px 0}
+  .note{margin-top:18px;font-size:12px;color:var(--sub);line-height:1.8;
+    border-left:3px solid var(--accent2);padding-left:14px}
+  .note b{color:var(--accent)}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;
+    flex-wrap:wrap;margin-bottom:14px}
+  .topbar a{font-size:12.5px;color:var(--accent);text-decoration:none;font-weight:600;
+    border:1px solid rgba(77,214,168,.35);border-radius:9px;padding:7px 16px}
+  .topbar a:hover{background:rgba(77,214,168,.08);border-color:var(--accent)}
+  .topbar span{font-size:12px;color:var(--sub);letter-spacing:1px}
+  @media(max-width:820px){.cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a href="overview.html">← 返回项目总览</a>
+    <span>DEMO 03 · 理解层拆解</span>
+  </div>
+  <h1>理解层拆解 · AI 如何"读懂"一条通知</h1>
+  <div class="sub">这是知时智能体最核心的一层——不是"抓通知"，而是"理解通知"</div>
+
+  <div class="ctrl">
+    <button class="primary" id="run">▶ 开始拆解</button>
+    <button id="reset">重置</button>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <h2>原始通知文本（采集自公开页面）</h2>
+      <div class="raw" id="raw">
+<span class="hl" data-k="time">各学院、各位同学：根据《安徽农业大学本科生转专业管理办法》文件精神，现将2026-2027学年第一学期转专业工作有关事项通知如下：</span>
+一、<span class="hl" data-k="aud">申请对象：2025级全日制普通本科在校生（不含定向生、专项生、中外合作办学及专升本学生）。</span>
+二、申请条件：1.已修课程平均学分绩点不低于2.5；2.无违纪处分记录；3.符合拟转入专业的身体条件与学科要求。
+三、时间安排：1.学生提交申请：<span class="hl" data-k="dead">11月10日至11月18日</span>；2.转出学院审核：11月19日至11月22日；3.转入学院考核（笔试/面试）：11月25日至11月28日；4.结果公示：12月1日至12月3日。
+四、办理方式：登录<span class="hl" data-k="entry">教务管理系统"转专业申请"模块</span>在线填报，并提交纸质申请表至拟转入学院教学办公室。
+五、其他：每位学生限申请一个专业，逾期不再受理。
+特此通知。教务处 2026年11月1日</div>
+    </div>
+
+    <div class="card">
+      <h2>AI 抽取的结构化要素</h2>
+
+      <div class="step">
+        <div class="lab">① 事件类型 EVENT</div>
+        <div class="val e" data-k="event">—</div>
+      </div>
+      <div class="step">
+        <div class="lab">② 适用人群 AUDIENCE</div>
+        <div class="val e" data-k="aud">—</div>
+      </div>
+      <div class="step">
+        <div class="lab">③ 截止时间 DEADLINE</div>
+        <div class="val e" data-k="dead">—</div>
+      </div>
+      <div class="step">
+        <div class="lab">④ 办理入口 ENTRY</div>
+        <div class="val e" data-k="entry">—</div>
+      </div>
+      <div class="step">
+        <div class="lab">⑤ 关键提醒 KEY POINTS</div>
+        <div class="val e" data-k="points">—</div>
+      </div>
+
+      <div class="conf" id="conf" style="display:none">
+        综合置信度：<b>96%</b> · 语义完整、时间明确，可直接推送
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>这一层为什么重要：</b>普通"爬虫+提醒"只能把通知原文整条推给你，重点还得你自己找。<br>
+    知时的理解层把非结构化文本变成结构化字段——<b>判断发生在 AI 这边，不是发生在用户这边</b>。<br>
+    这就是它区别于"信息聚合工具"、真正算得上"智能体"的地方。
+  </div>
+</div>
+
+<script>
+const EX = {
+  event:"通知 → 转专业",
+  aud:"2025级全日制普通本科在校生（无处分记录、绩点≥2.5）",
+  dead:"提交申请截止 2026-11-18（窗口 11/10–11/18）",
+  entry:"教务管理系统 → 转专业申请模块（并交纸质表至转入学院教学办）",
+  points:"① 申请窗口仅9天　② 限报一个专业，逾期不再受理　③ 转入考核 11/25–11/28"
+};
+
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+let running = false;
+
+function clearHl(){ document.querySelectorAll(".hl").forEach(h=>h.classList.remove("on")); }
+function clearVal(){ document.querySelectorAll(".val.e").forEach(v=>{v.textContent="—";v.classList.remove("on");}); }
+
+async function run(){
+  if(running) return; running = true; $("run").disabled = true;
+  clearHl(); clearVal(); $("conf").style.display="none";
+
+  const seq = ["time","aud","dead","entry"];
+  const map = {time:"event", aud:"aud", dead:"dead", entry:"entry"};
+
+  for(const k of seq){
+    document.querySelector(`.hl[data-k="${k}"]`).classList.add("on");
+    await sleep(600);
+    const v = document.querySelector(`.val.e[data-k="${map[k]}"]`);
+    v.textContent = EX[map[k]];
+    v.classList.add("on");
+    await sleep(400);
+  }
+  // points
+  const pv = document.querySelector('.val.e[data-k="points"]');
+  pv.innerHTML = EX.points.replace(/②/g,"<br>②").replace(/③/g,"<br>③");
+  pv.classList.add("on");
+  $("conf").style.display = "block";
+
+  $("run").disabled = false; running = false;
+}
+
+$("run").addEventListener("click", run);
+$("reset").addEventListener("click", ()=>{ if(running) return; clearHl(); clearVal(); $("conf").style.display="none"; });
+</script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>知时 · 安农校园信息雷达 | 项目总览</title>
+<style>
+  :root{--bg:#0f1115;--panel:#171a21;--panel2:#1e222b;--line:#2a2f3a;
+    --text:#e8eaed;--sub:#9aa4b2;--accent:#4dd6a8;--accent2:#5b9cf8;
+    --warn:#f5a524;--danger:#f2565b;--radius:16px;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(1200px 700px at 15% -12%,#1a2432 0%,var(--bg) 58%);
+    color:var(--text);font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.7;min-height:100vh;padding:46px 20px 70px}
+  .wrap{max-width:1080px;margin:0 auto}
+
+  /* hero */
+  .hero{text-align:center;margin-bottom:40px}
+  .logo{width:76px;height:76px;border-radius:22px;margin:0 auto 18px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;
+    color:#08120e;box-shadow:0 10px 34px rgba(77,214,168,.32)}
+  h1{font-size:30px;letter-spacing:.5px}
+  .tagline{font-size:14.5px;color:var(--sub);margin-top:8px}
+  .claim{margin-top:20px;font-size:15px;color:#cdd6e0;max-width:680px;
+    margin-left:auto;margin-right:auto;text-align:left;
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 22px}
+  .claim b{color:var(--accent)}
+  .claim .hl{color:var(--warn)}
+
+  /* 三个亮点 */
+  .hl3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+  .hli{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:18px;position:relative;overflow:hidden}
+  .hli::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+  .hli .hn{font-size:11px;color:var(--sub);letter-spacing:1.5px}
+  .hli .ht{font-size:15px;font-weight:600;margin:5px 0 7px;color:var(--accent)}
+  .hli p{font-size:12.5px;color:var(--sub);line-height:1.7}
+
+  /* 分区 */
+  .sec{margin-top:40px;font-size:12.5px;color:var(--sub);letter-spacing:2.5px;
+    border-bottom:1px solid var(--line);padding-bottom:9px;display:flex;
+    justify-content:space-between;align-items:flex-end}
+  .sec small{font-size:11px;color:#5f6a78;letter-spacing:0}
+
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:20px}
+  .cards.three{grid-template-columns:repeat(3,1fr)}
+  a.card{display:block;text-decoration:none;color:inherit;background:var(--panel);
+    border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;
+    transition:.25s;position:relative}
+  a.card:hover{border-color:var(--accent);transform:translateY(-3px);
+    box-shadow:0 14px 34px rgba(0,0,0,.4)}
+  a.card .n{font-size:11px;color:var(--sub);letter-spacing:1.2px}
+  a.card h3{font-size:16.5px;margin:7px 0 8px}
+  a.card p{font-size:13px;color:var(--sub);padding-right:60px}
+  a.card .go{position:absolute;right:20px;bottom:18px;color:var(--accent);
+    font-size:13px;font-weight:600}
+  a.card.key{border-color:rgba(77,214,168,.35);
+    background:linear-gradient(180deg,rgba(77,214,168,.05),var(--panel))}
+  a.card.key h3{color:var(--accent)}
+
+  /* 评分对位表 */
+  .score{margin-top:20px;background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);padding:6px 4px;overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px}
+  th{font-size:11.5px;color:var(--sub);letter-spacing:.5px;text-align:left;
+    padding:12px 16px;border-bottom:1px solid var(--line);font-weight:500}
+  td{padding:13px 16px;border-bottom:1px solid rgba(42,47,58,.55);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td .w{color:var(--accent);font-weight:700}
+  td .m{color:#c8d0db}
+
+  /* 演示路线 */
+  .route{margin-top:20px;background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);padding:6px 4px;overflow-x:auto}
+  .route table{min-width:660px}
+  .route .tm{color:var(--accent);font-weight:600;white-space:nowrap}
+  .route .act{color:var(--text)}
+  .route .sp{color:var(--sub);font-size:12.5px}
+  .route .sp b{color:var(--warn)}
+
+  /* 合规 */
+  .comp{margin-top:36px;background:var(--panel2);border:1px solid var(--line);
+    border-left:3px solid var(--accent2);border-radius:14px;padding:20px 22px;font-size:13px}
+  .comp h3{font-size:14px;color:var(--accent2);margin-bottom:10px;letter-spacing:.5px}
+  .comp p{color:#c8d0db;margin-bottom:8px}
+  .comp p:last-child{margin-bottom:0}
+  .comp b{color:var(--accent)}
+  .comp .no{color:var(--danger)}
+
+  .foot{margin-top:36px;text-align:center;font-size:11.5px;color:#5f6a78;line-height:2}
+  .foot b{color:var(--accent)}
+  @media(max-width:860px){
+    .cards,.cards.three,.hl3{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="logo">知</div>
+    <h1>知时 · 安农校园信息雷达</h1>
+    <div class="tagline">校园公开信息的智能聚合与个性化提醒智能体</div>
+
+    <div class="claim">
+      <b>学生错失机会，从来不是因为"查不到"，而是因为根本不知道有这回事。</b><br><br>
+      知时把分散在教务处、学院、学工、图书馆的公开通知，聚合成一张张
+      <b>"谁能报 · 剩几天 · 怎么办"</b> 的提醒卡片，主动送到学生面前——
+      做一个<span class="hl">会主动找你的校园信息雷达</span>。
+    </div>
+
+    <div class="hl3">
+      <div class="hli">
+        <div class="hn">亮点 01</div>
+        <div class="ht">理解后重构</div>
+        <p>800 字通知压成 3 句人话。不是搬运原文，是读懂再重写。</p>
+      </div>
+      <div class="hli">
+        <div class="hn">亮点 02</div>
+        <div class="ht">全链路溯源</div>
+        <p>每个结论都挂原文出处，点一下就能核对。可信的智能。</p>
+      </div>
+      <div class="hli">
+        <div class="hn">亮点 03</div>
+        <div class="ht">可解释的主动推送</div>
+        <p>只推与你身份、关注相符的通知，排序由可解释分数决定、可追溯；详情页可逐条核对「是否与我有关」；只有三天内截止才允许打扰。</p>
+      </div>
+      <div class="hli">
+        <div class="hn">亮点 04</div>
+        <div class="ht">问知时 · 自问自答</div>
+        <p>13 个高频疑问一问一答，每个答案都由真实字段算出、附「依据」一行，算不出就如实说算不出。</p>
+      </div>
+      <div class="hli">
+        <div class="hn">亮点 05</div>
+        <div class="ht">办事日历</div>
+        <p>把有截止的通知落到月历格子上，一眼看清哪天忙、哪天能空。与时间轴同一份数据，不是两套事实。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 怎么跑起来 -->
+  <div class="sec">怎么真的跑起来 <small>三种形态，都已可运行</small></div>
+  <div class="cards three">
+    <div class="card key" style="cursor:default">
+      <div class="n">形态 A · 可用应用（推荐先看）</div>
+      <h3>双击「知时.html」</h3>
+      <p>项目根目录里的 <b style="color:#4dd6a8">知时.html</b>：一个<b style="color:#4dd6a8">单文件、零依赖、双击即用</b>的完整应用。
+        手机壳界面里四页可操作：<b>雷达</b>（主动推送流）· <b>时间轴</b> · <b>简报</b>（自动整合）· <b>我的</b>（自主完善档案）。
+        每条通知都贴着出处：「可核对原文 / 真实采集 / 演示样例」。内置<b style="color:#4dd6a8">主动推送引擎</b>
+        （可解释评分排序 + 只推相符通知 + 详情页可逐条核对 + 只有三天内才打扰）、<b style="color:#4dd6a8">数据自查</b>
+        （三条铁律，不可靠的剔除、可疑的如实标注）、<b style="color:#4dd6a8">问知时</b>（13 问自问自答，答案带依据）与
+        <b style="color:#4dd6a8">办事日历</b>（月历看清哪天忙）。</p>
+      <a href="../知时.html" style="display:inline-block;margin-top:10px;color:#4dd6a8;
+        font-weight:600;font-size:13px;text-decoration:none">直接打开可用应用 →</a>
+    </div>
+    <div class="card" style="cursor:default">
+      <div class="n">形态 B · 微信小程序</div>
+      <h3>开发者工具打开 miniprogram 目录</h3>
+      <p>已配 <b style="color:#4dd6a8">touristappid 游客模式</b>，<b style="color:#4dd6a8">不需要自己注册 AppID</b> 就能编译预览。
+        十页可跑：雷达 / 时间轴 / 简报 / 搜索 / 详情溯源 / 订阅 / 推送设置 / 数据自查 / 问知时 / 办事日历。配色已按<b style="color:#4dd6a8">安农 VI 标准色</b>改造，支持浅色 / 深色双主题。</p>
+      <a href="../小程序预览.html" style="display:inline-block;margin-top:10px;color:#4dd6a8;
+        font-weight:600;font-size:13px;text-decoration:none">看十三屏界面预览（数字安农风）→</a>
+      <a href="mp-preview.html" style="display:inline-block;margin:10px 0 0 16px;color:#4dd6a8;
+        font-weight:600;font-size:13px;text-decoration:none">小程序真实数据预览页 →</a>
+    </div>
+    <div class="card" style="cursor:default">
+      <div class="n">形态 C · 后台主动推送</div>
+      <h3>双击「tools/注册后台推送.bat」</h3>
+      <p>应用内推送只在你打开时工作。注册后台任务后，<b style="color:#4dd6a8">关掉页面也能收到提醒</b>：
+        每天 08:00 / 20:00 自动检查安农公开通知，有三天内截止的就弹<b style="color:#4dd6a8">系统原生通知</b>，
+        并落一份 <b style="color:#4dd6a8">push_out/今日推送.txt</b>，写明「推了什么、为什么推、来源是哪」。
+        零依赖（用 Windows 自带的 PowerShell 弹通知），弹出失败则降级写文件，绝不静默失败。</p>
+      <a href="pipeline.html" style="display:inline-block;margin-top:10px;color:#4dd6a8;
+        font-weight:600;font-size:13px;text-decoration:none">看内部机理 →</a>
+    </div>
+  </div>
+
+  <!-- 核心演示 -->
+  <div class="sec">核心演示 <small>建议按顺序看</small></div>
+  <div class="cards three">
+    <a class="card key" href="index.html">
+      <div class="n">DEMO 01</div>
+      <h3>主链路演示</h3>
+      <p>采集 → 理解 → 匹配 → 提醒。一键跑通整条链，看一条通知如何变成倒计时卡片。</p>
+      <div class="go">进入 →</div>
+    </a>
+    <a class="card key" href="digest.html">
+      <div class="n">DEMO 02 · 最核心</div>
+      <h3>浓缩 + 溯源</h3>
+      <p>左原文右浓缩，双向联动高亮。这是与"官方平台已有功能"最硬的区别。</p>
+      <div class="go">进入 →</div>
+    </a>
+    <a class="card" href="understand.html">
+      <div class="n">DEMO 03</div>
+      <h3>理解层拆解</h3>
+      <p>非结构化文本 → 结构化五要素，逐条同步演示 AI 如何"读懂"一条通知。</p>
+      <div class="go">进入 →</div>
+    </a>
+  </div>
+
+  <!-- 落地面 -->
+  <div class="sec">落地面 <small>回答"凭什么能落地"</small></div>
+  <div class="cards three">
+    <a class="card key" href="pipeline.html">
+      <div class="n">DEMO 04 · 评委必问</div>
+      <h3>数据从哪来 · 跑在哪</h3>
+      <p>正面回答两个必问题：数据源（公网公开页聚合，不爬登录系统）、平台（小程序 + 网页版 + 学校云资源）。</p>
+      <div class="go">进入 →</div>
+    </a>
+    <a class="card" href="sources.html">
+      <div class="n">DEMO 05</div>
+      <h3>数据源接入状态 · 边界感</h3>
+      <p>七条链路的真实状态：哪条已跑通、哪条需授权、哪条是永不碰的红线。</p>
+      <div class="go">进入 →</div>
+    </a>
+    <a class="card" href="mobile.html">
+      <div class="n">DEMO 06</div>
+      <h3>小程序形态预览</h3>
+      <p>提醒列表 / 详情溯源 / 订阅设置三屏。回答"学生到底在哪看到它"。</p>
+      <div class="go">进入 →</div>
+    </a>
+    <a class="card key" href="rawdata.html">
+      <div class="n">DEMO 07 · 真实数据</div>
+      <h3>原始数据 · 逐条摊开</h3>
+      <p>采集器从官网公开页真实抓回的 33 条通知原文，逐条列出来源链接与抓取时间。不加工、不粉饰。</p>
+      <div class="go">进入 →</div>
+    </a>
+    <a class="card" href="inspect.html">
+      <div class="n">DEMO 08</div>
+      <h3>真实数据体检</h3>
+      <p>33 条真实抓取数据的质量体检：溯源锚点覆盖率、标签归类、原文可定位率。</p>
+      <div class="go">进入 →</div>
+    </a>
+  </div>
+
+  <!-- 评分对位 -->
+  <div class="sec">评分项对位 <small>创新30% · 实用25% · 技术25% · 体验20%</small></div>
+  <div class="score">
+    <table>
+      <thead><tr><th>评分项</th><th>权重</th><th>本作品对应</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>创新性</td><td class="w">30%</td>
+          <td class="m">① 从"问答检索"到"<b style="color:#4dd6a8">主动预警</b>"的范式跃迁<br>② <b style="color:#4dd6a8">理解后重构 + 全链路溯源</b><br>③ <b style="color:#4dd6a8">主动划清数据边界</b>，不做"打通一切"的虚话</td>
+        </tr>
+        <tr>
+          <td>实用性</td><td class="w">25%</td>
+          <td class="m">真实痛点 + 公开源即可落地 + 每个学生都用得上；小程序形态可直接触达</td>
+        </tr>
+        <tr>
+          <td>技术实现</td><td class="w">25%</td>
+          <td class="m">完整工作流编排 + 结构化字段抽取 + <b style="color:#4dd6a8">原文定位算法</b> + 定时/推送链路</td>
+        </tr>
+        <tr>
+          <td>用户体验</td><td class="w">20%</td>
+          <td class="m">三问式卡片 / 倒计时预警 / 双向联动核对 / 订阅全可控 / 置信度提示</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 演示路线 -->
+  <div class="sec">5 分钟答辩路线 <small>照着走一遍就是完整演示</small></div>
+  <div class="route">
+    <table>
+      <thead><tr><th>时间</th><th>动作</th><th>话术要点</th></tr></thead>
+      <tbody>
+        <tr><td class="tm">0:00–0:30</td><td class="act">开场故事</td><td class="sp">用本人真实经历：大一错过一条通知，发现问题不是懒，是通知散在六个地方，根本不知道有这回事</td></tr>
+        <tr><td class="tm">0:30–1:45</td><td class="act">点「运行智能体」</td><td class="sp">四阶段依次点亮 → 讲链路：<b>采集公开页 → AI 理解 → 画像匹配 → 主动推送</b></td></tr>
+        <tr><td class="tm">1:45–2:00</td><td class="act">点开一张卡片</td><td class="sp">「<b>判断发生在 AI 这边，不是用户这边</b>」——本作品最重要的一句话</td></tr>
+        <tr><td class="tm">2:00–3:00</td><td class="act">浓缩 + 溯源页</td><td class="sp">点要点 → 展开出处 → 跳原文 → 高亮定位 → 全部高亮。「不是读给你听，是读完告诉你重点，而且你能查证」</td></tr>
+        <tr><td class="tm">3:00–3:30</td><td class="act">改订阅再重跑</td><td class="sp">勾掉一项 → 回首页重跑 → 卡片数变少。「<b>匹配是活的，用户完全可控</b>」</td></tr>
+        <tr><td class="tm">3:30–4:00</td><td class="act">切到边界面板</td><td class="sp">指着教务系统那行：「这条我们明确不做。技术能绕，但合规不能碰」</td></tr>
+        <tr><td class="tm">4:00–5:00</td><td class="act">讲差异化 + 收尾</td><td class="sp">三个亮点；收尾用大赛通知原文——获奖作品将上线数智安农，<b>「我们不是要绕过学校平台，我们想成为它的一部分」</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 合规 -->
+  <div class="comp">
+    <h3>合规边界（设计前提，不是补丁）</h3>
+    <p><b>只用：</b>教务处、学院、学生工作处、图书馆等<b>公网公开通知页面</b>；
+       用户在小程序内<b>主动填写</b>的年级、学院、关注偏好。</p>
+    <p><span class="no">不碰：</span>教务系统后台、任何需登录鉴权的内部系统；
+       课表、成绩、学籍、一卡通等私域与敏感数据。</p>
+    <p><b>一句话：</b>我们聚合的都是别人看得见的东西，我们只是把它整理好、送到该看的人手上。</p>
+  </div>
+
+  <div class="foot">
+    <b>「农芯智」AI 智能体创新大赛</b> 参赛作品 · 知时 · 安农校园信息雷达<br>
+    通知数据中「农芯智」大赛一条为官网真实公开通知（来源 xxb.ahau.edu.cn），其余为演示示例，已标注来源单位。
+  </div>
+
+</div>
+</body>
+</html>

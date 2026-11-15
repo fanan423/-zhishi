@@ -1,0 +1,374 @@
+/* ===== 知时 · 数字安农风格 全局样式（双主题） ===== */
+/*
+ * 配色取自安徽农业大学官方视觉识别系统（VI）：
+ *   主色  安农绿   #00653E（R0 G101 B62）—— 农业科技 / 生态智慧
+ *   强调  麦穗金   #F3AE00（R243 G174 B0）—— 丰收 / 荣誉 / 提醒
+ *   点缀  朝阳橙红 #E77844（R231 G120 B68）—— 红色基因 / 紧急
+ *
+ * 两套主题通过 CSS 变量切换：
+ *   theme-light（默认）：白卡片 + 浅绿灰底 —— 贴近官网 / 数字安农服务气质
+ *   theme-dark         ：深墨绿底 + 金绿描边 —— 夜间 / 演示更沉稳
+ *
+ * 主题类挂在页面根节点（.screen），由 utils/theme.js 注入。
+ */
+
+/* ---------- 浅色主题（默认） ---------- */
+.screen,
+.theme-light {
+  --bg:          #F4F7F4;
+  --surface:     #FFFFFF;
+  --surface-2:   #F4F7F4;
+  --panel:       #FFFFFF;
+  --border:      #DCE5DC;
+  --border-soft: #EDF2ED;
+  --brand:       #00653E;
+  --brand-2:     #0A7A4C;
+  --brand-soft:  rgba(0, 101, 62, 0.10);
+  --gold:        #F3AE00;
+  --gold-ink:    #8A6000;
+  --gold-soft:   rgba(243, 174, 0, 0.16);
+  --alert:       #E77844;
+  --alert-soft:  rgba(231, 120, 68, 0.12);
+  --alert-ink:   #B04A1C;
+  --track:       #E6EDE6;
+  --txt:         #1B2A22;
+  --txt-2:       #5C6B62;
+  --txt-3:       #93A096;
+  --on-brand:    #FFFFFF;
+  --shadow:      0 2rpx 10rpx rgba(27, 42, 34, 0.04);
+  --card-shadow: 0 2rpx 10rpx rgba(27, 42, 34, 0.05);
+  --navbar:      #00653E;
+  --navbar-txt:  #FFFFFF;
+}
+
+/* ---------- 深色主题 ---------- */
+.theme-dark {
+  --bg:          #0C1A14;
+  --surface:     #122A20;
+  --surface-2:   #0E211A;
+  --panel:       #122A20;
+  --border:      #23473A;
+  --border-soft: #1B3A2E;
+  --brand:       #2FBF82;
+  --brand-2:     #23A06B;
+  --brand-soft:  rgba(47, 191, 130, 0.14);
+  --gold:        #F3B51E;
+  --gold-ink:    #F3C95A;
+  --gold-soft:   rgba(243, 181, 30, 0.18);
+  --alert:       #F0854F;
+  --alert-soft:  rgba(240, 133, 79, 0.16);
+  --alert-ink:   #F6A87C;
+  --track:       #1E4033;
+  --txt:         #E8F1EC;
+  --txt-2:       #A7BCB1;
+  --txt-3:       #7E968A;
+  --on-brand:    #042015;
+  --shadow:      0 2rpx 12rpx rgba(0, 0, 0, 0.28);
+  --card-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.32);
+  --navbar:      #0E211A;
+  --navbar-txt:  #E8F1EC;
+}
+
+page {
+  background: #F4F7F4;
+  color: #1B2A22;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.6;
+  font-size: 28rpx;
+}
+
+/* 页面根容器：承载主题变量 + 背景 */
+.screen {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--txt);
+}
+
+.wrap {
+  padding: 24rpx 28rpx 48rpx;
+}
+
+/* ---- 通用分隔线 ---- */
+.hr {
+  height: 1rpx;
+  background: var(--border);
+  margin: 20rpx 0;
+}
+
+/* ---- 通用按钮 ---- */
+.ab {
+  font-size: 27rpx;
+  font-weight: 600;
+  border-radius: 16rpx;
+  padding: 20rpx 0;
+  background: var(--surface);
+  color: var(--txt);
+  border: 1rpx solid var(--border);
+  line-height: 1.2;
+}
+.ab::after { border: none; }
+.ab.primary {
+  background: linear-gradient(135deg, var(--brand-2), var(--brand));
+  color: var(--on-brand);
+  border: none;
+}
+.ab.dis {
+  background: var(--border-soft);
+  color: var(--txt-3);
+  border: 1rpx solid var(--border);
+}
+
+/* ---- 通用标签 chip ---- */
+.chip {
+  font-size: 25rpx;
+  padding: 12rpx 28rpx;
+  border-radius: 30rpx;
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  color: var(--txt-2);
+}
+.chip.on {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+  color: var(--brand);
+  font-weight: 600;
+}
+
+/* ---- 顶部品牌 ---- */
+.mhead {
+  display: flex;
+  align-items: center;
+  padding-bottom: 22rpx;
+  border-bottom: 1rpx solid var(--border);
+  margin-bottom: 24rpx;
+}
+/* 校徽意象 logo：双圆形徽章 + AAU 展开书页 + 山川田野 + 建校 1928（依章程第 75 条） */
+.mhead .lg {
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--brand-2), var(--brand));
+  box-shadow: 0 4rpx 12rpx rgba(0, 101, 62, 0.22);
+  margin-right: 18rpx;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+/* 双圆形内环：外圈细白环，勾出庄重的"双圆形"轮廓 */
+.mhead .lg::before {
+  content: '';
+  position: absolute;
+  top: 4rpx; left: 4rpx; right: 4rpx; bottom: 4rpx;
+  border-radius: 50%;
+  border: 2rpx solid rgba(255, 255, 255, 0.5);
+  z-index: 2;
+}
+/* 徽章内的"田野"横纹 + 顶部"朝阳"金点，勾出校徽意象 */
+.mhead .lg::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 26rpx;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.22) 0 4rpx, transparent 4rpx 9rpx);
+  border-top: 2rpx solid rgba(255, 255, 255, 0.30);
+}
+.mhead .lg .sun {
+  position: absolute;
+  top: 10rpx; right: 12rpx;
+  width: 12rpx; height: 12rpx;
+  border-radius: 50%;
+  background: var(--gold);
+}
+.mhead .lg .aa {
+  position: relative;
+  z-index: 1;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -1rpx;
+  transform: translateY(-8rpx);
+}
+/* AAU 之下：展开的书籍书脊（用知识迎接未来） */
+.mhead .lg .book {
+  position: absolute;
+  left: 50%; top: 42rpx;
+  transform: translateX(-50%);
+  width: 30rpx; height: 4rpx;
+  border-radius: 0 0 4rpx 4rpx;
+  background: rgba(255, 255, 255, 0.5);
+  z-index: 2;
+}
+/* 建校年号 1928 */
+.mhead .lg .y {
+  position: absolute;
+  left: 0; right: 0; top: 47rpx;
+  z-index: 3;
+  text-align: center;
+  font-size: 13rpx;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.82);
+  letter-spacing: 1rpx;
+}
+.mhead .bx { flex: 1; min-width: 0; }
+.mhead .t1 { font-size: 32rpx; font-weight: 600; letter-spacing: 1rpx; color: var(--txt); }
+.mhead .t2 { font-size: 22rpx; color: var(--txt-2); margin-top: 2rpx; }
+.mhead .bell {
+  font-size: 22rpx;
+  color: var(--on-brand);
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--brand-2), var(--brand));
+  border-radius: 20rpx;
+  padding: 6rpx 18rpx;
+  flex-shrink: 0;
+}
+
+/* ---- 统计条 ---- */
+.stat {
+  display: flex;
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 20rpx;
+  padding: 24rpx 0;
+  margin-bottom: 26rpx;
+  box-shadow: var(--shadow);
+}
+.stat .it { flex: 1; text-align: center; }
+.stat .it + .it { border-left: 1rpx solid var(--border-soft); }
+.stat .n { font-size: 40rpx; font-weight: 700; color: var(--brand); }
+.stat .n.red { color: var(--alert); }
+.stat .l { font-size: 21rpx; color: var(--txt-3); margin-top: 2rpx; }
+
+/* ---- 分区标题 ---- */
+.sec {
+  font-size: 24rpx;
+  color: var(--brand);
+  font-weight: 600;
+  letter-spacing: 1rpx;
+  margin: 26rpx 0 16rpx;
+  display: flex;
+  align-items: center;
+}
+.sec::before {
+  content: '';
+  width: 8rpx;
+  height: 24rpx;
+  border-radius: 4rpx;
+  background: linear-gradient(180deg, var(--gold), var(--brand));
+  margin-right: 12rpx;
+}
+.sec.red { color: var(--alert); }
+.sec.red::before { background: var(--alert); }
+.sec .secsub { font-size: 20rpx; color: var(--txt-3); font-weight: 400; margin-left: 6rpx; }
+
+/* ---- 提醒卡片 ---- */
+.mc {
+  position: relative;
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 20rpx;
+  padding: 24rpx 26rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+.mc::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 6rpx;
+  background: var(--brand);
+}
+.mc.hi::before { background: var(--alert); }
+.mc.md::before { background: var(--gold); }
+
+.mc .r1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14rpx;
+}
+.mc .tt {
+  flex: 1;
+  font-size: 29rpx;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--txt);
+}
+.mc .dd {
+  font-size: 23rpx;
+  font-weight: 700;
+  padding: 4rpx 14rpx;
+  border-radius: 10rpx;
+  white-space: nowrap;
+  color: #FFFFFF;
+  background: var(--alert);
+  flex-shrink: 0;
+}
+.mc.md .dd { color: var(--gold-ink); background: var(--gold-soft); }
+.mc.lo .dd { color: var(--brand); background: var(--brand-soft); }
+.mc.hi .dd { color: #FFFFFF; background: var(--alert); }
+
+.mc .sr {
+  font-size: 22rpx;
+  color: var(--txt-3);
+  margin-top: 8rpx;
+}
+.mc .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 14rpx;
+}
+.mc .tg {
+  font-size: 21rpx;
+  padding: 3rpx 13rpx;
+  border-radius: 8rpx;
+  color: var(--brand);
+  background: var(--brand-soft);
+}
+.mc .tg.g {
+  color: var(--brand);
+  background: var(--brand-soft);
+  font-weight: 500;
+}
+.mc .tg.o {
+  color: var(--gold-ink);
+  background: var(--gold-soft);
+}
+.mc .go {
+  margin-top: 16rpx;
+  font-size: 22rpx;
+  color: var(--brand);
+  font-weight: 600;
+}
+.mc .badge {
+  font-size: 20rpx;
+  padding: 2rpx 12rpx;
+  border-radius: 8rpx;
+  color: var(--brand);
+  background: var(--brand-soft);
+  margin-left: 10rpx;
+}
+
+/* ---- 空态 ---- */
+.empty {
+  text-align: center;
+  color: var(--txt-3);
+  font-size: 26rpx;
+  padding: 80rpx 20rpx;
+}
+
+/* ---- 底部合规 ---- */
+.foot {
+  margin-top: 34rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--border);
+  font-size: 21rpx;
+  color: var(--txt-3);
+  line-height: 1.8;
+}
+.foot .hl { color: var(--brand); }

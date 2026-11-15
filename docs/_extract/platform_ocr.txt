@@ -1,0 +1,109 @@
+===== page-01.png =====
+扣子分享链接步骤
+塔罗占卜智能体
+设置
+协作
+新建话
+日志
+Trace
+总览
+分析
+渠道
+用量管理
+D默认对话
+开始部署你的项目吧
+已开启的案道
+API服务会在部军后默认上线。如需上线或下线策道，请前往【案道管理】页签，开
+启或关闭相应案道即可，无需重新部军，
+ API
+WebSDK
+部器版本
+0597d441e9 chore(sandbox): bump coze-coding-dev-sdk -.. 26 分Wm
+部署域名
+jiwbngn6dv 
+.coze.site
+服务器资源
+CPU:1
+RAM: 2 G8
+实数2
+并发：100
+更多配置
+部爱详细配置/端口等
+开始部究
+欢逆使用扣子编程，
+，可以在此赖入你的要求。
+取技能
+Auto v
+运行记录
+编出
+0.6 Core|1.3 3
+API部署成功后，点击渠道，选择Web SDK，再次部署
+5设置
+总览
+分析
+日志
+渠道
+用量管理
+<返同总费
+API
+Web SDK
+部署成
+郁署成功
+分享WebSDK链接
+查香预览7
+最入方式
+适看佳用说期
+JavaScript
+React
+Iframe
+输出
+运行总录
+0.6 Core|1.2 GB
+OqTA)
+coding)
+===== page-02.png =====
+WebSDK部署成功后，选择分享链接，设置分享权限（请设为公开可见），有效期至少为一个
+协作
+日预览
+设置
+总览日志
+分析
+渠道
+Trace
+用量管理
+分享产物
+返回总览
+项目已部署
+部署后，可以获取生产环境访问链接
+部署成功
+方式1分享调用方式
+打包
+构建
+Curl
+curl --location --request PosT
+"https://jvwbngn6dv.coze.site/str
+eam_run"1
+-header"Authorization:
+BeaIer<YOUR_TOKEN>"
+获取最新版调用方式，若希望获取历史版本，请前往懿置
+WebSDK部署成功
+管理
+方式2分享WebSDK链接
+分享WebSDK链接
+吕取消公开可见
+取消"公开可见"后，WebSDK不可被他人访问
+嵌入方式
+WebSDK链接
+JavaScript
+React 组件
+ccode.coze.cn/web-sdk/770236115944947716
+点击直接复制链接，
+终端
+输出
+运行记录
+通过此链接可石到WebSDK界
+(vibe-coding)
+root@localhost:/workspace/projectst
+公开可见一WebSDK链接有效期
+24小时
+2026-11-0114:20后链接会失效，访问用户会无权查

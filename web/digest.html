@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>浓缩 + 溯源 · 真正智能的阅读 | 知时</title>
+<style>
+  :root{--bg:#0f1115;--panel:#171a21;--panel2:#1e222b;--line:#2a2f3a;
+    --text:#e8eaed;--sub:#9aa4b2;--accent:#4dd6a8;--accent2:#5b9cf8;
+    --warn:#f5a524;--radius:14px;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(1200px 600px at 20% -10%,#1a2432 0%,var(--bg) 55%);
+    color:var(--text);font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;min-height:100vh;padding:26px 20px 60px}
+  .wrap{max-width:1140px;margin:0 auto}
+  h1{font-size:20px;letter-spacing:.5px}
+  .sub{font-size:13px;color:var(--sub);margin-top:5px}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:18px 0 6px}
+  select,button{font-family:inherit;font-size:13px;border-radius:9px;padding:9px 14px;
+    border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer}
+  button.primary{background:linear-gradient(135deg,var(--accent),#38b98f);color:#07120d;border:none;font-weight:600}
+  button:hover{border-color:var(--accent)}
+  .meta{font-size:12px;color:var(--sub);margin-left:auto}
+  .meta b{color:var(--accent)}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .card h2{font-size:13.5px;color:var(--accent);letter-spacing:.5px;margin-bottom:12px;
+    display:flex;justify-content:space-between;align-items:center}
+  .card h2 small{font-size:11px;color:var(--sub);font-weight:400}
+
+  /* 原文 */
+  .raw{font-size:13.5px;line-height:2;color:#c8d0db;white-space:pre-wrap;
+    max-height:560px;overflow-y:auto;padding-right:6px}
+  .q{background:rgba(245,165,36,.14);border-bottom:1px solid rgba(245,165,36,.35);
+    border-radius:3px;padding:1px 2px;transition:.3s;cursor:pointer}
+  .q:hover{background:rgba(245,165,36,.28)}
+  .q.on{background:rgba(77,214,168,.25);border-bottom-color:var(--accent);color:#bdf5e1}
+
+  /* 浓缩 */
+  .digest-line{font-size:15px;font-weight:600;line-height:1.7;padding:12px 14px;
+    background:linear-gradient(90deg,rgba(77,214,168,.10),transparent);
+    border-left:3px solid var(--accent);border-radius:8px;margin-bottom:14px}
+  .digest-line .lab{font-size:11px;color:var(--sub);display:block;letter-spacing:.5px;font-weight:400;margin-bottom:3px}
+
+  .pt{border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-bottom:10px;
+    background:var(--panel2);transition:.28s;cursor:pointer;position:relative}
+  .pt:hover{border-color:rgba(77,214,168,.5)}
+  .pt.on{border-color:var(--accent);background:linear-gradient(90deg,rgba(77,214,168,.09),var(--panel2))}
+  .pt .num{position:absolute;left:-1px;top:-1px;font-size:10px;color:var(--accent);
+    background:var(--panel2);border:1px solid var(--line);border-radius:9px 0 9px 0;padding:1px 7px}
+  .pt .main{font-size:13.5px;line-height:1.7;padding-left:18px}
+  .pt .src{font-size:11.5px;color:var(--sub);margin-top:8px;padding-left:18px;display:none}
+  .pt.on .src{display:block;animation:fade .3s}
+  .pt .src b{color:var(--warn)}
+  .pt .src .qq{color:#c8d0db;font-style:italic}
+
+  .hint{font-size:12px;color:var(--sub);margin-top:14px;line-height:1.8;
+    border-left:3px solid var(--accent2);padding-left:13px}
+  .hint b{color:var(--accent)}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;
+    flex-wrap:wrap;margin-bottom:14px}
+  .topbar a{font-size:12.5px;color:var(--accent);text-decoration:none;font-weight:600;
+    border:1px solid rgba(77,214,168,.35);border-radius:9px;padding:7px 16px}
+  .topbar a:hover{background:rgba(77,214,168,.08);border-color:var(--accent)}
+  .topbar span{font-size:12px;color:var(--sub);letter-spacing:1px}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @media(max-width:880px){.cols{grid-template-columns:1fr}.raw{max-height:300px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a href="overview.html">← 返回项目总览</a>
+    <span>DEMO 02 · 浓缩 + 溯源</span>
+  </div>
+  <h1>浓缩 + 溯源 · 真正智能的阅读</h1>
+  <div class="sub">不只"抓通知"，而是<b style="color:var(--accent)">读懂后重写</b>，且每一句都能点回原文核对</div>
+
+  <div class="toolbar">
+    <select id="picker"></select>
+    <button class="primary" id="toggle">一键高亮全部出处</button>
+    <span class="meta">点击右侧任一条浓缩 → 左侧原文<b>自动定位高亮</b></span>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <h2>📄 原文（采集自公开页面）<small id="srcLabel"></small></h2>
+      <div class="raw" id="raw"></div>
+    </div>
+    <div class="card">
+      <h2>✨ AI 浓缩版 <small>每句可溯源</small></h2>
+      <div id="digest"></div>
+    </div>
+  </div>
+
+  <div class="hint">
+    <b>这一页回答的正是"这就是数智安农翻版吗"的质疑：</b><br>
+    搬运信息谁都会——数智安农能列出通知原文，普通爬虫也能。但"知时"做的是<b>理解后重构</b>：
+    把 800 字通知压成 3 句人话，同时<b>每个结论都挂着原文出处</b>，点一下就能核对，杜绝 AI 胡说。<br>
+    这叫<b>可信的智能</b>——不是"我读给你听"，是"我读完告诉你重点，且你能查证"。
+  </div>
+</div>
+
+<script>
+const DATA = {
+ "t2026-1103-000":{
+   src:"数据管理处 · xxb.ahau.edu.cn/info/1041/8381.htm",
+   raw:"为深入贯彻《教育强国建设规划纲要（2024—2035年）》等文件精神，推进人工智能赋能学校教育教学，特举办2026年“农芯智”AI智能体创新大赛。一、大赛主题：数智安农，智创校园。二、参赛对象：在职教职工及在校学生均可报名参赛，可以个人或团队形式参加，每人只能参加一个团队。团队可跨学院（部门）、跨学科组队，每支队伍限1—3人，每个团队仅允许提交1个作品。三、大赛安排：（一）报名与作品提交合并进行，于2026年12月3日前将项目成果提交至赛事指定渠道（赛事QQ群：934927951）。（二）评选规则：创新性30%、实用性25%、技术实现25%、用户体验20%。四、大赛支持：（一）算力使用：在“数智安农”平台搜索“大模型公共服务（token鲨）”提交算力申请。（二）培训安排：预计11月中旬开展大模型及智能体开发相关讲座与培训。五、选题方向：（一）AI+教学科研；（二）AI+管理服务；（三）AI+生活创意；（四）AI+安农特色。六、奖项设置：学生组一等奖2名（3000元）、二等奖4名（1500元）、三等奖6名（1000元）、优秀奖若干（500元）。数据管理处、人事处、本科生院、研究生院、团委 2026年11月2日",
+   one:"学校办了个 AI 智能体比赛，12月3日前报名并交作品，赢了有奖金还能上学校平台。",
+   points:[
+     {text:"报名和交作品是一起做的，截止 12月3日，交到赛事QQ群 934927951。",quote:"报名与作品提交合并进行，于2026年12月3日前将项目成果提交至赛事指定渠道（赛事QQ群：934927951）"},
+     {text:"可以一个人报，也可以组队，一队最多3人；每人只能进一个队，每队只能交1个作品。",quote:"可以个人或团队形式参加，每人只能参加一个团队。团队可跨学院（部门）、跨学科组队，每支队伍限1—3人，每个团队仅允许提交1个作品"},
+     {text:"评分主要看四点：创新、实用、技术、体验，创新占大头（30%）。",quote:"评选规则：创新性30%、实用性25%、技术实现25%、用户体验20%"},
+     {text:"算力不用自己买，在学校平台申请就行（搜“token鲨”）。",quote:"在“数智安农”平台搜索“大模型公共服务（token鲨）”提交算力申请"},
+     {text:"11月中旬有官方培训，建议去。",quote:"预计11月中旬开展大模型及智能体开发相关讲座与培训"}
+   ]
+ },
+ "t2026-1103-001":{
+   src:"教务处 · jwc.ahau.edu.cn",
+   raw:"各学院、各位同学：根据《安徽农业大学本科生转专业管理办法》文件精神，现将2026-2027学年第一学期转专业工作有关事项通知如下：一、申请对象：2025级全日制普通本科在校生（不含定向生、专项生、中外合作办学及专升本学生）。二、申请条件：1.已修课程平均学分绩点不低于2.5；2.无违纪处分记录。三、时间安排：1.学生提交申请：11月10日至11月18日；2.转出学院审核：11月19日至11月22日；3.转入学院考核（笔试/面试）：11月25日至11月28日；4.结果公示：12月1日至12月3日。四、办理方式：登录教务管理系统“转专业申请”模块在线填报，并提交纸质申请表至拟转入学院教学办公室。五、其他：每位学生限申请一个专业，逾期不再受理。教务处 2026年11月1日",
+   one:"这学期转专业开始了，想转的同学 11月18日前必须提交申请，只给9天。",
+   points:[
+     {text:"2025级全日制本科生可申请（无处分、已修绩点≥2.5）。",quote:"申请对象：2025级全日制普通本科在校生。二、申请条件：1.已修课程平均学分绩点不低于2.5；2.无违纪处分记录"},
+     {text:"11月10日到18日提交申请，只有9天窗口，逾期不再受理。",quote:"学生提交申请：11月10日至11月18日。五、其他：每位学生限申请一个专业，逾期不再受理"},
+     {text:"只能报一个专业；转出审核、转入考核、结果公示依次在11月下旬到12月初。",quote:"转出学院审核：11月19日至11月22日；3.转入学院考核（笔试/面试）：11月25日至11月28日；4.结果公示：12月1日至12月3日"},
+     {text:"在教务系统在线填报，另交一张纸质表到拟转入学院教学办。",quote:"登录教务管理系统“转专业申请”模块在线填报，并提交纸质申请表至拟转入学院教学办公室"}
+   ]
+ },
+ "t2026-1103-002":{
+   src:"教务处 · jwc.ahau.edu.cn",
+   raw:"各学院：为进一步做好2026年“正大杯”第十四届全国大学生市场调查与分析大赛校内选拔工作，现将网考及校赛安排补充通知如下：一、网考时间：2026年11月16日（周日）09:00-11:00，形式为线上机考，请各参赛团队提前30分钟进入考场。二、校赛材料提交：11月24日前提交调研报告初稿电子版。三、答辩时间：暂定11月30日。四、参赛要求：本科组每队3-5人，需完成网考方可进入校赛。教务处、经济管理学院 2026年10月28日",
+   one:"正大杯网考11月16日线上机考，赶不上就进不了校赛。",
+   points:[
+     {text:"11月16日（周日）09:00-11:00 线上机考，提前30分钟进场。",quote:"网考时间：2026年11月16日（周日）09:00-11:00，形式为线上机考，请各参赛团队提前30分钟进入考场"},
+     {text:"11月24日前交调研报告初稿，11月30日答辩。",quote:"校赛材料提交：11月24日前提交调研报告初稿电子版。三、答辩时间：暂定11月30日"},
+     {text:"必须考完网考才能进校赛——这是硬门槛。",quote:"本科组每队3-5人，需完成网考方可进入校赛"}
+   ]
+ },
+ "t2026-1103-004":{
+   src:"学生工作处 · xsc.ahau.edu.cn",
+   raw:"各学院：2026年国家励志奖学金、国家助学金评审工作已进入公示阶段。一、公示时间：11月1日至11月7日。二、异议受理：公示期内如有异议，请以书面形式向学生工作处反映，逾期不再受理。三、材料补交：部分同学申请材料不完整（缺家庭经济困难认定表、缺成绩排名证明），请于11月6日前补齐至所在学院资助专员处。四、注意事项：逾期未补交材料视为自动放弃，不再补办。学生工作处 2026年10月30日",
+   one:"拿了励志奖学金/助学金的同学注意，材料没交齐的 11月6日前必须补上。",
+   points:[
+     {text:"申请材料缺件的（缺困难认定表或缺成绩排名），11月6日前交给学院资助专员。",quote:"部分同学申请材料不完整（缺家庭经济困难认定表、缺成绩排名证明），请于11月6日前补齐至所在学院资助专员处"},
+     {text:"逾期不补就视为自动放弃，没有补办机会。",quote:"四、注意事项：逾期未补交材料视为自动放弃，不再补办"},
+     {text:"公示期11月1日到7日，有异议要书面反映。",quote:"一、公示时间：11月1日至11月7日……请以书面形式向学生工作处反映，逾期不再受理"}
+   ]
+ },
+ "t2026-1103-005":{
+   src:"教务处 · jwc.ahau.edu.cn",
+   raw:"各学院：本学期期中考试定于11月9日至11月13日进行。一、考试科目：高等数学、大学英语、线性代数、大学物理等公共基础课由教务处统一安排；专业课程由各学院自行安排。二、考试时间：公共课集中在11月9日、10日两天。三、考场安排：考试前3天可登录教务系统查询考场。四、注意事项：请考生携带学生证、身份证参加考试，禁止携带手机等电子设备进入考场。教务处 2026年10月25日",
+   one:"期中考试 11月9日、10日两天集中考，考前一礼拜该复习了。",
+   points:[
+     {text:"考试时间 11月9日到13日，公共课集中在9日、10日。",quote:"本学期期中考试定于11月9日至11月13日进行。二、考试时间：公共课集中在11月9日、10日两天"},
+     {text:"考高数、大学英语、线代、大物这些公共课，专业课学院自己安排。",quote:"考试科目：高等数学、大学英语、线性代数、大学物理等公共基础课由教务处统一安排；专业课程由各学院自行安排"},
+     {text:"考前3天能查考场，必须带学生证+身份证，禁带手机。",quote:"考试前3天可登录教务系统查询考场。四、注意事项：请考生携带学生证、身份证参加考试，禁止携带手机等电子设备进入考场"}
+   ]
+ }
+};
+
+const $ = id => document.getElementById(id);
+let current = null;
+
+/* 下拉：只放有浓缩数据的 */
+const KEYS = Object.keys(DATA);
+const LABEL = {"t2026-1103-000":"农芯智AI大赛通知（真实数据）","t2026-1103-001":"转专业工作通知","t2026-1103-002":"正大杯网考通知","t2026-1103-004":"奖助学金材料补交","t2026-1103-005":"期中考试安排"};
+const sel = $("picker");
+KEYS.forEach(k=>{const o=document.createElement("option");o.value=k;o.textContent=LABEL[k]||k;sel.appendChild(o);});
+
+/* 把原文中引用的句子包成可高亮 span */
+function renderRaw(d){
+  let html = d.raw;
+  d.points.forEach((p,i)=>{
+    // 转义后做包含替换（quote 是原文子串）
+    if(html.includes(p.quote)){
+      html = html.replace(p.quote, `<span class="q" data-i="${i}">${p.quote}</span>`);
+    }else{
+      // 找不到完全匹配时，尝试用前半段匹配
+      const head = p.quote.slice(0, Math.min(18, p.quote.length));
+      if(html.includes(head)){
+        html = html.replace(head, `<span class="q" data-i="${i}">${head}</span>`);
+      }
+    }
+  });
+  return html;
+}
+
+function render(k){
+  current = k;
+  const d = DATA[k];
+  $("srcLabel").textContent = "来源：" + d.src;
+  $("raw").innerHTML = renderRaw(d);
+
+  const box = $("digest");
+  box.innerHTML = `
+    <div class="digest-line"><span class="lab">一句话读懂</span>${d.one}</div>
+    ${d.points.map((p,i)=>`
+      <div class="pt" data-i="${i}">
+        <span class="num">要点 ${i+1}</span>
+        <div class="main">${p.text}</div>
+        <div class="src">📌 原文出处：<span class="qq">「${p.quote}」</span></div>
+      </div>`).join("")}
+  `;
+
+  // 右侧点击 → 左侧高亮
+  box.querySelectorAll(".pt").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const i = el.dataset.i;
+      box.querySelectorAll(".pt").forEach(x=>x.classList.remove("on"));
+      el.classList.add("on");
+      const q = document.querySelector(`.q[data-i="${i}"]`);
+      document.querySelectorAll(".q").forEach(x=>x.classList.remove("on"));
+      if(q){
+        q.classList.add("on");
+        q.scrollIntoView({block:"center", behavior:"smooth"});
+      }
+    });
+  });
+
+  // 左侧点击 → 右侧高亮
+  $("raw").querySelectorAll(".q").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const i = el.dataset.i;
+      $("raw").querySelectorAll(".q").forEach(x=>x.classList.remove("on"));
+      el.classList.add("on");
+      const pt = document.querySelector(`.pt[data-i="${i}"]`);
+      box.querySelectorAll(".pt").forEach(x=>x.classList.remove("on"));
+      if(pt){ pt.classList.add("on"); pt.scrollIntoView({block:"center", behavior:"smooth"}); }
+    });
+  });
+}
+
+/* 一键高亮全部 */
+let allOn = false;
+$("toggle").addEventListener("click", ()=>{
+  allOn = !allOn;
+  document.querySelectorAll(".q").forEach(x=> x.classList.toggle("on", allOn));
+  $("toggle").textContent = allOn ? "取消高亮" : "一键高亮全部出处";
+});
+
+sel.addEventListener("change", ()=> render(sel.value));
+render(KEYS[0]);
+</script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+/* 数据自查页 —— 数字安农风格（跟随主题变量） */
+
+/* ---- 结论卡 ---- */
+.verdict {
+  border-radius: 22rpx;
+  padding: 28rpx 30rpx;
+  margin-bottom: 10rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 101, 62, 0.20);
+}
+.verdict.ok {
+  background: linear-gradient(160deg, var(--brand-2), var(--brand));
+}
+.verdict.bad {
+  background: linear-gradient(160deg, #F08A4B, var(--alert));
+  box-shadow: 0 8rpx 24rpx rgba(231, 120, 68, 0.26);
+}
+.verdict .vh {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+.verdict .vicon {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 44rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--brand);
+  background: #FFFFFF;
+  flex-shrink: 0;
+}
+.verdict.bad .vicon { color: var(--alert); }
+.verdict .vt {
+  font-size: 33rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 1rpx;
+}
+.verdict .vs {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+  margin-top: 14rpx;
+}
+.verdict .vmeta {
+  font-size: 20rpx;
+  color: rgba(255, 255, 255, 0.72);
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.22);
+}
+
+/* ---- 三条铁律 ---- */
+.rulecard {
+  display: flex;
+  gap: 18rpx;
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 18rpx;
+  padding: 22rpx 24rpx;
+  margin-bottom: 14rpx;
+  box-shadow: var(--card-shadow);
+}
+.rulecard .rtag {
+  flex-shrink: 0;
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 14rpx;
+  text-align: center;
+  line-height: 60rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  background: linear-gradient(135deg, var(--brand-2), var(--brand));
+}
+.rulecard .rbody { flex: 1; min-width: 0; }
+.rulecard .rt {
+  font-size: 27rpx;
+  font-weight: 600;
+  color: var(--txt);
+  margin-bottom: 6rpx;
+}
+.rulecard .rd {
+  font-size: 22rpx;
+  color: var(--txt-2);
+  line-height: 1.6;
+}
+
+/* ---- 通用块 ---- */
+.box {
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 18rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 8rpx;
+  box-shadow: var(--shadow);
+}
+
+/* ---- 自动纠正 / 疑点行 ---- */
+.arl {
+  font-size: 24rpx;
+  color: var(--txt-2);
+  line-height: 1.7;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid var(--border-soft);
+}
+.arl:last-of-type { border-bottom: none; }
+.arl.warn {
+  color: var(--alert-ink);
+  background: var(--alert-soft);
+  border-radius: 10rpx;
+  padding: 12rpx 16rpx;
+  margin-bottom: 8rpx;
+  border-bottom: none;
+}
+.arnote {
+  font-size: 20rpx;
+  color: var(--txt-3);
+  line-height: 1.7;
+  margin-top: 10rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx dashed var(--border);
+}
+
+/* ---- 被剔除条目 ---- */
+.dcard {
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid var(--border-soft);
+}
+.dcard:last-child { border-bottom: none; }
+.dcard .dt {
+  font-size: 25rpx;
+  font-weight: 500;
+  color: var(--txt);
+  line-height: 1.5;
+}
+.dcard .dwhy {
+  font-size: 21rpx;
+  color: var(--alert-ink);
+  margin-top: 8rpx;
+  line-height: 1.6;
+}
+.dnone {
+  font-size: 23rpx;
+  color: var(--txt-3);
+  line-height: 1.7;
+  padding: 12rpx 0;
+}
+
+/* ---- 可举证清单 ---- */
+.vcard {
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid var(--border-soft);
+}
+.vcard:last-child { border-bottom: none; }
+.vcard .vt1 {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--txt);
+  line-height: 1.5;
+}
+.vcard .vsr {
+  font-size: 21rpx;
+  color: var(--txt-3);
+  margin-top: 8rpx;
+}
+.vcard .vu {
+  font-size: 20rpx;
+  color: var(--brand);
+  background: var(--brand-soft);
+  border-radius: 8rpx;
+  padding: 8rpx 14rpx;
+  margin-top: 12rpx;
+  line-height: 1.5;
+  word-break: break-all;
+}
+.vcard .vgo {
+  font-size: 21rpx;
+  color: var(--brand);
+  font-weight: 600;
+  margin-top: 12rpx;
+}
+
+/* ---- 留痕 ---- */
+.hrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 14rpx;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid var(--border-soft);
+}
+.hrow:last-child { border-bottom: none; }
+.hrow .ht {
+  font-size: 22rpx;
+  color: var(--txt-3);
+  flex-shrink: 0;
+}
+.hrow .hx {
+  font-size: 22rpx;
+  color: var(--txt-2);
+  text-align: right;
+}
+.hint {
+  font-size: 20rpx;
+  color: var(--txt-3);
+  line-height: 1.7;
+  margin-top: 12rpx;
+}
+
+/* ---- 按钮 ---- */
+.acts { margin-top: 26rpx; display: flex; flex-direction: column; gap: 14rpx; }
+.ab {
+  font-size: 27rpx;
+  font-weight: 600;
+  border-radius: 16rpx;
+  padding: 20rpx 0;
+  background: var(--surface);
+  color: var(--txt);
+  border: 1rpx solid var(--border);
+  line-height: 1.2;
+}
+.ab::after { border: none; }
+.ab.primary {
+  background: linear-gradient(135deg, var(--brand-2), var(--brand));
+  color: var(--on-brand);
+  border: none;
+}
+
+/* ---- 底部 ---- */
+.foot {
+  margin-top: 34rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--border);
+  font-size: 21rpx;
+  color: var(--txt-3);
+  line-height: 1.8;
+}
+.foot .hl { color: var(--brand); }

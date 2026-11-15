@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据源接入状态 · 边界感 | 知时</title>
+<style>
+  :root{--bg:#0f1115;--panel:#171a21;--panel2:#1e222b;--line:#2a2f3a;
+    --text:#e8eaed;--sub:#9aa4b2;--accent:#4dd6a8;--accent2:#5b9cf8;
+    --warn:#f5a524;--danger:#f2565b;--radius:14px;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(1200px 600px at 20% -10%,#1a2432 0%,var(--bg) 55%);
+    color:var(--text);font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;min-height:100vh;padding:26px 20px 60px}
+  .wrap{max-width:1180px;margin:0 auto}
+  h1{font-size:20px;letter-spacing:.5px}
+  .sub{font-size:13px;color:var(--sub);margin-top:5px}
+  .sub b{color:var(--accent)}
+
+  /* 三条边界总结 */
+  .banner{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0 6px}
+  .bn{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden}
+  .bn::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
+  .bn.ok::before{background:var(--accent)}
+  .bn.mid::before{background:var(--warn)}
+  .bn.no::before{background:var(--danger)}
+  .bn .bt{font-size:12px;letter-spacing:1px;color:var(--sub)}
+  .bn .bh{font-size:15px;font-weight:600;margin:4px 0 6px}
+  .bn.ok .bh{color:var(--accent)}
+  .bn.mid .bh{color:var(--warn)}
+  .bn.no .bh{color:var(--danger)}
+  .bn p{font-size:12.5px;color:var(--sub);line-height:1.7}
+
+  /* 表格 */
+  .tbl{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:6px 4px;margin-top:16px;overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:820px}
+  th{font-size:11.5px;color:var(--sub);letter-spacing:.5px;text-align:left;
+    padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap;font-weight:500}
+  td{padding:14px;border-bottom:1px solid rgba(42,47,58,.55);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:rgba(255,255,255,.02)}
+  .name{font-size:13.5px;font-weight:600}
+  .name small{display:block;font-size:11px;color:var(--sub);font-weight:400;margin-top:2px}
+  .st{display:inline-block;font-size:11px;padding:2px 9px;border-radius:20px;white-space:nowrap;font-weight:600}
+  .st.yes{background:rgba(77,214,168,.14);color:var(--accent);border:1px solid rgba(77,214,168,.32)}
+  .st.half{background:rgba(245,165,36,.14);color:var(--warn);border:1px solid rgba(245,165,36,.32)}
+  .st.no{background:rgba(242,86,91,.14);color:var(--danger);border:1px solid rgba(242,86,91,.32)}
+  .st.blue{background:rgba(91,156,248,.14);color:#8fbcff;border:1px solid rgba(91,156,248,.32)}
+  .why2{font-size:12px;color:#c8d0db}
+  .why2 b{color:var(--accent)}
+  .why2 i{color:var(--danger);font-style:normal}
+  .role{font-size:12px;color:var(--sub)}
+
+  .note{margin-top:18px;background:var(--panel2);border:1px solid var(--line);
+    border-left:3px solid var(--accent2);border-radius:12px;padding:16px 18px;font-size:13px}
+  .note h3{font-size:13.5px;color:var(--accent2);margin-bottom:8px;letter-spacing:.5px}
+  .note p{color:#c8d0db;margin-bottom:8px}
+  .note p:last-child{margin-bottom:0}
+  .note b{color:var(--accent)}
+  .note em{color:var(--warn);font-style:normal}
+
+  .back{display:inline-block;margin-top:20px;font-size:13px;color:var(--accent);text-decoration:none}
+  .back:hover{text-decoration:underline}
+  @media(max-width:900px){.banner{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>数据源接入状态 · 边界感</h1>
+  <div class="sub">答辩用页：我对每条链路<b>都摸过边界，也知道哪条不能碰</b>——这本身就是可信度的来源</div>
+
+  <div class="banner">
+    <div class="bn ok">
+      <div class="bt">LAYER 01 · 可做</div>
+      <div class="bh">公网公开页</div>
+      <p>教务处、学院、学工、图书馆的公开通知页，等同"人工翻官网"的自动化。今天已跑通。</p>
+    </div>
+    <div class="bn mid">
+      <div class="bt">LAYER 02 · 半自动</div>
+      <div class="bh">公众号 / QQ群</div>
+      <p>公众号给链接再解析；QQ群走机器人收群内公开文件。需用户主动授权，且只处理公开内容。</p>
+    </div>
+    <div class="bn no">
+      <div class="bt">LAYER 03 · 不做</div>
+      <div class="bh">教务系统 / 数智安农后台</div>
+      <p>需登录态、含个人数据。技术能绕，但合规上不能碰。这是红线，不是能力问题。</p>
+    </div>
+  </div>
+
+  <div class="tbl">
+    <table>
+      <thead>
+        <tr><th>渠道</th><th>接入状态</th><th>技术可行性</th><th>合规判断</th><th>在系统中的角色</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="name">信息与计算机学院 · 通知公告<small>xxb.ahau.edu.cn</small></td>
+          <td><span class="st yes">● 已跑通</span></td>
+          <td class="why2"><b>高</b> · 静态列表页，可稳定解析</td>
+          <td class="why2"><b>合规</b> · 公开页面</td>
+          <td class="role">核心采集源 · 院级通知</td>
+        </tr>
+        <tr>
+          <td class="name">工学院 · 通知公告<small>gxy.ahau.edu.cn</small></td>
+          <td><span class="st yes">● 已跑通</span></td>
+          <td class="why2"><b>高</b> · 与学院同一套解析模板</td>
+          <td class="why2"><b>合规</b> · 公开页面</td>
+          <td class="role">核心采集源 · 院级通知</td>
+        </tr>
+        <tr>
+          <td class="name">图书馆 · 活动通知 / 新闻公告<small>lib.ahau.edu.cn</small></td>
+          <td><span class="st yes">● 已跑通</span></td>
+          <td class="why2"><b>高</b> · 讲座/活动类通知丰富</td>
+          <td class="why2"><b>合规</b> · 公开页面</td>
+          <td class="role">核心采集源 · 讲座培训</td>
+        </tr>
+        <tr>
+          <td class="name">经济管理学院 · 工作动态<small>jgxy.ahau.edu.cn</small></td>
+          <td><span class="st yes">● 已跑通</span></td>
+          <td class="why2"><b>高</b> · 二级学院标准模板</td>
+          <td class="why2"><b>合规</b> · 公开页面</td>
+          <td class="role">核心采集源 · 院级通知</td>
+        </tr>
+        <tr>
+          <td class="name">校官网新闻<small>www.ahau.edu.cn / news.ahau.edu.cn</small></td>
+          <td><span class="st yes">● 已跑通</span></td>
+          <td class="why2"><b>高</b> · 新闻类内容稳定</td>
+          <td class="why2"><b>合规</b> · 公开页面</td>
+          <td class="role">补充采集源 · 校级要闻</td>
+        </tr>
+        <tr>
+          <td class="name">学工处 / 研究生院 / 团委等<small>部分二级单位站点</small></td>
+          <td><span class="st half">◐ 被安全设备拦截</span></td>
+          <td class="why2"><b>中</b> · 站点返回 503 + 统一拦截页</td>
+          <td class="why2"><i>非技术问题</i> · 属校方 WAF 策略，需人工确认后对接</td>
+          <td class="role">待评估采集源 · 已如实记录</td>
+        </tr>
+        <tr>
+          <td class="name">微信公众号<small>校内各单位订阅号</small></td>
+          <td><span class="st half">◐ 半自动</span></td>
+          <td class="why2"><b>中</b> · 无公开 API，需用户贴链接或授权转发</td>
+          <td class="why2"><b>基本合规</b> · 只处理用户主动送来的公开推文</td>
+          <td class="role">补充采集源 · 图文类通知</td>
+        </tr>
+        <tr>
+          <td class="name">QQ 群<small>班级群 / 赛事群 934927951</small></td>
+          <td><span class="st half">◐ 需授权</span></td>
+          <td class="why2"><b>中高</b> · OneBot 协议机器人可收群内文件</td>
+          <td class="why2"><em>灰色</em> · 必须群主同意 + 只取公开文件，不读私聊</td>
+          <td class="role">补充采集源 · 官方常在此发一手通知</td>
+        </tr>
+        <tr>
+          <td class="name">数智安农 · 公开露出面<small>平台对外可见的通知栏</small></td>
+          <td><span class="st blue">○ 待评估</span></td>
+          <td class="why2"><b>中</b> · 仅抓未登录可见部分</td>
+          <td class="why2"><b>合规</b> · 不越登录态即为公开信息</td>
+          <td class="role">补充采集源 · 与官网去重</td>
+        </tr>
+        <tr>
+          <td class="name">教务系统后台<small>jwgl 登录后页面</small></td>
+          <td><span class="st no">✕ 明确不做</span></td>
+          <td class="why2">技术可绕过 CAS 登录</td>
+          <td class="why2"><i>红线</i> · 含个人成绩/学籍，需登录态，属私域数据</td>
+          <td class="role">—— 永不接入</td>
+        </tr>
+        <tr>
+          <td class="name">微信小程序<small>面向用户的展示端</small></td>
+          <td><span class="st blue">○ 展示端</span></td>
+          <td class="why2"><b>高</b> · 标准小程序开发</td>
+          <td class="why2"><b>合规</b> · 仅展示已聚合结果</td>
+          <td class="role"><b>推送出口</b> · 不做采集源，只做触达端</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <h3>为什么"不做"反而是加分项</h3>
+    <p>1. <b>技术边界清清楚楚</b>：每条渠道我都实际验证过能不能取、怎么取、取到什么程度，不是拍脑袋说"我们要打通一切"。</p>
+    <p>2. <b>连"被拦截"也如实写出来</b>：部分二级单位站点部署了校方统一安全设备（返回 503 + 拦截页），这一条我们<b>不粉饰成"已打通"</b>，而是标注"被安全设备拦截，需人工确认后对接"。<b>把做不到的如实写出来，是可信度的来源。</b></p>
+    <p>3. <b>合规意识是评委的加分点</b>：学校 2026年10月刚发过《弱口令及账号权限专项排查整治》通知，此时宣称"爬教务后台"是<em>反向踩雷</em>；主动划出红线，说明这个作品是能落地的。</p>
+    <p>4. <b>唯一正当的"接入"路径是赢下比赛</b>：大赛通知原文写明——获奖作品将通过"数智安农 / 徽农智"平台上线推广。<b>先做出好东西，再让平台主动把你接进去</b>，而不是现在硬闯后台。</p>
+  </div>
+
+  <div class="note" style="border-left-color:var(--accent)">
+    <h3>交付形态与"可访问入口"（对照官方提交办法）</h3>
+    <p><b>官方给了两条路</b>：① <b>平台类</b>——用 Dify / 扣子 / wiki 等平台搭的，交"可公开访问的分享链接"；② <b>原创代码类</b>——自写源码，优先"可公网部署的链接"，部署不了则走<b>路径 2</b>（只能交演示视频）。</p>
+    <p><b>我们的现状</b>：原创代码类 · 本地 Demo（无公网服务器）→ 落在<b>路径 2</b>。这意味着：<em>必须交一份完整的 5 分钟演示视频</em>，且<b>答辩现场必须能当场跑起来</b>——所以小程序 Demo 要保证随时可演示、不掉链子。</p>
+    <p><b>下一步最容易赚分的一步</b>：如果后期能把小程序 / 网页版<b>部署到可公网访问的地址</b>（或迁到学校云资源），就能升到<b>路径 1</b>，把"能点开看的链接"一起交上去——<b>可访问的实物，比只有视频的说服力强得多</b>。</p>
+  </div>
+
+  <div class="note" style="border-left-color:var(--warn)">
+    <h3>官方指定动作：链接设置（扣子平台流程）</h3>
+    <p>若采用平台类形态（例如把智能体放到<b>扣子</b>上），官方教程给的路径是：</p>
+    <p><b>①</b> API 部署成功后 → 点<b>渠道</b> → 选 <b>Web SDK</b> → <b>再次部署</b>；<br>
+       <b>②</b> Web SDK 部署成功后 → 选<b>分享链接</b> → 权限设为 <b>「公开可见」</b> → <b>有效期至少 1 个月</b>。</p>
+    <p>官方明确要求：<b>链接失效或无法访问视为未有效提交</b>。所以有效期必须覆盖整个评审周期——<em>别设成 24 小时那种会过期的</em>。</p>
+  </div>
+
+  <a class="back" href="inspect.html">← 返回 Demo 索引</a>
+</div>
+</body>
+</html>

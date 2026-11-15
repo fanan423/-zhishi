@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>知时 · 小程序预览（真跑数据）</title>
+<style>
+  :root{--bg:#0f1115;--panel:#171a21;--panel2:#1e222b;--line:#2a2f3a;
+    --text:#e8eaed;--sub:#9aa4b2;--ac:#4dd6a8;--ac2:#5b9cf8;--warn:#f5a524;--danger:#f2565b;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(1400px 700px at 12% -10%,#1a2432 0%,var(--bg) 58%);
+    color:var(--text);font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.65;padding:34px 20px 70px}
+  .wrap{max-width:1240px;margin:0 auto}
+  .hd{text-align:center;margin-bottom:12px}
+  .hd h1{font-size:26px}
+  .hd p{color:var(--sub);font-size:13.5px;margin-top:8px}
+  .hd .kbd{display:inline-block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:7px;padding:2px 9px;font-size:12px;color:var(--ac);margin:0 3px}
+  .banner{margin:22px auto 8px;max-width:900px;background:linear-gradient(180deg,rgba(77,214,168,.08),var(--panel));
+    border:1px solid rgba(77,214,168,.3);border-radius:14px;padding:16px 20px;font-size:13px;color:#cdd6e0}
+  .banner b{color:var(--ac)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));
+    gap:26px;margin-top:30px;justify-items:center}
+  .col{width:100%;max-width:376px}
+  .col-h{font-size:12.5px;color:var(--sub);letter-spacing:1.5px;margin-bottom:10px;
+    display:flex;justify-content:space-between;align-items:center}
+  .col-h b{color:var(--ac);letter-spacing:0;font-size:14px}
+  .col-h .route{font-size:11px;color:#5f6a78}
+
+  .phone{background:var(--bg);border:1px solid var(--line);border-radius:20px;
+    overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.45);
+    display:flex;flex-direction:column;max-height:820px}
+  .ph-bar{background:#0b0e12;padding:11px 14px 9px;display:flex;align-items:center;
+    justify-content:space-between;font-size:12px;border-bottom:1px solid var(--line)}
+  .ph-time{color:var(--sub)}
+  .ph-title{font-weight:600;font-size:12.5px}
+  .ph-dots{color:var(--sub);font-size:10px}
+  .ph-sub{background:#12151b;padding:7px 14px;font-size:11.5px;color:var(--sub);
+    border-bottom:1px solid var(--line)}
+  .ph-body{padding:13px;overflow-y:auto;flex:1}
+
+  /* 通用块 */
+  .sect-t{font-size:11.5px;color:var(--sub);letter-spacing:1px;margin:15px 0 8px;
+    padding-bottom:5px;border-bottom:1px solid var(--line)}
+  .sect-t:first-child{margin-top:0}
+  .note-box{background:var(--panel2);border-left:3px solid var(--ac2);border-radius:8px;
+    padding:9px 12px;font-size:11.5px;color:#c8d0db;margin:9px 0}
+  .note-box b{color:var(--ac)}
+
+  /* 屏5 · 我的小头像条（订阅页复用） */
+  .hero-mini{display:flex;align-items:center;gap:11px;background:var(--panel);
+    border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:12px}
+  .hm-logo{width:38px;height:38px;border-radius:10px;flex:0 0 38px;
+    background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;
+    align-items:center;justify-content:center;font-weight:700;color:#08120e;font-size:17px}
+  .hm-t{font-size:13.5px;font-weight:600}
+  .hm-s{font-size:11.5px;color:var(--sub)}
+
+  /* 屏1 · 今日头条（合并原三卡） */
+  .hero{border-radius:14px;padding:14px 15px 12px;margin-bottom:12px;
+    background:linear-gradient(160deg,#0a7a4c,#00653E);box-shadow:0 6px 18px rgba(0,101,62,.28)}
+  .hero.tone-alert{background:linear-gradient(160deg,#C0392B,#8E2418);box-shadow:0 6px 18px rgba(192,57,43,.3)}
+  .hero.tone-new{background:linear-gradient(160deg,#B8860B,#8A6508);box-shadow:0 6px 18px rgba(184,134,11,.28)}
+  .hero-hd{display:flex;align-items:center;gap:8px}
+  .hero-k{font-size:11px;font-weight:700;color:rgba(255,255,255,.94);letter-spacing:1.5px}
+  .hero-badge{font-size:10.5px;font-weight:700;color:#fff;background:rgba(255,255,255,.22);
+    border-radius:5px;padding:1px 8px}
+  .hero-idx{margin-left:auto;font-size:10.5px;color:rgba(255,255,255,.88);
+    background:rgba(255,255,255,.14);border-radius:5px;padding:1px 8px}
+  .hero-line{font-size:14px;color:#fff;line-height:1.55;margin-top:8px;font-weight:500}
+  .hero-lead{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:9px;
+    padding-top:9px;border-top:1px solid rgba(255,255,255,.24)}
+  .hero-lv{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:5px;color:#fff;
+    background:rgba(255,255,255,.24)}
+  .hero-nb{font-size:10px;font-weight:700;color:#00653E;background:#fff;padding:1px 7px;border-radius:5px}
+  .hero-title{flex:1;min-width:0;font-size:14.5px;font-weight:700;color:#fff;line-height:1.42}
+  .hero-meta{font-size:11px;color:rgba(255,255,255,.84);margin-top:7px}
+  .hero-hint{font-size:12px;color:rgba(255,255,255,.9);margin-top:8px}
+  .hero-ft{display:flex;align-items:center;gap:9px;margin-top:10px}
+  .hero-act{font-size:12.5px;font-weight:700;color:#00653E;background:#fff;border-radius:7px;padding:6px 15px}
+  .hero-sub{font-size:11px;color:rgba(255,255,255,.88)}
+
+  /* 梯度卡片：中卡（三天内）/ 小卡（归档） */
+  .sect-t.red{color:var(--danger)}
+  .sec-warn{font-size:9.5px;font-weight:700;color:#fff;background:var(--danger);
+    border-radius:5px;padding:1px 7px;margin-left:8px}
+  .sec-sub{font-size:10px;color:var(--sub);margin-left:6px;font-weight:400}
+  .pc{background:var(--panel);border:1px solid var(--line);border-radius:11px;
+    margin-bottom:9px;position:relative;overflow:hidden}
+  .pc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--ac)}
+  .pc.major{padding:12px 13px}
+  .pc.major::before{background:var(--danger)}
+  .pc-row{display:flex;align-items:center;gap:7px}
+  .pc-lv{font-size:10px;font-weight:700;color:#fff;background:var(--danger);border-radius:5px;padding:2px 8px}
+  .pc-new{font-size:10px;font-weight:700;color:#fff;background:var(--ac);border-radius:5px;padding:2px 7px}
+  .pc-rank{margin-left:auto;font-size:10.5px;color:var(--sub);font-weight:600}
+  .pc-t{font-size:14px;font-weight:600;line-height:1.42;margin-top:7px}
+  .pc-meta{font-size:11px;color:var(--sub);margin-top:6px}
+  .pc-one{font-size:12px;color:#c8d0db;line-height:1.55;margin-top:6px}
+  .minor-box{background:var(--panel);border:1px solid var(--line);border-radius:11px;
+    padding:4px 10px;margin-bottom:9px}
+  .pc.minor{display:flex;align-items:flex-start;gap:8px;background:transparent;border:0;
+    border-bottom:1px solid var(--line);border-radius:0;margin:0;padding:9px 0}
+  .pc.minor:last-child{border-bottom:0}
+  .pc.minor::before{display:none}
+  .pc-mico{font-size:12px;flex:0 0 14px;line-height:1.5}
+  .pc-mmid{flex:1;min-width:0}
+  .pc-mt{font-size:12.5px;font-weight:500;line-height:1.42}
+  .pc-mm{font-size:10.5px;color:var(--sub);margin-top:2px}
+  .pc-mnew{font-size:9.5px;font-weight:700;color:#fff;background:var(--ac);
+    border-radius:5px;padding:1px 6px;flex:0 0 auto}
+  .sumline{font-size:12px;color:var(--sub);margin:11px 0 4px}
+  .sumline b{color:var(--text)}
+
+  .grp{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    margin-bottom:9px;overflow:hidden}
+  .grp.open{border-color:rgba(77,214,168,.35)}
+  .grp.urgent.open{border-color:rgba(242,86,91,.4)}
+  .grp-h{display:flex;align-items:center;gap:8px;padding:11px 12px;font-size:13.5px}
+  .grp-ico{font-size:15px}
+  .grp-k{font-weight:600;flex:1}
+  .grp-n{font-size:11.5px;color:var(--sub)}
+  .badge-urgent{background:rgba(242,86,91,.16);color:var(--danger);font-size:10px;
+    border-radius:5px;padding:1px 6px;font-weight:600}
+  .grp-arrow{color:var(--sub);font-size:11px}
+  .grp-d{font-size:11px;color:#5f6a78;padding:0 12px 10px}
+  .card{background:var(--panel2);border-radius:9px;padding:10px 11px;margin:0 10px 9px}
+  .card-t{font-size:12.5px;font-weight:600;margin-bottom:5px}
+  .card-one{font-size:11.5px;color:var(--sub);margin-bottom:7px}
+  .card-f{display:flex;justify-content:space-between;font-size:11px;color:#5f6a78}
+  .cd{font-weight:600;color:var(--sub)}
+  .cd.hi{color:var(--danger)} .cd.md{color:var(--warn)}
+  .tag-real{display:inline-block;margin-top:6px;font-size:10px;color:var(--ac);
+    background:rgba(77,214,168,.12);border-radius:5px;padding:1px 6px}
+
+  /* 屏2 */
+  .sbar{background:var(--panel);border:1px solid var(--line);border-radius:11px;
+    padding:9px 13px;display:flex;align-items:center;gap:9px;font-size:13px}
+  .s-ico{font-size:13px}
+  .s-txt{flex:1}
+  .s-x{color:var(--sub);font-size:12px}
+  .hotline{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:11px 0 3px}
+  .hot-lb{font-size:11px;color:var(--sub)}
+  .hot{background:var(--panel2);border:1px solid var(--line);border-radius:7px;
+    padding:2px 8px;font-size:11px;color:#c8d0db}
+  .card-s{background:var(--panel);border:1px solid var(--line);border-radius:11px;
+    padding:11px 12px;margin-bottom:9px}
+  .cs-t{font-size:13px;font-weight:600;margin-bottom:6px}
+  .cs-t mark{background:rgba(245,165,36,.28);color:#ffd58a;border-radius:3px;padding:0 2px}
+  .cs-hit{font-size:10.5px;color:var(--ac);margin-bottom:5px}
+  .why{color:var(--warn);margin-left:6px}
+  .cs-snip{font-size:11.5px;color:var(--sub);margin-bottom:6px}
+  .cs-snip mark{background:rgba(245,165,36,.28);color:#ffd58a;border-radius:3px;padding:0 2px}
+  .cs-f{font-size:10.5px;color:#5f6a78}
+
+  /* 屏3 */
+  .dt-head{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px}
+  .dt-head.mini{padding:10px 12px}
+  .dt-t{font-size:14px;font-weight:600;margin-bottom:7px}
+  .dt-meta{display:flex;gap:11px;flex-wrap:wrap;font-size:11px;color:#5f6a78;margin-bottom:7px}
+  .dt-flags{display:flex;gap:7px;flex-wrap:wrap}
+  .fl{font-size:10.5px;color:#5f6a78;background:var(--panel2);border-radius:5px;padding:1px 7px}
+  .fl.ok{color:var(--ac);background:rgba(77,214,168,.12)}
+  .fl.real{color:var(--ac2);background:rgba(91,156,248,.12)}
+  .tabs{display:flex;gap:8px;margin:12px 0 9px}
+  .tab{flex:1;text-align:center;font-size:12.5px;padding:7px 0;border-radius:9px;
+    background:var(--panel);border:1px solid var(--line);color:var(--sub)}
+  .tab.on{background:rgba(77,214,168,.13);border-color:rgba(77,214,168,.4);color:var(--ac);font-weight:600}
+  .tab-inline{font-size:10.5px;padding:1px 8px;border-radius:6px;background:var(--panel2);color:var(--sub)}
+  .tab-inline.on{background:rgba(77,214,168,.13);color:var(--ac)}
+  .one-box{background:linear-gradient(180deg,rgba(77,214,168,.07),var(--panel));
+    border:1px solid rgba(77,214,168,.28);border-radius:11px;padding:11px 13px;margin-top:11px}
+  .ob-lb{font-size:10.5px;color:var(--ac);letter-spacing:1px;margin-bottom:5px}
+  .ob-t{font-size:13px;line-height:1.75}
+  .facts{display:flex;flex-direction:column;gap:6px}
+  .fact{display:flex;gap:9px;background:var(--panel);border:1px solid var(--line);
+    border-radius:9px;padding:8px 11px;font-size:12px}
+  .f-k{color:var(--ac2);flex:0 0 62px;font-size:11.5px}
+  .f-v{color:#cdd6e0;flex:1}
+  .pt{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:10px 12px;margin-bottom:8px}
+  .pt.on{border-color:rgba(245,165,36,.4);background:linear-gradient(180deg,rgba(245,165,36,.05),var(--panel))}
+  .pt-t{font-size:12.5px;margin-bottom:7px}
+  .pt-q{font-size:10.5px;margin-bottom:5px;display:flex;gap:9px;align-items:center}
+  .q-lb{color:var(--ac2)}
+  .q-ok{color:var(--ac)} .q-no{color:var(--danger)}
+  .pt-quote{font-size:11px;color:#7f8a99;background:var(--panel2);border-radius:7px;
+    padding:7px 9px;font-style:italic}
+  .trace-box{background:var(--panel2);border-radius:9px;padding:10px 12px;
+    font-size:11.5px;color:#c8d0db;margin-top:9px}
+  .trace-box b{color:var(--ac)}
+  .rawbox{background:var(--panel);border:1px solid var(--line);border-radius:11px;
+    padding:12px;font-size:12px;line-height:2;color:#8b95a3}
+  .raw-hl{background:rgba(245,165,36,.3);color:#ffd58a;border-radius:3px;padding:1px 2px}
+  .raw-plain{color:#8b95a3}
+
+  /* 屏5 */
+  .sub-row{display:flex;align-items:center;gap:9px;background:var(--panel);
+    border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:7px;font-size:12.5px}
+  .sub-row.on{border-color:rgba(77,214,168,.35);background:rgba(77,214,168,.06)}
+  .sub-ck{width:16px;height:16px;border-radius:5px;border:1px solid var(--line);flex:0 0 16px;
+    display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--ac)}
+  .sub-row.on .sub-ck{background:var(--ac);border-color:var(--ac);color:#08120e;font-weight:700}
+  .sub-ico{font-size:14px}
+  .sub-k{flex:1;font-weight:500}
+  .sub-c{font-size:11px;color:#5f6a78}
+  .sub-extra{background:var(--panel2);border-radius:9px;padding:9px 12px;font-size:11.5px;
+    color:var(--sub);margin-top:10px;display:flex;flex-direction:column;gap:4px}
+  .reach{background:linear-gradient(180deg,rgba(77,214,168,.1),var(--panel));
+    border:1px solid rgba(77,214,168,.32);border-radius:10px;padding:11px 13px;
+    font-size:12.5px;margin-top:10px}
+  .reach b{color:var(--ac);font-size:16px}
+  .chg{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:8px}
+  .chg td{border-bottom:1px solid rgba(42,47,58,.6);padding:7px 8px;color:#c8d0db}
+  .chg td:first-child{color:var(--sub)}
+  .chg .up{color:var(--ac);font-weight:600}
+  .foot{margin-top:38px;text-align:center;font-size:11.5px;color:#5f6a78;line-height:2}
+  .foot b{color:var(--ac)}
+
+  /* 屏6 · 推送设置（微信触达 + 触达时间线） */
+  .wx-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 13px}
+  .wx-hd{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .wx-lb{font-size:10.5px;color:var(--sub)}
+  .wx-st{font-size:15px;font-weight:700;margin-top:3px}
+  .wx-st.off{color:#5f6a78}
+  .wx-st.demo{color:#f5a524}
+  .wx-st.real{color:var(--ac)}
+  .wx-tag{font-size:10px;padding:2px 9px;border-radius:99px;border:1px solid var(--line);color:var(--sub);white-space:nowrap}
+  .wx-tag.demo{color:#f5a524;border-color:rgba(245,165,36,.4);background:rgba(245,165,36,.08)}
+  .wx-tip{font-size:11px;color:var(--sub);line-height:1.7;margin-top:8px}
+  .wx-row{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:8px 0;border-top:1px solid rgba(42,47,58,.6);font-size:12px}
+  .wx-row .k{color:var(--sub)}
+  .wx-row .v{color:#e6ebf2;font-weight:500}
+  .wx-btn{width:100%;margin-top:10px;border:none;border-radius:9px;padding:10px 0;font-size:12.5px;
+    background:linear-gradient(135deg,#2fbf8e,#1f9d74);color:#04120c;font-weight:600}
+  .wx-btn.ghost{background:transparent;border:1px dashed var(--line);color:var(--sub);font-weight:400;margin-top:7px}
+  .wx-dd{border-top:1px solid rgba(42,47,58,.6);padding-top:9px;margin-top:9px}
+  .wx-i{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;padding:5px 0}
+  .wx-i .num{color:var(--ac);font-weight:700;font-size:15px}
+  .wx-i .k2{color:var(--sub)}
+  .tl{margin-top:12px;display:flex;flex-direction:column;gap:9px}
+  .tl-g{display:flex;gap:9px}
+  .tl-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:0 0 8px;background:#5f6a78}
+  .tl-dot.u{background:#e5484d} .tl-dot.h{background:#f5a524} .tl-dot.s{background:#c7a400}
+  .tl-bd{flex:1;min-width:0}
+  .tl-dt{font-size:11.5px;font-weight:600;margin-bottom:5px}
+  .tl-dt .n{color:#5f6a78;font-weight:400;font-size:10.5px;margin-left:6px}
+  .tl-it{background:var(--panel2);border-radius:8px;padding:7px 9px;margin-bottom:5px}
+  .tl-t{font-size:11.5px;line-height:1.5;color:#dfe6ee}
+  .tl-m{font-size:10.5px;color:#5f6a78;margin-top:4px}
+
+  /* 屏7 · 今日简报 + 智能体主动送达 */
+  .bhead-mini{background:var(--panel);border:1px solid var(--line);border-radius:11px;
+    padding:10px 13px;margin-bottom:11px}
+  .bh-t{font-size:15px;font-weight:700}
+  .bh-s{font-size:10.5px;color:var(--sub);margin-top:3px}
+  .sum-mini{background:linear-gradient(180deg,rgba(77,214,168,.08),var(--panel));
+    border:1px solid rgba(77,214,168,.3);border-radius:12px;padding:12px 13px;margin-bottom:6px}
+  .sm-lb{font-size:10.5px;color:var(--ac);letter-spacing:1px;margin-bottom:6px}
+  .sm-tx{font-size:13px;line-height:1.7}
+  .sm-idx{display:flex;align-items:baseline;gap:8px;margin-top:9px;padding-top:9px;
+    border-top:1px solid rgba(42,47,58,.7)}
+  .sin{font-size:11px;color:var(--sub)}
+  .siv{font-size:20px;font-weight:700;color:var(--ac)}
+  .sil{font-size:11.5px;color:var(--sub)}
+
+  .agbox{background:var(--panel);border:1px solid var(--line);border-left:5px solid #5f6a78;
+    border-radius:12px;padding:12px 13px 11px}
+  .agbox.on{border-left-color:#17A05A;background:linear-gradient(180deg,rgba(23,160,90,.06),var(--panel))}
+  .agbox.warn{border-left-color:#E08A16;background:linear-gradient(180deg,rgba(224,138,22,.07),var(--panel))}
+  .ag-hd{display:flex;align-items:center;padding-bottom:9px;border-bottom:1px dashed var(--line)}
+  .ag-dot{width:11px;height:11px;border-radius:50%;margin-right:9px;flex:0 0 11px;background:#5f6a78}
+  .agbox.on .ag-dot{background:#17A05A;box-shadow:0 0 0 4px rgba(23,160,90,.18)}
+  .agbox.warn .ag-dot{background:#E08A16;box-shadow:0 0 0 4px rgba(224,138,22,.18)}
+  .ag-lab{flex:1;font-size:13px;font-weight:600}
+  .agbox.on .ag-lab{color:#17A05A}
+  .agbox.warn .ag-lab{color:#E08A16}
+  .ag-via{font-size:10px;color:var(--sub);background:var(--panel2);border-radius:7px;padding:2px 8px}
+  .ag-warn{margin-top:10px;font-size:11.5px;line-height:1.65;color:#f5a524;
+    background:rgba(245,165,36,.1);border:1px solid rgba(245,165,36,.3);border-radius:8px;padding:8px 10px}
+  .ag-warnr{display:block;margin-top:4px;font-size:10.5px;color:#8b95a3}
+  .ag-loading{font-size:11.5px;color:var(--sub);text-align:center;padding:16px 0}
+  .ag-tl,.ag-sl{font-size:11px;font-weight:600;color:#c8d0db;margin:11px 0 7px}
+  .ag-sl{color:var(--sub);font-weight:400}
+  .ag-notify{background:linear-gradient(180deg,rgba(77,214,168,.06),transparent);
+    border:1px solid rgba(77,214,168,.2);border-radius:9px;padding:10px 11px;margin-bottom:8px}
+  .ag-nr1{display:flex;align-items:flex-start}
+  .ag-nt{flex:1;font-size:13px;font-weight:600;line-height:1.45;margin-right:9px}
+  .ag-nd{font-size:10.5px;font-weight:700;color:#04120c;background:linear-gradient(135deg,#4dd6a8,#1f9d74);
+    border-radius:6px;padding:2px 8px;flex:0 0 auto;white-space:nowrap}
+  .ag-nsr{font-size:10.5px;color:#5f6a78;margin-top:5px}
+  .ag-nrs{font-size:11.5px;color:#4dd6a8;margin-top:6px;line-height:1.5;
+    background:rgba(77,214,168,.08);border-radius:6px;padding:5px 8px}
+  .ag-none{font-size:11.5px;color:#c8d0db;line-height:1.6;margin-top:6px}
+  .ag-sitem{display:flex;align-items:center;padding:8px 2px;border-bottom:1px solid rgba(42,47,58,.6)}
+  .ag-sitem:last-child{border-bottom:none}
+  .ag-st{flex:1;font-size:12px;color:#c8d0db;overflow:hidden;text-overflow:ellipsis;
+    white-space:nowrap;margin-right:9px}
+  .ag-sd{font-size:10.5px;color:#5f6a78;flex:0 0 auto}
+  .ag-em{text-align:center;font-size:12px;color:var(--sub);padding:20px 0}
+  .ag-meta{margin-top:11px;padding-top:9px;border-top:1px dashed var(--line);
+    font-size:10px;color:#5f6a78;line-height:1.85}
+  .ag-meta span{display:block}
+  .ag-acts{display:flex;gap:8px;margin-top:11px}
+  .ag-btn{flex:1;text-align:center;font-size:12px;color:#4dd6a8;background:var(--panel2);
+    border:1px solid var(--line);border-radius:8px;padding:9px 0}
+
+  @media(max-width:760px){.grid{gap:20px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hd">
+    <h1>知时 · 小程序七页预览</h1>
+    <p>这份页面里的每一个字，都是小程序页面 <b style="color:#4dd6a8">真跑一遍</b> 出来的 data 值 —— 不是示意图</p>
+    <p style="margin-top:6px">
+      <span class="kbd">node tools/show_miniprogram.js</span> 重新生成 ·
+      <span class="kbd">微信开发者工具</span> 导入 miniprogram 目录即可自己点
+    </p>
+  </div>
+
+  <div class="banner">
+    <b>跑通的事实：</b>123 条通知（真实公开源 117 条）· 已浓缩 123 条 ·
+    9 个标签 · 画像命中 21 条，分 4 组推送 ·
+    溯源定位 100%（全部要点都能在原文中找到出处）<br>
+    <span style="color:#9aa4b2">小程序已配 <b style="color:#4dd6a8">touristappid 游客模式</b>，不需要自己注册 AppID 就能编译预览。</span><br>
+    <span style="color:#9aa4b2">⑦ 号屏的「智能体主动送达」是<b style="color:#4dd6a8">真跑一遍</b>出来的：本机未部署服务 → 如实降级本地算法，
+    页面上会明说"本地算"而不假装是服务端算的。</span>
+  </div>
+
+  <div class="grid">
+    <div class="col">
+      <div class="col-h"><span><b>① 推送</b></span><span class="route">pages/index</span></div>
+      
+  <div class="phone">
+    <div class="ph-bar">
+      <span class="ph-time">15:32</span>
+      <span class="ph-title">知时 · 信息雷达</span>
+      <span class="ph-dots">••• ⊙</span>
+    </div>
+    <div class="ph-sub">按标签分组推送</div>
+    <div class="ph-body">
+  
+  <div class="hero tone-alert">
+    <div class="hero-hd">
+      <span class="hero-k">今日头条</span>
+      <span class="hero-badge">2 条待办</span>
+      <span class="hero-idx">知时指数 30</span>
+    </div>
+    <div class="hero-line">有 2 条三天内要办，共 21 条与你有关（含 21 条新收录）</div>
+    
+      <div class="hero-lead">
+        <span class="hero-lv">🔴 今天就要办</span>
+        <span class="hero-nb">新</span>
+        <span class="hero-title">关于2026-2027学年第一学期期中考试安排的通知</span>
+      </div>
+      <div class="hero-meta">教务处 · 剩 1 天</div>
+    <div class="hero-ft">
+      <span class="hero-act">先办这件 ›</span>
+      <span class="hero-sub">共 21 条与你有关 · 21 条新收录</span>
+    </div>
+  </div>
+  
+  <div class="sect-t red">🔴 三天内要办 · 7 条<span class="sec-warn">会打扰你</span></div>
+  
+    <div class="pc major">
+      <div class="pc-row">
+        <span class="pc-lv">🔴 今天就要办</span>
+        <span class="pc-new">新</span>
+        <span class="pc-rank">#1</span>
+      </div>
+      <div class="pc-t">关于2026-2027学年第一学期期中考试安排的通知</div>
+      <div class="pc-meta">教务处 · 剩 1 天</div>
+      <div class="pc-one">期中考试 11月9日、10日两天集中考，考前一礼拜该复习了。</div>
+    </div>
+    <div class="pc major">
+      <div class="pc-row">
+        <span class="pc-lv">🟠 三天内要办</span>
+        <span class="pc-new">新</span>
+        <span class="pc-rank">#2</span>
+      </div>
+      <div class="pc-t">关于报送2026年度国家奖学金、国家励志奖学金获得者宣传材料的通知</div>
+      <div class="pc-meta">党委学生工作部（学工部） · 剩 2 天</div>
+      <div class="pc-one">💰 报送2026年度国家奖学金、国家励志奖学金获得者宣传… —— 面向全校学生，截止 2026-11-10。</div>
+    </div>
+    <div class="pc major">
+      <div class="pc-row">
+        <span class="pc-lv">⚪️ 长期有效</span>
+        <span class="pc-new">新</span>
+        <span class="pc-rank">#3</span>
+      </div>
+      <div class="pc-t">关于举办第八届“ ProQuest杯”外文文献检索答题大赛的通知</div>
+      <div class="pc-meta">图书馆</div>
+      <div class="pc-one">🏆 举办第八届“ ProQuest杯”外文文献检索答题大… —— 面向全校本科生、研究生（图书馆活动）。</div>
+    </div>
+    <div class="pc major">
+      <div class="pc-row">
+        <span class="pc-lv">🟢 本月内</span>
+        <span class="pc-new">新</span>
+        <span class="pc-rank">#4</span>
+      </div>
+      <div class="pc-t">关于开展2026年度“正大杯”市场调查与分析大赛校内选拔的补充通知</div>
+      <div class="pc-meta">教务处 · 剩 8 天</div>
+      <div class="pc-one">正大杯网考11月16日线上机考，赶不上就进不了校赛。</div>
+    </div>
+    <div class="pc major">
+      <div class="pc-row">
+        <span class="pc-lv">🟢 本月内</span>
+        <span class="pc-new">新</span>
+        <span class="pc-rank">#5</span>
+      </div>
+      <div class="pc-t">关于中国国际大学生创新大赛（2027）校级项目培育申报的通知</div>
+      <div class="pc-meta">创新创业学院 · 剩 12 天</div>
+      <div class="pc-one">中国国际大学生创新大赛开始培育申报，入选有导师、场地、经费，还能优先推省赛。</div>
+    </div>
+    <div class="pc major">
+      <div class="pc-row">
+        <span class="pc-lv">⚪️ 长期有效</span>
+        <span class="pc-new">新</span>
+        <span class="pc-rank">#6</span>
+      </div>
+      <div class="pc-t">关于举办2026年安徽省大学生ERP数智化运营大赛校园选拔赛通知</div>
+      <div class="pc-meta">经济管理学院</div>
+      <div class="pc-one">🏆 举办2026年安徽省大学生ERP数智化运营大赛校园选… —— 面向全校本科生、研究生（竞赛选拔）。</div>
+    </div>
+    <div class="pc major">
+      <div class="pc-row">
+        <span class="pc-lv">⚪️ 长期有效</span>
+        <span class="pc-new">新</span>
+        <span class="pc-rank">#7</span>
+      </div>
+      <div class="pc-t">关于2025-2026学年本科生转专业工作安排的通知</div>
+      <div class="pc-meta">教务处 · jwc.ahau.edu.cn</div>
+      <div class="pc-one">上一年转专业的完整流程：12月8-11日线上申请，两级审核后按第一、第二志愿分别选录，次年1月16日前校长办公会定人选。</div>
+    </div>
+  
+  <div class="sect-t">🟡 一周内 · 长期归档 · 14 条<span class="sec-sub">静默进流</span></div>
+  <div class="minor-box">
+    
+      <div class="pc minor">
+        <span class="pc-mico">⚪️</span>
+        <div class="pc-mmid">
+          <div class="pc-mt">关于做好2026-2027学年 “女子升大计划”助学金受资助学生推荐工作的通知</div>
+          <div class="pc-mm">党委学生工作部（学工部）</div>
+        </div>
+        <span class="pc-mnew">新</span>
+      </div>
+      <div class="pc minor">
+        <span class="pc-mico">⚪️</span>
+        <div class="pc-mmid">
+          <div class="pc-mt">关于建设本科课程考试试题资源库的通知</div>
+          <div class="pc-mm">本科生院（教务处）</div>
+        </div>
+        <span class="pc-mnew">新</span>
+      </div>
+      <div class="pc minor">
+        <span class="pc-mico">⚪️</span>
+        <div class="pc-mmid">
+          <div class="pc-mt">关于2026年国家励志奖学金、国家助学金评审结果的公示及材料补交通知</div>
+          <div class="pc-mm">学生工作处 · 已过期</div>
+        </div>
+        <span class="pc-mnew">新</span>
+      </div>
+      <div class="pc minor">
+        <span class="pc-mico">⚪️</span>
+        <div class="pc-mmid">
+          <div class="pc-mt">关于报送2026-2027学年本科生转专业工作领导小组名单及选录细则的通知</div>
+          <div class="pc-mm">本科生院（教务处） · 已过期</div>
+        </div>
+        <span class="pc-mnew">新</span>
+      </div>
+      <div class="pc minor">
+        <span class="pc-mico">⚪️</span>
+        <div class="pc-mmid">
+          <div class="pc-mt">安徽农业大学2025-2026学年“十佳班集体”评选结果公示</div>
+          <div class="pc-mm">党委学生工作部（学工部） · 已过期</div>
+        </div>
+        <span class="pc-mnew">新</span>
+      </div>
+      <div class="pc minor">
+        <span class="pc-mico">⚪️</span>
+        <div class="pc-mmid">
+          <div class="pc-mt">关于报送2026-2027学年本科生转专业工作领导小组名单及选录细则的通知</div>
+          <div class="pc-mm">本科生院 · 已过期</div>
+        </div>
+        <span class="pc-mnew">新</span>
+      </div>
+      <div class="pc minor">
+        <span class="pc-mico">⚪️</span>
+        <div class="pc-mmid">
+          <div class="pc-mt">关于举办第十八届校园心理情景剧大赛的通知</div>
+          <div class="pc-mm">党委学生工作部（学工部） · 已过期</div>
+        </div>
+        <span class="pc-mnew">新</span>
+      </div>
+      <div class="pc minor">
+        <span class="pc-mico">⚪️</span>
+        <div class="pc-mmid">
+          <div class="pc-mt">关于安徽农业大学2026年安徽省大学生ERP数智化运营大赛校园选拔赛结果的公示</div>
+          <div class="pc-mm">经济管理学院 · 已过期</div>
+        </div>
+        <span class="pc-mnew">新</span>
+      </div>
+      <div class="pc minor">
+        <span class="pc-mico">⚪️</span>
+        <div class="pc-mmid">
+          <div class="pc-mt">关于做好2025-2026学年十佳班集体答辩展示会的通知</div>
+          <div class="pc-mm">党委学生工作部（学工部） · 已过期</div>
+        </div>
+        <span class="pc-mnew">新</span>
+      </div>
+      <div class="pc minor">
+        <span class="pc-mico">⚪️</span>
+        <div class="pc-mmid">
+          <div class="pc-mt">关于选聘2026年下半年事业单位公开招聘考试考点工作人员的通知</div>
+          <div class="pc-mm">本科生院（教务处） · 已过期</div>
+        </div>
+        <span class="pc-mnew">新</span>
+      </div>
+      <div class="pc minor">
+        <span class="pc-mico">⚪️</span>
+        <div class="pc-mmid">
+          <div class="pc-mt">2025-2026学年本科学生国家奖学金、国家励志奖学金及2026-2027学年本科学生国家助学金名单公示</div>
+          <div class="pc-mm">党委学生工作部（学工部） · 已过期</div>
+        </div>
+        <span class="pc-mnew">新</span>
+      </div>
+      <div class="pc minor">
+        <span class="pc-mico">⚪️</span>
+        <div class="pc-mmid">
+          <div class="pc-mt">安徽农业大学2026-2027学年家庭经济困难学生认定结果公示</div>
+          <div class="pc-mm">党委学生工作部（学工部） · 已过期</div>
+        </div>
+        <span class="pc-mnew">新</span>
+      </div>
+      <div class="pc minor">
+        <span class="pc-mico">⚪️</span>
+        <div class="pc-mmid">
+          <div class="pc-mt">这个寒假，学习有奖！</div>
+          <div class="pc-mm">图书馆 · 已过期</div>
+        </div>
+        <span class="pc-mnew">新</span>
+      </div>
+      <div class="pc minor">
+        <span class="pc-mico">⚪️</span>
+        <div class="pc-mmid">
+          <div class="pc-mt">关于举办2026年安徽省大学生“AI+信息素养”大赛校园选拔赛的通知</div>
+          <div class="pc-mm">图书馆 · 已过期</div>
+        </div>
+        <span class="pc-mnew">新</span>
+      </div>
+  </div>
+  <div class="sumline">共 <b>123</b> 条通知 · 真实公开源 <b>117</b> 条 · 已浓缩 <b>123</b> 条</div>
+  <div class="sect-t">按标签分组 · 4 组 / 21 条</div>
+  
+    <div class="grp  ">
+      <div class="grp-h">
+        <span class="grp-ico">🔀</span>
+        <span class="grp-k">转专业</span>
+        <span class="grp-n">3 条</span>
+        
+        <span class="grp-arrow">▸</span>
+      </div>
+      <div class="grp-d">转专业 / 专业分流</div>
+      
+    </div>
+    <div class="grp  urgent">
+      <div class="grp-h">
+        <span class="grp-ico">🏆</span>
+        <span class="grp-k">学科竞赛</span>
+        <span class="grp-n">8 条</span>
+        <span class="badge-urgent">紧急</span>
+        <span class="grp-arrow">▸</span>
+      </div>
+      <div class="grp-d">各类竞赛报名与提交</div>
+      
+    </div>
+    <div class="grp  urgent">
+      <div class="grp-h">
+        <span class="grp-ico">💰</span>
+        <span class="grp-k">奖助学金</span>
+        <span class="grp-n">7 条</span>
+        <span class="badge-urgent">紧急</span>
+        <span class="grp-arrow">▸</span>
+      </div>
+      <div class="grp-d">奖学金 / 助学金 / 评优评先</div>
+      
+    </div>
+    <div class="grp  urgent">
+      <div class="grp-h">
+        <span class="grp-ico">📝</span>
+        <span class="grp-k">考试安排</span>
+        <span class="grp-n">3 条</span>
+        <span class="badge-urgent">紧急</span>
+        <span class="grp-arrow">▸</span>
+      </div>
+      <div class="grp-d">考试时间地点 / 补考缓考</div>
+      
+    </div>
+</div>
+  </div>
+    </div>
+    <div class="col">
+      <div class="col-h"><span><b>② 搜索</b></span><span class="route">pages/search</span></div>
+      
+  <div class="phone">
+    <div class="ph-bar">
+      <span class="ph-time">15:32</span>
+      <span class="ph-title">搜索</span>
+      <span class="ph-dots">••• ⊙</span>
+    </div>
+    <div class="ph-sub">主动搜索 · 命中高亮</div>
+    <div class="ph-body">
+  <div class="sbar"><span class="s-ico">🔍</span><span class="s-txt">转专业</span><span class="s-x">✕</span></div>
+  <div class="hotline">
+    <span class="hot-lb">热搜</span>
+    <span class="hot">转专业</span><span class="hot">奖学金</span><span class="hot">竞赛</span><span class="hot">考试安排</span><span class="hot">讲座</span><span class="hot">选课</span><span class="hot">图书馆</span>
+  </div>
+  <div class="sect-t">命中 3 条 · 真实公开源 3 条</div>
+  
+    <div class="card-s">
+      <div class="cs-t">🔀 关于报送2026-2027学年本科生<mark>转专业</mark>工作领导小组名单及选录细则的通知</div>
+      <div class="cs-hit">命中：标题 / 标签 / 浓缩 / 要点 / 原文</div>
+      <div class="cs-snip">…各学院（部）：2026-2027学年本科生<mark>转专业</mark>工作即将启动，各学院在<mark>转专业</mark>工作启动前应依据《安徽农业大学本科学生<mark>转专业</mark>办法》（校教发〔2024〕23 号）文件（附件1……</div>
+      <div class="cs-f">本科生院 · 2026-10-26</div>
+    </div>
+    <div class="card-s">
+      <div class="cs-t">🔀 关于报送2026-2027学年本科生<mark>转专业</mark>工作领导小组名单及选录细则的通知</div>
+      <div class="cs-hit">命中：标题 / 标签 / 浓缩 / 要点 / 原文</div>
+      <div class="cs-snip">…各学院（部）： 202 6 -202 7 学年本科生<mark>转专业</mark>工作即将启动，各学院在<mark>转专业</mark>工作启动前应依据《安徽农业大学本科学生<mark>转专业</mark>办法》（校教发〔 202 4 〕 23 号）文件……</div>
+      <div class="cs-f">本科生院（教务处） · 2026-10-26</div>
+    </div>
+    <div class="card-s">
+      <div class="cs-t">🔀 关于2025-2026学年本科生<mark>转专业</mark>工作安排的通知</div>
+      <div class="cs-hit">命中：标题 / 标签 / 浓缩 / 原文</div>
+      <div class="cs-snip">…各学院、校直单位：为深化我校教育教学改革，充分调动学生学习的积极性、主动性，根据《安徽农业大学本科学生<mark>转专业</mark>办法》（校教发〔2024〕23 号）（附件1）文件和《2025-2026学年本科生<mark>转专业</mark>工作安排的通知》精神，对照安徽农……</div>
+      <div class="cs-f">教务处 · 2025-12-04</div>
+    </div>
+  <div class="sect-t">换个词：搜「竞赛」→ 11 条</div>
+  <div class="note-box">其中 <b>8</b> 条标题里没有「竞赛」二字，命中来自<b>标签</b>——页面会明说「为什么搜到」，不让人困惑。</div>
+  <div class="sect-t">点标签浏览：「学科竞赛」→ 11 条</div>
+</div>
+  </div>
+    </div>
+    <div class="col">
+      <div class="col-h"><span><b>③ 详情</b></span><span class="route">pages/detail</span></div>
+      
+  <div class="phone">
+    <div class="ph-bar">
+      <span class="ph-time">15:32</span>
+      <span class="ph-title">详情</span>
+      <span class="ph-dots">••• ⊙</span>
+    </div>
+    <div class="ph-sub">浓缩 + 溯源</div>
+    <div class="ph-body">
+  <div class="dt-head">
+    <div class="dt-t">关于举办2026年“农芯智”AI智能体创新大赛的通知</div>
+    <div class="dt-meta">
+      <span>数据管理处（信息化办公室）</span>
+      <span>2026-11-03</span>
+      <span class="cd hi">剩 25 天</span>
+    </div>
+    <div class="dt-flags">
+      <span class="fl ok">已订阅该类</span>
+      <span class="fl real">真实公开源</span>
+    </div>
+  </div>
+  <div class="tabs"><span class="tab on">浓缩</span><span class="tab">原文</span></div>
+  <div class="one-box">
+    <div class="ob-lb">一句话看懂</div>
+    <div class="ob-t">学校办了个 AI 智能体比赛，12月3日前报名并交作品，赢了有奖金还能上学校平台。</div>
+  </div>
+  <div class="sect-t">四要素</div>
+  <div class="facts">
+    
+      <div class="fact">
+        <span class="f-k">谁该看</span>
+        <span class="f-v">在校学生 / 在职教职工（1-3人团队）</span>
+      </div>
+      <div class="fact">
+        <span class="f-k">要交什么</span>
+        <span class="f-v">项目成果（作品说明+可运行智能体）/ 5分钟演示视频 / 答辩PPT</span>
+      </div>
+      <div class="fact">
+        <span class="f-k">去哪办</span>
+        <span class="f-v">赛事QQ群 934927951（报名与提交合并）</span>
+      </div>
+      <div class="fact">
+        <span class="f-k">剩几天</span>
+        <span class="f-v">剩 25 天（截止 2026-12-03）</span>
+      </div>
+  </div>
+  <div class="sect-t">浓缩要点 · 每条都挂原文出处</div>
+  
+    <div class="pt on">
+      <div class="pt-t">1. 报名和交作品是一起做的，截止 12月3日，交到赛事QQ群 934927951。</div>
+      <div class="pt-q">
+        <span class="q-lb">原文出处</span>
+        <span class="q-ok">✔ 第 188 字符处可定位</span>
+      </div>
+      <div class="pt-quote">「报名与作品提交合并进行，于2026年12月3日前将项目成果提交至赛事指定渠道（赛事QQ群：934927951）」</div>
+    </div>
+    <div class="pt ">
+      <div class="pt-t">2. 可以一个人报，也可以组队，一队最多3人；每人只能进一个队，每队只能交1个作品。</div>
+      <div class="pt-q">
+        <span class="q-lb">原文出处</span>
+        <span class="q-ok">✔ 第 114 字符处可定位</span>
+      </div>
+      <div class="pt-quote">「可以个人或团队形式参加，每人只能参加一个团队。团队可跨学院（部门）、跨学科组队，每支队伍限1—3人，每个团队仅允许提交1个作品」</div>
+    </div>
+    <div class="pt ">
+      <div class="pt-t">3. 评分主要看四点：创新、实用、技术、体验，创新占大头（30%）。</div>
+      <div class="pt-q">
+        <span class="q-lb">原文出处</span>
+        <span class="q-ok">✔ 第 247 字符处可定位</span>
+      </div>
+      <div class="pt-quote">「评选规则：创新性30%、实用性25%、技术实现25%、用户体验20%」</div>
+    </div>
+    <div class="pt ">
+      <div class="pt-t">4. 算力不用自己买，在学校平台申请就行（搜“token鲨”）。</div>
+      <div class="pt-q">
+        <span class="q-lb">原文出处</span>
+        <span class="q-ok">✔ 第 297 字符处可定位</span>
+      </div>
+      <div class="pt-quote">「在“数智安农”平台搜索“大模型公共服务（token鲨）”提交算力申请」</div>
+    </div>
+    <div class="pt ">
+      <div class="pt-t">5. 11月中旬有官方培训，建议去。</div>
+      <div class="pt-q">
+        <span class="q-lb">原文出处</span>
+        <span class="q-ok">✔ 第 340 字符处可定位</span>
+      </div>
+      <div class="pt-quote">「预计11月中旬开展大模型及智能体开发相关讲座与培训」</div>
+    </div>
+  <div class="trace-box">
+    溯源完整度自评：<b>5 / 5</b> 条要点能在原文中定位
+    <span class="q-ok">✔ 全部可核对</span>
+  </div>
+</div>
+  </div>
+    </div>
+    <div class="col">
+      <div class="col-h"><span><b>④ 原文</b></span><span class="route">pages/detail · 原文 Tab</span></div>
+      
+  <div class="phone">
+    <div class="ph-bar">
+      <span class="ph-time">15:32</span>
+      <span class="ph-title">原文</span>
+      <span class="ph-dots">••• ⊙</span>
+    </div>
+    <div class="ph-sub">可跳转高亮</div>
+    <div class="ph-body">
+  <div class="dt-head mini">
+    <div class="dt-t">关于举办2026年“农芯智”AI智能体创新大赛的通知</div>
+    <div class="dt-meta"><span class="tab-inline on">浓缩</span><span class="tab-inline">原文</span></div>
+  </div>
+  <div class="note-box">原文切成 <b>11</b> 段，其中 <b>5</b> 段标为「可跳转高亮」——点要点就能跳到这些句子。</div>
+  <div class="rawbox">
+    <span class="raw-plain">为深入贯彻《教育强国建设规划纲要（2024—2035年）》等文件精神，推进人工智能赋能学校教育教学，特举办2026年“农芯智”AI智能体创新大赛。一、大赛主题：数智安农，智创校园。二、参赛对象：在职教职工及在校学生均可报名参赛，</span><span class="raw-hl" title="要点 2">可以个人或团队形式参加，每人只能参加一个团队。团队可跨学院（部门）、跨学科组队，每支队伍限1—3人，每个团队仅允许提交1个作品</span><span class="raw-plain">。三、大赛安排：（一）</span><span class="raw-hl" title="要点 1">报名与作品提交合并进行，于2026年12月3日前将项目成果提交至赛事指定渠道（赛事QQ群：934927951）</span><span class="raw-plain">。（二）</span><span class="raw-hl" title="要点 3">评选规则：创新性30%、实用性25%、技术实现25%、用户体验20%</span><span class="raw-plain">。四、大赛支持：（一）算力使用：</span><span class="raw-hl" title="要点 4">在“数智安农”平台搜索“大模型公共服务（token鲨）”提交算力申请</span><span class="raw-plain">。（二）培训安排：</span><span class="raw-hl" title="要点 5">预计11月中旬开展大模型及智能体开发相关讲座与培训</span><span class="raw-plain">。五、选题方向：（一）AI+教学科研；（二）AI+管理服务；（三）AI+生活创意；（四）AI+安农特色。六、奖项设置：学生组一等奖2名（3000元）、二等奖4名（1500元）、三等奖6名（1000元）、优秀奖若干（500元）。数据管理处、人事处、本科生院、研究生院、团委 2026年11月2日</span>
+    
+  </div>
+  <div class="note-box">点第 1 条要点 → 跳到 tab=<b>raw</b>，高亮第 <b>1</b> 句。</div>
+</div>
+  </div>
+    </div>
+    <div class="col">
+      <div class="col-h"><span><b>⑤ 订阅</b></span><span class="route">pages/me</span></div>
+      
+  <div class="phone">
+    <div class="ph-bar">
+      <span class="ph-time">15:32</span>
+      <span class="ph-title">我的订阅</span>
+      <span class="ph-dots">••• ⊙</span>
+    </div>
+    <div class="ph-sub">勾选即订阅 · 实时看收益</div>
+    <div class="ph-body">
+  <div class="hero-mini">
+    <div class="hm-logo">我</div>
+    <div>
+      <div class="hm-t">2025级 · 大一</div>
+      <div class="hm-s">信息与人工智能学院</div>
+    </div>
+  </div>
+  <div class="sect-t">关注事项（9 个标签，勾选即订阅）</div>
+  
+    <div class="sub-row on">
+      <span class="sub-ck">✔</span>
+      <span class="sub-ico">🔀</span>
+      <span class="sub-k">转专业</span>
+      <span class="sub-c">该类 3 条</span>
+    </div>
+    <div class="sub-row on">
+      <span class="sub-ck">✔</span>
+      <span class="sub-ico">🏆</span>
+      <span class="sub-k">学科竞赛</span>
+      <span class="sub-c">该类 11 条</span>
+    </div>
+    <div class="sub-row on">
+      <span class="sub-ck">✔</span>
+      <span class="sub-ico">💰</span>
+      <span class="sub-k">奖助学金</span>
+      <span class="sub-c">该类 11 条</span>
+    </div>
+    <div class="sub-row on">
+      <span class="sub-ck">✔</span>
+      <span class="sub-ico">📝</span>
+      <span class="sub-k">考试安排</span>
+      <span class="sub-c">该类 7 条</span>
+    </div>
+    <div class="sub-row ">
+      <span class="sub-ck"></span>
+      <span class="sub-ico">📚</span>
+      <span class="sub-k">选课</span>
+      <span class="sub-c">该类 3 条</span>
+    </div>
+    <div class="sub-row ">
+      <span class="sub-ck"></span>
+      <span class="sub-ico">🎓</span>
+      <span class="sub-k">讲座培训</span>
+      <span class="sub-c">该类 39 条</span>
+    </div>
+    <div class="sub-row ">
+      <span class="sub-ck"></span>
+      <span class="sub-ico">📖</span>
+      <span class="sub-k">图书资源</span>
+      <span class="sub-c">该类 10 条</span>
+    </div>
+    <div class="sub-row ">
+      <span class="sub-ck"></span>
+      <span class="sub-ico">🧾</span>
+      <span class="sub-k">学工事务</span>
+      <span class="sub-c">该类 25 条</span>
+    </div>
+    <div class="sub-row ">
+      <span class="sub-ck"></span>
+      <span class="sub-ico">📢</span>
+      <span class="sub-k">校内通知</span>
+      <span class="sub-c">该类 14 条</span>
+    </div>
+  <div class="sub-extra">
+    <div>提醒时机：截止前 7 天 / 3 天 / 1 天</div>
+    <div>推送渠道：小程序服务通知 + 群内播报</div>
+  </div>
+  <div class="reach">⚡ 当前订阅能收到：<b>21</b> 条</div>
+  <div class="sect-t">改订阅，实时看到收益变化</div>
+  <table class="chg">
+    <tr><td>勾上「讲座培训」</td><td>订阅 5 项</td><td class="up">可触达 56 条（+35）</td></tr>
+    <tr><td>取消「讲座培训」</td><td>订阅 4 项</td><td>可触达 21 条</td></tr>
+    <tr><td>点「全选」</td><td>订阅 9 项</td><td>可触达 81 条</td></tr>
+    <tr><td>点「恢复默认」</td><td>订阅 4 项</td><td>可触达 21 条</td></tr>
+    <tr><td>点「保存」</td><td colspan="2" class="up">已写入本地存储 ✔</td></tr>
+  </table>
+</div>
+  </div>
+    </div>
+    <div class="col">
+      <div class="col-h"><span><b>⑥ 推送设置</b></span><span class="route">pages/push</span></div>
+      
+  <div class="phone">
+    <div class="ph-bar">
+      <span class="ph-time">15:32</span>
+      <span class="ph-title">推送设置</span>
+      <span class="ph-dots">••• ⊙</span>
+    </div>
+    <div class="ph-sub">微信触达 + 触达时间线</div>
+    <div class="ph-body">
+  <div class="sect-t">🔔 主动推送引擎 · 真跑一遍的结果</div>
+  <div class="wx-tip" style="margin-bottom:10px">微信服务通知是痛点的最后一步 —— 关掉小程序也能收到提醒。下面是真跑一遍的授权、登记与推演结果。</div>
+  
+  <div class="wx-card">
+    <div class="wx-hd">
+      <div>
+        <div class="wx-lb">当前状态</div>
+        <div class="wx-st demo">已登记 · 演示模式</div>
+      </div>
+      <span class="wx-tag demo">演示模式</span>
+    </div>
+    <div class="wx-tip">已完成授权登记流程；待小程序后台配置订阅消息模板后自动转为真实下发，无需你重操作。</div>
+    <div class="wx-row"><span class="k">已订阅类别</span><span class="v">截止提醒 · 新通知提醒 · 转专业 · 学科竞赛 · 奖助学金 · 考试安排</span></div>
+    <div class="wx-row"><span class="k">提前几天提醒</span><span class="v">截止前 7 / 3 / 1 天</span></div>
+    <div class="wx-row"><span class="k">送达留痕</span><span class="v">1 次</span></div>
+    <button class="wx-btn">更新订阅授权</button>
+    <button class="wx-btn ghost">模拟一次主动送达</button>
+  </div>
+  <div class="sect-t" style="margin-top:14px">📲 触达时间线 · 什么时候会主动找你</div>
+  
+  <div class="wx-card" style="margin-top:10px">
+    <div class="wx-i"><span class="k2">与你相关</span><span class="num">123</span></div>
+    <div class="wx-i"><span class="k2">已规划提醒</span><span class="num">21</span></div>
+    <div class="wx-i"><span class="k2">未来 14 天会打扰</span><span class="num">15 次</span></div>
+    <div class="wx-tip">按「截止前 7 / 3 / 1 天」推演：每条通知在截止前会提醒几次、具体哪天提醒，全部由真实发布日与截止日算出。</div>
+    <div class="tl">
+      
+        <div class="tl-g">
+          <div class="tl-dot s"></div>
+          <div class="tl-bd">
+            <div class="tl-dt">11月1日<span class="n">1 条</span></div>
+            
+              <div class="tl-it">
+                <div class="tl-t">机械与车辆工程学院“精匠讲堂”系列学术报告</div>
+                <div class="tl-m">机械与车辆工程学院（工学院） · 11月8日 截止 · 剩 0 天</div>
+              </div>
+          </div>
+        </div>
+        <div class="tl-g">
+          <div class="tl-dot s"></div>
+          <div class="tl-bd">
+            <div class="tl-dt">11月2日<span class="n">1 条</span></div>
+            
+              <div class="tl-it">
+                <div class="tl-t">关于2026-2027学年第一学期期中考试安排的通知</div>
+                <div class="tl-m">教务处 · 11月9日 截止 · 剩 1 天</div>
+              </div>
+          </div>
+        </div>
+        <div class="tl-g">
+          <div class="tl-dot s"></div>
+          <div class="tl-bd">
+            <div class="tl-dt">11月3日<span class="n">2 条</span></div>
+            
+              <div class="tl-it">
+                <div class="tl-t">关于报送2026年度国家奖学金、国家励志奖学金获得者宣传材料的通知</div>
+                <div class="tl-m">党委学生工作部（学工部） · 11月10日 截止 · 剩 2 天</div>
+              </div>
+              <div class="tl-it">
+                <div class="tl-t">机械与车辆工程学院2026-2027学年第一学期第十周考试安排</div>
+                <div class="tl-m">机械与车辆工程学院（工学院） · 11月10日 截止 · 剩 2 天</div>
+              </div>
+          </div>
+        </div>
+        <div class="tl-g">
+          <div class="tl-dot s"></div>
+          <div class="tl-bd">
+            <div class="tl-dt">11月5日<span class="n">1 条</span></div>
+            
+              <div class="tl-it">
+                <div class="tl-t">关于举办“AI时代的信息检索与学术素养”讲座的通知</div>
+                <div class="tl-m">图书馆 · 11月12日 截止 · 剩 4 天</div>
+              </div>
+          </div>
+        </div>
+        <div class="tl-g">
+          <div class="tl-dot s"></div>
+          <div class="tl-bd">
+            <div class="tl-dt">11月8日<span class="n">2 条</span></div>
+            
+              <div class="tl-it">
+                <div class="tl-t">关于做好2026级本科学生《学生手册》考试工作的通知</div>
+                <div class="tl-m">党委学生工作部（学工部） · 11月15日 截止 · 剩 7 天</div>
+              </div>
+              <div class="tl-it">
+                <div class="tl-t">11月8日机械与车辆工程学院“精匠讲堂”系列学术报告</div>
+                <div class="tl-m">学生报告（学术讲座） · 11月8日 截止 · 剩 0 天</div>
+              </div>
+          </div>
+        </div>
+        <div class="tl-g">
+          <div class="tl-dot s"></div>
+          <div class="tl-bd">
+            <div class="tl-dt">11月9日<span class="n">2 条</span></div>
+            
+              <div class="tl-it">
+                <div class="tl-t">11月9日园艺学院一带一路中外名师大讲堂系列报告（三十三）</div>
+                <div class="tl-m">学生报告（学术讲座） · 11月9日 截止 · 剩 1 天</div>
+              </div>
+              <div class="tl-it">
+                <div class="tl-t">关于开展2026年度“正大杯”市场调查与分析大赛校内选拔的补充通知</div>
+                <div class="tl-m">教务处 · 11月16日 截止 · 剩 8 天</div>
+              </div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+  </div>
+    </div>
+    <div class="col">
+      <div class="col-h"><span><b>⑦ 今日简报 · 智能体</b></span><span class="route">pages/digest</span></div>
+      
+  <div class="phone">
+    <div class="ph-bar">
+      <span class="ph-time">15:32</span>
+      <span class="ph-title">今日简报</span>
+      <span class="ph-dots">••• ⊙</span>
+    </div>
+    <div class="ph-sub">简报 + 智能体主动送达清单</div>
+    <div class="ph-body">
+  <div class="bhead-mini">
+    <div class="bh-t">今日简报</div>
+    <div class="bh-s">2026-11-08 15:25 生成 · 知时 · 数字安农信息雷达</div>
+  </div>
+  <div class="sum-mini">
+    <div class="sm-lb">一句话总结</div>
+    <div class="sm-tx">今天起 2 条在三天内截止。</div><div class="sm-tx">你关注的 4 类共命中 21 条。。</div>
+    <div class="sm-idx"><span class="sin">知时指数</span>
+      <span class="siv">30</span>
+      <span class="sil">比较轻松</span></div>
+  </div>
+  <div class="sect-t">💰 数据可信度 · 你看到的从哪来</div>
+  <div class="note-box">真实公开源占比 <b>117 / 123</b> —— 绝大多数来自安农官网公开页</div>
+  <div class="sect-t">🤖 智能体主动送达 · 你不打开它也在跑</div>
+  <div class="wx-tip" style="margin-bottom:10px">上面是「你打开小程序时本地现算」，下面是<b style="color:#4dd6a8">服务端智能体按点自己跑出来</b>的清单 —— 后者才是治"错过"的那一环。</div>
+  <div class="agbox off"><div class="ag-hd"><span class="ag-dot"></span><span class="ag-lab">本地模式（未部署智能体服务）</span><span class="ag-via">本地算</span></div><div class="ag-tl">该主动提醒你 · 2 件</div><div class="ag-notify"><div class="ag-nr1"><div class="ag-nt">关于2026-2027学年第一学期期中考试安排的通知</div><div class="ag-nd">明天截止</div></div><div class="ag-nsr">考试安排 · 教务处</div><div class="ag-nrs">💡 还剩 1 天</div><div class="ag-none">期中考试 11月9日、10日两天集中考，考前一礼拜该复习了。</div></div><div class="ag-notify"><div class="ag-nr1"><div class="ag-nt">关于报送2026年度国家奖学金、国家励志奖学金获得者宣传材料的通知</div><div class="ag-nd">D-2</div></div><div class="ag-nsr">奖助学金 · 党委学生工作部（学工部）</div><div class="ag-nrs">💡 还剩 2 天</div><div class="ag-none">💰 报送2026年度国家奖学金、国家励志奖学金获得者宣传… —— 面向全校学生，截止 2026-11-10。</div></div><div class="ag-sl">静默进流 · 不打扰你（3 条示例）</div><div class="ag-sitem"><span class="ag-st">关于举办第八届“ ProQuest杯”外文文献检索答题大赛的通知</span><span class="ag-sd"></span></div><div class="ag-sitem"><span class="ag-st">关于开展2026年度“正大杯”市场调查与分析大赛校内选拔的补充通知</span><span class="ag-sd">还有 8 天</span></div><div class="ag-sitem"><span class="ag-st">关于中国国际大学生创新大赛（2027）校级项目培育申报的通知</span><span class="ag-sd">还有 12 天</span></div><div class="ag-meta"><span>最近计算：2026-11-08T07:25:02.246Z</span><span>模式：纯规则</span><span>命中 21 条 · 打扰 2 条 · 静默 19 条</span></div><div class="ag-acts"><div class="ag-btn">🔄 让它重算一遍</div><div class="ag-btn">📋 复制清单</div></div></div>
+</div>
+  </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <b>「农芯智」AI 智能体创新大赛</b> 参赛作品 · 知时 · 安农校园信息雷达<br>
+    数据来自公网公开通知页聚合；仅聚合公开信息，不涉及教务后台 / 课表 / 成绩 / 学籍
+  </div>
+
+</div>
+</body>
+</html>

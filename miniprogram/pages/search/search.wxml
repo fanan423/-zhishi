@@ -1,0 +1,130 @@
+<view class="screen theme-{{theme}}">
+<view class="wrap">
+
+  <!-- 搜索框 -->
+  <view class="sbox">
+    <text class="sic">🔍</text>
+    <input class="sin"
+           value="{{q}}"
+           focus="{{focus}}"
+           placeholder="搜通知｜如「转专业」「奖学金」「竞赛」"
+           placeholder-class="sph"
+           confirm-type="search"
+           bindinput="onInput"
+           bindconfirm="onConfirm" />
+    <text class="scl" wx:if="{{q}}" bindtap="onClear">✕</text>
+  </view>
+
+  <!-- 标签筛选 -->
+  <scroll-view class="tscroll" scroll-x enable-flex>
+    <view class="trow">
+      <view class="tchip {{tagFilter === '' ? 'on' : ''}}" data-t="" bindtap="tapTag">全部</view>
+      <view class="tchip {{tagFilter === item.key ? 'on' : ''}}"
+            wx:for="{{allTags}}" wx:key="key"
+            data-t="{{item.key}}" bindtap="tapTag">
+        {{item.icon}} {{item.key}}
+        <text class="tnum" wx:if="{{tagCounts[item.key]}}">{{tagCounts[item.key]}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- ============ 未搜索：热词 + 历史 ============ -->
+  <block wx:if="{{!searched}}">
+
+    <view class="sec">热门搜索</view>
+    <view class="wchips">
+      <view class="wchip" wx:for="{{hotWords}}" wx:key="*this" data-w="{{item}}" bindtap="tapWord">{{item}}</view>
+    </view>
+
+    <block wx:if="{{history.length > 0}}">
+      <view class="sec">
+        搜索历史
+        <text class="hdcl" bindtap="clearHistory">清空</text>
+      </view>
+      <view class="wchips">
+        <view class="wchip his" wx:for="{{history}}" wx:key="*this" data-w="{{item}}" bindtap="tapWord">{{item}}</view>
+      </view>
+    </block>
+
+    <view class="sec">按标签浏览</view>
+    <view class="browselist">
+      <view class="brow" wx:for="{{allTags}}" wx:key="key" data-t="{{item.key}}" bindtap="browseTag">
+        <text class="bico">{{item.icon}}</text>
+        <view class="bmid">
+          <view class="bk">{{item.key}}</view>
+          <view class="bd">{{item.desc}}</view>
+        </view>
+        <view class="bnum">{{tagCounts[item.key] || 0}} 条 ›</view>
+      </view>
+    </view>
+
+    <view class="foot">
+      <text class="hl">搜索范围：</text>标题 / AI 浓缩 / 原文全文 / 来源单位，全部来自公网公开通知页。每条结果都带出处，可点进详情核对原文。
+    </view>
+  </block>
+
+  <!-- ============ 已搜索：结果 ============ -->
+  <block wx:else>
+
+    <view class="rhead">
+      找到 <text class="hl2">{{stat.total}}</text> 条
+      <text wx:if="{{tagFilter}}" class="rftag">· 标签「{{tagFilter}}」</text>
+      <text wx:if="{{stat.real}}" class="rfreal">· 其中真实公开数据 {{stat.real}} 条</text>
+    </view>
+
+    <view class="mc {{item.level}}"
+          wx:for="{{results}}" wx:key="id"
+          data-id="{{item.id}}" bindtap="goDetail">
+
+      <view class="r1">
+        <view class="tt">
+          <text wx:for="{{titleSegs[item.id]}}" wx:for-item="sg" wx:key="index"
+                class="{{sg.hl ? 'mhl' : ''}}">{{sg.text}}</text>
+        </view>
+        <view class="dd" wx:if="{{item.countdown !== null}}">剩 {{item.countdown}} 天</view>
+      </view>
+
+      <view class="sr">
+        {{item.icon}} {{item.event}} · {{item.source}} · {{item.publish}}
+        <text wx:if="{{item.deadline}}"> · 截止 {{item.deadline}}</text>
+      </view>
+
+      <!-- 浓缩一句话 -->
+      <view class="d1" wx:if="{{item.digestOne}}">{{item.digestOne}}</view>
+
+      <!-- 原文命中片段（带高亮）→ 这就是"为什么它被搜出来"的证据 -->
+      <view class="snip" wx:if="{{item.snippet && item.hitInSnippet}}">
+        <text class="snl">原文命中</text>
+        <view class="snt">
+          <text wx:if="{{item.snippetPrefix}}" class="ell">{{item.snippetPrefix}}</text><text
+            wx:for="{{snippetSegs[item.id]}}" wx:for-item="sg" wx:key="index"
+            class="{{sg.hl ? 'mhl' : ''}}">{{sg.text}}</text><text wx:if="{{item.snippetSuffix}}" class="ell">{{item.snippetSuffix}}</text>
+        </view>
+      </view>
+
+      <!-- 无可见高亮时，如实说明命中来源（标签 / 浓缩 / 来源单位等） -->
+      <view class="whyhit" wx:if="{{item.needExplain && item.hitSources.length > 0}}">
+        为什么搜到：命中 <text class="whl">{{item.hitSources}}</text>（标题与原文中无该词字面出现）
+      </view>
+
+      <view class="tags">
+        <text class="tg">{{item.event}}</text>
+        <text class="tg g" wx:if="{{item.real && item.url}}">✓ 可核对原文</text>
+        <text class="tg o" wx:elif="{{item.real}}">真实采集</text>
+      </view>
+
+      <view class="go">📌 看浓缩与原文出处 ›</view>
+    </view>
+
+    <view class="empty" wx:if="{{results.length === 0}}">
+      <view>没有搜到相关通知</view>
+      <view style="margin-top:10rpx">换个说法试试，或点上方标签直接浏览</view>
+    </view>
+
+    <view class="foot">
+      <text class="hl">所有结果可溯源：</text>点进任一条，都能看到 AI 浓缩的每句话对应的原文出处，可一键跳回原文高亮核对。
+    </view>
+  </block>
+
+</view>
+</view>

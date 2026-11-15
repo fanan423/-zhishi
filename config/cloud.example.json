@@ -1,0 +1,7 @@
+{
+  "_comment": "云端配置模板。复制为 cloud.local.json 后填真实值；cloud.local.json 已被 .gitignore 与打包器排除，绝不进提交包。",
+  "_policy": "publishableKey / workBuddyOAuthClientId 是客户端公开标识（publishable），不是私密密钥；但按最小暴露原则仍不随源码分发。",
+  "endpoint": "https://mp-api.app.workbuddy.host",
+  "publishableKey": "",
+  "workBuddyOAuthClientId": ""
+}

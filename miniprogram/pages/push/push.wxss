@@ -1,0 +1,439 @@
+/* 推送设置页 —— 数字安农风格（跟随主题变量） */
+
+/* ---- 引擎状态卡 ---- */
+.sumcard {
+  border-radius: 22rpx;
+  padding: 30rpx;
+  background: linear-gradient(160deg, var(--brand-2), var(--brand));
+  box-shadow: 0 8rpx 24rpx rgba(0, 101, 62, 0.22);
+  margin-bottom: 10rpx;
+}
+.sumcard .sumlb {
+  font-size: 23rpx;
+  color: rgba(255, 255, 255, 0.82);
+  letter-spacing: 0.5rpx;
+}
+.sumcard .sumtx {
+  font-size: 29rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+  line-height: 1.55;
+  margin-top: 14rpx;
+}
+.sumcard .sumidx {
+  display: flex;
+  align-items: baseline;
+  gap: 12rpx;
+  margin-top: 20rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.22);
+  flex-wrap: wrap;
+}
+.sumcard .sin { font-size: 22rpx; color: rgba(255, 255, 255, 0.8); }
+.sumcard .siv { font-size: 40rpx; font-weight: 800; color: #FFFFFF; }
+.sumcard .sil { font-size: 21rpx; color: rgba(255, 255, 255, 0.86); }
+
+/* ---- 开关行 ---- */
+.trow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid var(--border-soft);
+}
+.trow:last-child { border-bottom: none; }
+.trow .tl { flex: 1; min-width: 0; }
+.trow .tt { font-size: 27rpx; color: var(--txt); font-weight: 500; }
+.trow .td {
+  font-size: 21rpx;
+  color: var(--txt-3);
+  line-height: 1.5;
+  margin-top: 6rpx;
+}
+.sw {
+  width: 88rpx;
+  height: 50rpx;
+  border-radius: 26rpx;
+  background: var(--border);
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.sw.on { background: var(--brand); }
+.sw .swd {
+  position: absolute;
+  top: 6rpx;
+  left: 6rpx;
+  width: 38rpx;
+  height: 38rpx;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.2);
+  transition: left 0.2s;
+}
+.sw.on .swd { left: 44rpx; }
+
+/* ---- 说明框 ---- */
+.whybox {
+  background: var(--brand-soft);
+  border-radius: 14rpx;
+  padding: 20rpx 24rpx;
+  margin-top: 16rpx;
+}
+.whybox .whyt {
+  font-size: 23rpx;
+  font-weight: 700;
+  color: var(--brand);
+  margin-bottom: 8rpx;
+}
+.whybox .whyd {
+  font-size: 22rpx;
+  color: var(--txt-2);
+  line-height: 1.7;
+}
+
+/* ---- 后台推送说明 ---- */
+.daemon {
+  background: var(--brand-soft);
+  border-radius: 14rpx;
+  padding: 20rpx 24rpx;
+  margin-top: 14rpx;
+}
+.daemon .dh {
+  font-size: 23rpx;
+  font-weight: 700;
+  color: var(--brand);
+  margin-bottom: 10rpx;
+}
+.daemon .dl {
+  font-size: 22rpx;
+  color: var(--txt-2);
+  line-height: 1.85;
+}
+.daemon .dc { font-weight: 700; color: var(--brand); }
+
+/* ---- 留痕行 ---- */
+.kvrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid var(--border-soft);
+}
+.kvrow:last-of-type { border-bottom: none; }
+.kvrow .kk { font-size: 24rpx; color: var(--txt-2); }
+.kvrow .vv { font-size: 25rpx; color: var(--txt); font-weight: 600; }
+
+/* ---- 推送卡片 ---- */
+.pcard {
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 18rpx;
+  padding: 24rpx 26rpx;
+  margin-bottom: 16rpx;
+  box-shadow: var(--card-shadow);
+  position: relative;
+  overflow: hidden;
+}
+.pcard::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 7rpx;
+  background: var(--brand);
+}
+.pcard.lv-now::before, .pcard.lv-hot::before { background: var(--alert); }
+.pcard.lv-soon::before { background: var(--gold); }
+.pcard.lv-plan::before { background: var(--brand); }
+.pcard.lv-far::before { background: var(--border); }
+
+.pcard .prow {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+.pcard .plv {
+  font-size: 20rpx;
+  font-weight: 700;
+  padding: 4rpx 14rpx;
+  border-radius: 8rpx;
+}
+.pcard .plv.now, .pcard .plv.hot { color: #FFFFFF; background: var(--alert); }
+.pcard .plv.soon { color: var(--gold-ink); background: var(--gold-soft); }
+.pcard .plv.plan { color: var(--brand); background: var(--brand-soft); }
+.pcard .plv.far { color: var(--txt-2); background: var(--border-soft); }
+.pcard .pnew {
+  font-size: 19rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  background: var(--brand);
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+.pcard .prank {
+  margin-left: auto;
+  font-size: 20rpx;
+  color: var(--txt-3);
+  font-weight: 600;
+}
+.pcard .ptitle {
+  font-size: 29rpx;
+  font-weight: 600;
+  color: var(--txt);
+  line-height: 1.45;
+  margin-top: 14rpx;
+}
+.pcard .pmeta {
+  font-size: 21rpx;
+  color: var(--txt-3);
+  margin-top: 12rpx;
+  line-height: 1.5;
+}
+.pcard .pcd { display: inline-block; margin-left: 10rpx; font-size: 20rpx; font-weight: 700;
+  padding: 2rpx 14rpx; border-radius: 10rpx; }
+.pcard .pcd.now { color: #FFFFFF; background: var(--alert); }
+.pcard .pcd.far { color: var(--gold-ink); background: var(--gold-soft); }
+.pcard .pcd.exp { color: var(--txt-3); background: var(--border-soft); }
+.pcard .pd1 {
+  font-size: 24rpx;
+  color: var(--txt-2);
+  line-height: 1.6;
+  margin-top: 12rpx;
+}
+.pcard .ptags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 14rpx;
+}
+.pcard .tg {
+  font-size: 20rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 8rpx;
+  color: var(--brand);
+  background: var(--brand-soft);
+}
+.pcard .tg.g { color: var(--brand); background: var(--brand-soft); }
+.pcard .tg.o { color: var(--gold-ink); background: var(--gold-soft); }
+.pcard .tg.s { color: var(--txt-3); background: var(--border-soft); }
+
+/* ---- 通用补充（本页用到但可能未定义） ---- */
+.sec {
+  font-size: 26rpx;
+  color: var(--brand);
+  font-weight: 700;
+  letter-spacing: 1rpx;
+  margin: 32rpx 0 16rpx;
+  display: flex;
+  align-items: center;
+}
+.sec .secsub {
+  font-size: 21rpx;
+  color: var(--txt-3);
+  font-weight: 400;
+  margin-left: 10rpx;
+}
+.box {
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: 18rpx;
+  padding: 8rpx 26rpx;
+  box-shadow: var(--shadow);
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid var(--border-soft);
+}
+.row:last-child { border-bottom: none; }
+.row .rk { font-size: 26rpx; color: var(--txt-2); }
+.row .rv { font-size: 26rpx; color: var(--txt); font-weight: 500; }
+.row .arrow { color: var(--txt-3); margin-left: 8rpx; }
+.hint {
+  font-size: 21rpx;
+  color: var(--txt-3);
+  line-height: 1.65;
+  padding: 14rpx 0 6rpx;
+  border-top: 1rpx dashed var(--border);
+  margin-top: 8rpx;
+}
+.empty {
+  text-align: center;
+  color: var(--txt-3);
+  font-size: 26rpx;
+  padding: 60rpx 20rpx;
+}
+.acts {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin: 28rpx 0 10rpx;
+}
+.ab {
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  padding: 22rpx 0;
+  border: 1rpx solid var(--border);
+  background: var(--surface);
+  color: var(--txt);
+  line-height: 1.2;
+}
+.ab.primary {
+  background: linear-gradient(160deg, var(--brand-2), var(--brand));
+  color: #FFFFFF;
+  border: none;
+  font-weight: 600;
+  box-shadow: 0 6rpx 18rpx rgba(0, 101, 62, 0.22);
+}
+.foot {
+  margin-top: 36rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--border);
+  font-size: 21rpx;
+  color: var(--txt-3);
+  line-height: 1.8;
+}
+.foot .hl { color: var(--brand); font-weight: 600; }
+
+/* ============ ★ 微信服务通知 ============ */
+.wxhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 4rpx 0 8rpx;
+}
+.wxhead .wxt { font-size: 21rpx; color: var(--txt-3); }
+.wxhead .wxs { font-size: 30rpx; font-weight: 700; margin-top: 6rpx; }
+.wxhead .wxs.off { color: var(--txt-3); }
+.wxhead .wxs.demo { color: #C77700; }
+.wxhead .wxs.real { color: var(--brand); }
+.wxtag {
+  flex-shrink: 0;
+  font-size: 20rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid var(--border);
+  color: var(--txt-2);
+}
+.wxtag.demo { color: #C77700; border-color: rgba(199, 119, 0, 0.4); background: rgba(199, 119, 0, 0.08); }
+.wxtag.real { color: var(--brand); border-color: rgba(0, 101, 62, 0.35); background: rgba(0, 101, 62, 0.07); }
+
+.wxrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--border-soft);
+}
+.wxrow:last-of-type { border-bottom: none; }
+.wxrow .wxk { font-size: 25rpx; color: var(--txt-2); flex-shrink: 0; }
+.wxrow .wxv { font-size: 26rpx; color: var(--txt); font-weight: 500; text-align: right; }
+.wxrow .wxv.pick .arrow { color: var(--txt-3); margin-left: 6rpx; }
+.wxv .wxtype {
+  display: inline-block;
+  font-size: 21rpx;
+  color: var(--brand);
+  background: rgba(0, 101, 62, 0.08);
+  border-radius: 8rpx;
+  padding: 4rpx 12rpx;
+  margin-left: 8rpx;
+}
+.wxv .wxempty { color: var(--txt-3); }
+
+.wxacts {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+  margin: 22rpx 0 6rpx;
+}
+.ab.ghost {
+  background: transparent;
+  color: var(--txt-2);
+  border: 1rpx dashed var(--border);
+}
+.ab.dis { opacity: 0.6; }
+
+/* ============ ★ 触达时间线 ============ */
+.reachsum {
+  font-size: 25rpx;
+  color: var(--txt-2);
+  line-height: 1.7;
+}
+.reachsum .rsn {
+  font-weight: 700;
+  color: var(--txt);
+  font-size: 28rpx;
+  margin: 0 2rpx;
+}
+.reachsum .rsn.hl { color: var(--brand); }
+
+.dayline {
+  margin-top: 18rpx;
+  padding-left: 8rpx;
+}
+.daygroup {
+  display: flex;
+  gap: 18rpx;
+  padding-bottom: 20rpx;
+  position: relative;
+}
+.daydot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  margin-top: 10rpx;
+  flex-shrink: 0;
+  background: var(--txt-3);
+  box-shadow: 0 0 0 6rpx rgba(0, 101, 62, 0.08);
+}
+.daydot.now { background: #D93025; box-shadow: 0 0 0 6rpx rgba(217, 48, 37, 0.12); }
+.daydot.hot { background: #E8710A; box-shadow: 0 0 0 6rpx rgba(232, 113, 10, 0.12); }
+.daydot.soon { background: #C7A400; box-shadow: 0 0 0 6rpx rgba(199, 164, 0, 0.12); }
+.daydot.urgent { background: #D93025; box-shadow: 0 0 0 6rpx rgba(217, 48, 37, 0.12); }
+
+.daybody { flex: 1; min-width: 0; }
+.daydate {
+  font-size: 25rpx;
+  font-weight: 600;
+  color: var(--txt);
+  margin-bottom: 10rpx;
+}
+.daydate .daycnt {
+  font-size: 20rpx;
+  color: var(--txt-3);
+  font-weight: 400;
+  margin-left: 8rpx;
+}
+.dayitem {
+  background: var(--surface);
+  border: 1rpx solid var(--border-soft);
+  border-radius: 14rpx;
+  padding: 18rpx 20rpx;
+  margin-bottom: 10rpx;
+}
+.dayitem .dit {
+  font-size: 25rpx;
+  color: var(--txt);
+  line-height: 1.5;
+  font-weight: 500;
+}
+.dayitem .dmeta {
+  font-size: 21rpx;
+  color: var(--txt-3);
+  margin-top: 8rpx;
+}
+
+/* 推送卡：微信会提醒 标签 */
+.ptags .tg.wx {
+  color: #0A6BC7;
+  background: rgba(10, 107, 199, 0.08);
+  border-radius: 8rpx;
+  padding: 2rpx 10rpx;
+}

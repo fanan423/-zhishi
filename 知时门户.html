@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>知时 · 安农校园信息雷达 | 统一门户</title>
+<style>
+  :root{--bg:#0f1115;--panel:#171a21;--panel2:#1e222b;--line:#2a2f3a;
+    --text:#e8eaed;--sub:#9aa4b2;--accent:#2fae7a;--accent2:#4f93f0;
+    --warn:#e09b2d;--radius:14px;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--text);
+    font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.6;display:flex;overflow:hidden}
+
+  /* ---------- 左侧导航 ---------- */
+  .side{width:314px;flex:0 0 314px;height:100vh;background:var(--panel);
+    border-right:1px solid var(--line);display:flex;flex-direction:column}
+  .brand{padding:20px 20px 16px;border-bottom:1px solid var(--line)}
+  .brand .row{display:flex;align-items:center;gap:11px}
+  .logo{width:40px;height:40px;border-radius:12px;flex:0 0 auto;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;
+    color:#06140f;box-shadow:0 6px 18px rgba(47,174,122,.3)}
+  .brand h1{font-size:16.5px;letter-spacing:.3px}
+  .brand .sub{font-size:11.5px;color:var(--sub);margin-top:2px}
+  .brand .stat{margin-top:13px;display:grid;grid-template-columns:1fr 1fr;
+    gap:7px}
+  .brand .st{background:var(--panel2);border:1px solid var(--line);border-radius:9px;
+    padding:7px 9px}
+  .brand .st b{font-size:16px;color:var(--accent);font-weight:800;letter-spacing:-.3px}
+  .brand .st span{display:block;font-size:10px;color:var(--sub);margin-top:1px}
+  .brand .st.b2 b{color:var(--accent2)}
+
+  .nav{flex:1 1 auto;overflow-y:auto;padding:12px 12px 26px}
+  .nav::-webkit-scrollbar{width:8px}
+  .nav::-webkit-scrollbar-thumb{background:#2c323d;border-radius:4px}
+
+  /* ---------- 主推大按钮（首屏 4 项） ---------- */
+  .navh{font-size:10.5px;color:#5f6a78;letter-spacing:1.6px;margin:4px 8px 8px}
+  a.nv.star{gap:12px;padding:14px 13px;border-radius:12px;margin-bottom:8px;
+    background:linear-gradient(135deg,rgba(47,174,122,.09),rgba(79,147,240,.06));
+    border:1px solid var(--line)}
+  a.nv.star:hover{border-color:rgba(47,174,122,.55);
+    background:linear-gradient(135deg,rgba(47,174,122,.17),rgba(79,147,240,.1))}
+  a.nv.star.on{background:linear-gradient(90deg,rgba(47,174,122,.2),rgba(47,174,122,.05));
+    border-color:rgba(47,174,122,.55)}
+  a.nv.star .nv-i{font-size:21px;width:26px}
+  a.nv.star .nv-t{font-size:14.5px;font-weight:700}
+  a.nv.star .nv-a{font-size:19px;color:#6b7583;flex:0 0 auto;transition:.16s}
+  a.nv.star:hover .nv-a{color:var(--accent);transform:translateX(2px)}
+
+  /* ---------- 折叠分组 ---------- */
+  .fg{margin-bottom:6px}
+  .nv-g{font-size:10.5px;color:#5f6a78;letter-spacing:1.6px;margin:13px 8px 7px}
+  .nv-g:first-child{margin-top:4px}
+  .fg-h{display:flex;align-items:center;gap:7px;cursor:pointer;
+    padding:7px 8px;border-radius:8px;user-select:none;transition:.15s}
+  .fg-h:hover{background:var(--panel2);color:#8f9bab}
+  .fg-h span:first-child{flex:1}
+  .fg-n{font-size:9.5px;color:#6b7583;background:var(--panel2);
+    border:1px solid var(--line);border-radius:20px;padding:0 7px;letter-spacing:0}
+  .fg-x{font-size:10px;color:#6b7583;transition:transform .2s;display:inline-block}
+  .fg.open .fg-x{transform:rotate(180deg)}
+  .fg-b{padding-top:1px}
+
+  a.nv{display:flex;gap:10px;align-items:center;text-decoration:none;color:inherit;
+    padding:9px 10px;border-radius:10px;border:1px solid transparent;transition:.16s;
+    margin-bottom:2px;cursor:pointer}
+  a.nv:hover{background:var(--panel2);border-color:var(--line)}
+  a.nv.on{background:linear-gradient(90deg,rgba(47,174,122,.15),rgba(47,174,122,.04));
+    border-color:rgba(47,174,122,.4)}
+  a.nv.on .nv-t{color:var(--accent)}
+  .nv-i{font-size:16px;flex:0 0 auto;width:20px;text-align:center}
+  .nv-b{flex:1;min-width:0}
+  .nv-t{display:block;font-size:13px;font-weight:600;color:#dfe5ec;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .nv-tg{display:block;font-size:10px;color:#6b7583;margin-top:1px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* ---------- 右侧工作区 ---------- */
+  .main{flex:1 1 auto;display:flex;flex-direction:column;height:100vh;min-width:0}
+  .bar{flex:0 0 auto;height:56px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:12px;padding:0 18px;background:var(--panel)}
+  .bar .title{font-size:14.5px;font-weight:600}
+  .bar .desc{font-size:11.5px;color:var(--sub);overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap}
+  .bar .sp{flex:1}
+  .bar .act{border:1px solid var(--line);background:var(--panel2);color:#cdd6e0;
+    border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;text-decoration:none;
+    display:inline-flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap}
+  .bar .act:hover{border-color:var(--accent);color:var(--accent)}
+  .frame{flex:1 1 auto;border:0;width:100%;background:#0f1115}
+  .hint{flex:1 1 auto;display:flex;align-items:center;justify-content:center;
+    text-align:center;color:#5f6a78;font-size:13.5px;padding:40px;flex-direction:column;gap:10px}
+  .hint .big{font-size:40px;opacity:.5}
+
+  @media (max-width:860px){
+    body{flex-direction:column;overflow:auto}
+    .side{width:100%;flex:0 0 auto;height:auto}
+    .nav{max-height:240px}
+    .main{height:auto}
+    .frame{height:78vh}
+  }
+</style>
+</head>
+<body>
+  <aside class="side">
+    <div class="brand">
+      <div class="row">
+        <div class="logo">知</div>
+        <div>
+          <h1>知时 · 校园信息雷达</h1>
+          <div class="sub">安徽农业大学 · 统一演示门户</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="st"><b>124</b><span>真实公开通知</span></div>
+        <div class="st b2"><b>11</b><span>来源单位</span></div>
+        <div class="st b2"><b>124</b><span>带官网链接</span></div>
+        <div class="st"><b>2025–2026</b><span>年份覆盖</span></div>
+      </div>
+    </div>
+    <nav class="nav" id="nav">
+    <div class="navh">主推入口</div>
+      <a class="nv star" data-key="app" href="#" data-file="知时.html">
+        <span class="nv-i">📱</span>
+        <span class="nv-b"><span class="nv-t">可用应用</span><span class="nv-tg">单文件·双击即用</span></span>
+        <span class="nv-a">›</span>
+      </a>
+      <a class="nv star" data-key="demo" href="#" data-file="交互Demo.html">
+        <span class="nv-i">🕹</span>
+        <span class="nv-b"><span class="nv-t">交互 Demo</span><span class="nv-tg">五 Tab 可点</span></span>
+        <span class="nv-a">›</span>
+      </a>
+      <a class="nv star" data-key="digest" href="#" data-file="web/digest.html">
+        <span class="nv-i">🔬</span>
+        <span class="nv-b"><span class="nv-t">浓缩 + 溯源</span><span class="nv-tg">最核心</span></span>
+        <span class="nv-a">›</span>
+      </a>
+      <a class="nv star" data-key="overview" href="#" data-file="web/overview.html">
+        <span class="nv-i">📊</span>
+        <span class="nv-b"><span class="nv-t">项目总览</span><span class="nv-tg">答辩用</span></span>
+        <span class="nv-a">›</span>
+      </a>
+    <div class="fg open" data-g="0">
+      <div class="nv-g fg-h" data-fg="0"><span>核心演示</span><span class="fg-n">2</span><span class="fg-x">▾</span></div>
+      <div class="fg-b">
+        <a class="nv" data-key="index" href="#" data-file="web/index.html">
+          <span class="nv-i">🧭</span>
+          <span class="nv-b"><span class="nv-t">主链路演示</span><span class="nv-tg">DEMO 01</span></span>
+        </a>
+        <a class="nv" data-key="understand" href="#" data-file="web/understand.html">
+          <span class="nv-i">🧠</span>
+          <span class="nv-b"><span class="nv-t">理解层拆解</span><span class="nv-tg">DEMO 03</span></span>
+        </a>
+      </div>
+    </div>
+    <div class="fg" data-g="1">
+      <div class="nv-g fg-h" data-fg="1"><span>落地面</span><span class="fg-n">4</span><span class="fg-x">▾</span></div>
+      <div class="fg-b" style="display:none">
+        <a class="nv" data-key="pipeline" href="#" data-file="web/pipeline.html">
+          <span class="nv-i">⚙️</span>
+          <span class="nv-b"><span class="nv-t">数据从哪来 · 跑在哪</span><span class="nv-tg">DEMO 04 · 评委必问</span></span>
+        </a>
+        <a class="nv" data-key="sources" href="#" data-file="web/sources.html">
+          <span class="nv-i">🛰</span>
+          <span class="nv-b"><span class="nv-t">数据源接入状态</span><span class="nv-tg">DEMO 05 · 边界感</span></span>
+        </a>
+        <a class="nv" data-key="rawdata" href="#" data-file="web/rawdata.html">
+          <span class="nv-i">🗂</span>
+          <span class="nv-b"><span class="nv-t">原始数据 · 逐条摊开</span><span class="nv-tg">DEMO 07 · 真实数据</span></span>
+        </a>
+        <a class="nv" data-key="inspect" href="#" data-file="web/inspect.html">
+          <span class="nv-i">🩺</span>
+          <span class="nv-b"><span class="nv-t">真实数据体检</span><span class="nv-tg">DEMO 08</span></span>
+        </a>
+      </div>
+    </div>
+    <div class="fg" data-g="2">
+      <div class="nv-g fg-h" data-fg="2"><span>形态预览</span><span class="fg-n">3</span><span class="fg-x">▾</span></div>
+      <div class="fg-b" style="display:none">
+        <a class="nv" data-key="mobile" href="#" data-file="web/mobile.html">
+          <span class="nv-i">📲</span>
+          <span class="nv-b"><span class="nv-t">小程序形态预览</span><span class="nv-tg">DEMO 06</span></span>
+        </a>
+        <a class="nv" data-key="mppreview" href="#" data-file="小程序预览.html">
+          <span class="nv-i">🖼</span>
+          <span class="nv-b"><span class="nv-t">十三屏界面预览</span><span class="nv-tg">数字安农风</span></span>
+        </a>
+        <a class="nv" data-key="mpreal" href="#" data-file="web/mp-preview.html">
+          <span class="nv-i">🧪</span>
+          <span class="nv-b"><span class="nv-t">小程序真实数据预览</span><span class="nv-tg">Node 模拟宿主</span></span>
+        </a>
+      </div>
+    </div>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div class="bar">
+      <span class="title" id="barTitle">可用应用</span>
+      <span class="desc" id="barDesc"></span>
+      <span class="sp"></span>
+      <a class="act" id="openNew" href="#" target="_blank">↗ 新窗口打开</a>
+    </div>
+    <div class="hint" id="hint">
+      <span class="big">👈</span>
+      <span>左侧选一项，这里直接内嵌打开</span>
+      <span style="font-size:11.5px;color:#495159">共 13 个入口 · 数据规模实时统计自通知池</span>
+    </div>
+    <iframe class="frame" id="frame" style="display:none"
+      referrerpolicy="no-referrer"></iframe>
+  </main>
+
+<script>
+(function(){
+  var nav = document.getElementById('nav');
+  var frame = document.getElementById('frame');
+  var hint = document.getElementById('hint');
+  var barTitle = document.getElementById('barTitle');
+  var barDesc = document.getElementById('barDesc');
+  var openNew = document.getElementById('openNew');
+  var cur = null;
+
+  /* 首次进入自动打开"可用应用" */
+  var FIRST = nav.querySelector('a.nv[data-key="app"]');
+
+  function pick(a){
+    if (!a) return;
+    var file = a.getAttribute('data-file');
+    var title = a.querySelector('.nv-t').textContent;
+    var desc = a.querySelector('.nv-tg').textContent;
+    revealKey(a);
+    /* 高亮 */
+    [].forEach.call(nav.querySelectorAll('a.nv'), function(x){
+      x.classList.toggle('on', x === a);
+    });
+    barTitle.textContent = title;
+    barDesc.textContent = desc;
+    openNew.setAttribute('href', file);
+    /* 内嵌 */
+    hint.style.display = 'none';
+    frame.style.display = 'block';
+    frame.setAttribute('src', file);
+    cur = a;
+    try { location.hash = a.getAttribute('data-key'); } catch(e){}
+  }
+
+  nav.addEventListener('click', function(e){
+    /* 折叠分组头：切换该组展开/收起 */
+    var h = e.target.closest ? e.target.closest('.fg-h') : null;
+    if (h){
+      var fg = h.parentNode;
+      var body = fg.querySelector('.fg-b');
+      var open = fg.classList.toggle('open');
+      if (body) body.style.display = open ? 'block' : 'none';
+      return;
+    }
+    var a = e.target.closest ? e.target.closest('a.nv') : null;
+    if (!a) return;
+    e.preventDefault();
+    pick(a);
+  });
+
+  /* 若 #key 落在折叠分组里，自动展开该组 */
+  function revealKey(a){
+    if (!a) return;
+    var fg = a.closest('.fg');
+    if (fg && !fg.classList.contains('open')){
+      fg.classList.add('open');
+      var body = fg.querySelector('.fg-b');
+      if (body) body.style.display = 'block';
+    }
+  }
+
+  /* 支持用 #key 直达（演示时直接贴一个链接进某一页） */
+  function fromHash(){
+    var k = (location.hash || '').replace(/^#/, '');
+    if (!k) return null;
+    return nav.querySelector('a.nv[data-key="' + k + '"]');
+  }
+  window.addEventListener('hashchange', function(){
+    var a = fromHash();
+    if (a && a !== cur) pick(a);
+  });
+
+  pick(fromHash() || FIRST);
+})();
+</script>
+</body>
+</html>

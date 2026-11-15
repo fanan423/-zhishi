@@ -1,0 +1,224 @@
+{
+  "_comment": "知时 · 信息源注册表（可插拔）。每个源声明：怎么取列表、怎么取详情、怎么归类。新增源只改本文件或加一个 adapter 名，不改采集器主流程。",
+  "_schema_version": "1.1",
+  "_policy": "仅采集公网公开通知页；不涉及教务后台、不涉及任何登录态系统。",
+
+  "adapters": {
+    "ahau_vsb": {
+      "_doc": "安农 Visual SiteBuilder 模板（www/jwc/xgb/gxy/jgxy/lib/gh/bwc/rsc/xxb 等绝大多数二级站都是这套）。列表页 a[href] 命中 /info/<栏目>/<文章>.htm；详情正文在 div.content / div.v_news_content。",
+      "list_selector": "a[href]",
+      "detail_link_regex": "(?:^|/)info/(\\d+)/(\\d+)\\.htm",
+      "content_selectors": ["div.v_news_content", "div.content", "div#content", "div.article", "div.main", "form", "body"],
+      "date_in_parent": true
+    },
+    "generic": {
+      "_doc": "通用兜底适配器：任何静态通知列表页。只按相对链接解析，不依赖特定栏目路径。",
+      "list_selector": "a[href]",
+      "detail_link_regex": "(?:^|/)info/\\d+/\\d+\\.htm|(?:^|/)content/\\d+",
+      "content_selectors": ["article", "div.content", "div.article", "main", "body"],
+      "date_in_parent": true
+    }
+  },
+
+  "sources": [
+    {
+      "id": "www_legacy",
+      "site": "安徽农业大学官网 · 通知公告（行政事务栏）",
+      "unit": "www",
+      "adapter": "ahau_vsb",
+      "list_url": "https://www.ahau.edu.cn/index/tzgg.htm",
+      "base": "https://www.ahau.edu.cn/",
+      "pages": 2,
+      "per_site": 10,
+      "enabled": false,
+      "audience": "校级",
+      "note": "默认关闭：该栏目实测被『房产出租/资产处置公告』占满（招标采购文书），面向事务而非学生，价值极低。保留配置便于按需开启。"
+    },
+    {
+      "id": "xslt",
+      "site": "学生报告（学术讲座）· 学术报告",
+      "unit": "xslt",
+      "adapter": "ahau_vsb",
+      "list_url": "http://xslt.ahau.edu.cn/xsbg.htm",
+      "base": "http://xslt.ahau.edu.cn/",
+      "pages": 1,
+      "per_site": 35,
+      "enabled": true,
+      "audience": "全校学生",
+      "note": "★ 学生向学术报告/讲座频道：各学院系列讲座、专家报告、论坛。详情链接形如 info/1002/10xxx.htm，日期在相邻 span。只翻第 0 页——实测第 1 页即跳回 2019 年，翻页无新内容。"
+    },
+    {
+      "id": "xslt_fzlt",
+      "site": "学生报告（学术讲座）· 发展论坛",
+      "unit": "xslt",
+      "adapter": "ahau_vsb",
+      "list_url": "http://xslt.ahau.edu.cn/fzlt.htm",
+      "base": "http://xslt.ahau.edu.cn/",
+      "pages": 1,
+      "per_site": 25,
+      "enabled": true,
+      "audience": "全校学生",
+      "note": "学生向发展论坛频道，与学术报告同站不同栏目。同样只翻第 0 页。"
+    },
+    {
+      "id": "jwc_wzsy",
+      "site": "本科生院（教务处）· 通知公告",
+      "unit": "jwc",
+      "adapter": "ahau_vsb",
+      "list_url": "https://jwc.ahau.edu.cn/xz/wzsy/tzgg.htm",
+      "base": "https://jwc.ahau.edu.cn/",
+      "pages": 6,
+      "per_site": 45,
+      "enabled": true,
+      "audience": "本科生",
+      "campus_units": ["本科生院"],
+      "note": "本科生最刚需：转专业、学籍注册、考试安排、毕业论文、选课、学籍核对。入口经 jwc 引导页 → 本科生院。"
+    },
+    {
+      "id": "xgb",
+      "site": "党委学生工作部（学工部）· 通知公告",
+      "unit": "xgb",
+      "adapter": "ahau_vsb",
+      "list_url": "https://xgb.ahau.edu.cn/index/tzgg.htm",
+      "base": "https://xgb.ahau.edu.cn/",
+      "pages": 5,
+      "per_site": 45,
+      "enabled": true,
+      "audience": "学生",
+      "campus_units": ["学生工作部"],
+      "note": "奖助学金、征兵、学风建设、学生手册、生涯发展等学工事务。入口经 jwc 引导页 → 党委学生工作部。"
+    },
+    {
+      "id": "lib_news",
+      "site": "图书馆 · 新闻公告",
+      "unit": "lib",
+      "adapter": "ahau_vsb",
+      "list_url": "https://lib.ahau.edu.cn/bggk/xwgg/qb.htm",
+      "base": "https://lib.ahau.edu.cn/",
+      "pages": 4,
+      "per_site": 20,
+      "enabled": true,
+      "audience": "校级",
+      "note": "开闭馆、数据库试用、借阅规则变更。与「活动通知」合并计 20 条上限。"
+    },
+    {
+      "id": "lib_act",
+      "site": "图书馆 · 活动通知",
+      "unit": "lib",
+      "adapter": "ahau_vsb",
+      "list_url": "https://lib.ahau.edu.cn/hdtz.htm",
+      "base": "https://lib.ahau.edu.cn/",
+      "pages": 2,
+      "per_site": 20,
+      "enabled": true,
+      "audience": "校级",
+      "note": "讲座、培训、读书活动。与「新闻公告」合并计 20 条上限。"
+    },
+    {
+      "id": "gxy",
+      "site": "机械与车辆工程学院（工学院）· 通知公告",
+      "unit": "gxy",
+      "adapter": "ahau_vsb",
+      "list_url": "https://gxy.ahau.edu.cn/index/tzgg.htm",
+      "base": "https://gxy.ahau.edu.cn/",
+      "pages": 6,
+      "per_site": 35,
+      "enabled": true,
+      "audience": "工学院",
+      "campus_units": ["机械与车辆工程学院"],
+      "note": "工学院官网。翻页收窄到 6 页，避免翻到 2010-2012 年历史存档。"
+    },
+    {
+      "id": "jgxy",
+      "site": "经济管理学院 · 通知公告",
+      "unit": "jgxy",
+      "adapter": "ahau_vsb",
+      "list_url": "https://jgxy.ahau.edu.cn/index/tzgg.htm",
+      "base": "https://jgxy.ahau.edu.cn/",
+      "pages": 3,
+      "per_site": 25,
+      "enabled": true,
+      "audience": "经管学院",
+      "campus_units": ["经济管理学院"],
+      "note": "经管学院学生向通知公告栏（职业规划大赛、助学金推荐、补考缓考、推免、奖学金评审细则）。原用「工作动态/gzdt」栏全是党政会议纪要（纪委会议、巡察整改、理论学习中心组），对学生零价值，已换到本栏。相对链接写法（../info/...）由 urljoin 归一。"
+    },
+    {
+      "id": "bwc",
+      "site": "保卫处 · 通知公告",
+      "unit": "bwc",
+      "adapter": "ahau_vsb",
+      "list_url": "https://bwc.ahau.edu.cn/index/tzgg.htm",
+      "base": "https://bwc.ahau.edu.cn/",
+      "pages": 3,
+      "per_site": 20,
+      "enabled": true,
+      "audience": "校级",
+      "note": "校园安全、门禁、消防演练等。"
+    },
+    {
+      "id": "rsc",
+      "site": "人事处 · 通知公告",
+      "unit": "rsc",
+      "adapter": "ahau_vsb",
+      "list_url": "https://rsc.ahau.edu.cn/index/tzgg.htm",
+      "base": "https://rsc.ahau.edu.cn/",
+      "pages": 2,
+      "per_site": 10,
+      "enabled": true,
+      "audience": "教职工",
+      "note": "以教职工为受众，学生视角多不相关；保留少量以便「各花入各眼」的教职工用户。"
+    },
+    {
+      "id": "xxb",
+      "site": "数据管理处（信息化办公室）· 通知公告",
+      "unit": "xxb",
+      "adapter": "ahau_vsb",
+      "list_url": "https://xxb.ahau.edu.cn/index/tzgg.htm",
+      "base": "https://xxb.ahau.edu.cn/",
+      "pages": 2,
+      "per_site": 15,
+      "enabled": true,
+      "audience": "校级",
+      "note": "★ 修正：xxb.ahau.edu.cn 实为【数据管理处/信息化办公室】（非信息与计算机学院，上一版标注有误）。栏目内容较少但真实（智慧安农门户故障说明、AI+信息素养大赛等校园信息化通知）。信息与计算机学院新域疑似 ai.ahau.edu.cn，实测跳转统一身份认证平台（登录态），按合规红线不采集，已记入 blocked_sites。"
+    },
+    {
+      "id": "gh_legacy",
+      "site": "校工会 · 通知公告",
+      "unit": "gh",
+      "adapter": "ahau_vsb",
+      "list_url": "https://gh.ahau.edu.cn/index/tzgg.htm",
+      "base": "https://gh.ahau.edu.cn/",
+      "pages": 1,
+      "per_site": 6,
+      "enabled": false,
+      "audience": "教职工",
+      "note": "默认关闭：工会通知面向教职工（体检、福利、疗休养），对学生几乎零价值，上一版它占了 45 条造成来源畸形。默认不采集，需要时改 enabled=true。"
+    }
+  ],
+
+  "blocked_sites": [
+    { "site": "一站式服务大厅（智慧安农/ehall）", "url": "https://ehall.ahau.edu.cn/", "status": "blocked", "note": "校方安全设备(WAF)拦截，且属登录态系统，按合规红线不采集。" },
+    { "site": "学生工作处（xsc 旧域）", "url": "https://xsc.ahau.edu.cn/index/tzgg.htm", "status": "blocked", "note": "WAF 拦截；其公开通知已由 xgb.ahau.edu.cn 覆盖。" },
+    { "site": "党委学生工作部（xsc 旧域）", "url": "https://xsc.ahau.edu.cn/tzgg.htm", "status": "blocked", "note": "WAF 拦截；同上。新域 xgb 可达。" },
+    { "site": "创新创业学院（cxcy）", "url": "https://cxcy.ahau.edu.cn/index/tzgg.htm", "status": "blocked", "note": "WAF 拦截，需人工确认。" },
+    { "site": "农学院（nxy）", "url": "https://nxy.ahau.edu.cn/index/tzgg.htm", "status": "blocked", "note": "WAF 拦截，需人工确认。" },
+    { "site": "校团委（tw）", "url": "https://tw.ahau.edu.cn/index/tzgg.htm", "status": "blocked", "note": "WAF 拦截，需人工确认。" },
+    { "site": "经济管理学院（jgy 旧域）", "url": "https://jgy.ahau.edu.cn/index/tzgg.htm", "status": "blocked", "note": "WAF 拦截；新版经管已迁移至 jgxy.ahau.edu.cn。" },
+    { "site": "人工智能学院（ai 新域）", "url": "https://ai.ahau.edu.cn/index/tzgg.htm", "status": "blocked", "note": "实测跳转『统一身份认证平台』（登录态门户），按合规红线不采集。" }
+  ],
+
+  "future_sources": [
+    {
+      "id": "szsn",
+      "site": "数智安农 · 统一信息门户",
+      "unit": "szsn",
+      "adapter": "szsn_api",
+      "enabled": false,
+      "status": "reserved",
+      "audience": "校级",
+      "note": "★ 预留后门：数智安农是一站式登录态门户（ehall/one.ahau.edu.cn 被 WAF 拦截）。接入方式：① 校方开放 API（首选，需 OAuth/单点授权）→ 实现 szsn_api 适配器；② 已授权用户 Cookie 白名单（合规前提下）；③ 通知订阅推送（校方 webhook/站内信）。当前占位，未启用、不硬闯。实现时只需在 adapters 中补 szsn_api，主流程零改动。",
+      "auth": "oauth_or_session",
+      "endpoints_doc": "https://ehall.ahau.edu.cn/ (登录态，需授权)"
+    }
+  ]
+}
