@@ -796,7 +796,7 @@
   }
 
   /**
-   * 构建推送流。notices 是候选池（调用方已按档案筛过，或传全池由本函数筛）。
+   * 构建通知列表。notices 是候选池（调用方已按档案筛过，或传全池由本函数筛）。
    * opts: { limit, profile, seenIds, filter:true }
    */
   function buildPush(notices, opts) {
@@ -809,7 +809,7 @@
 
     var pool = (notices || []).filter(function (n) {
       if (opts.filter === false) return true;
-      /* 非学生事项（纪委会议/巡察/值班表/经费公示/学校新闻…）不进推送流 */
+      /* 非学生事项（纪委会议/巡察/值班表/经费公示/学校新闻…）不进通知列表 */
       if (String(n.audience || '').indexOf('非学生事项') >= 0) return false;
       /* 与我有关 = 命中订阅标签 OR 命中自定义关键词；两条口径与小程序 store.isRelevant 同源 */
       var byTag = (profile.interests || []).indexOf(n.event) >= 0;
@@ -895,7 +895,7 @@
   }
 
   /* ============================================================
-   * 七、「问知时」问答引擎（与 miniprogram/utils/ask.js 同源）
+   * 七、「问答」问答引擎（与 miniprogram/utils/ask.js 同源）
    * ============================================================
    * 小程序版依赖 store（有 wx API），网页版走纯函数：接收 notices + profile。
    * 两边的**问题文案、筛选口径、答案措辞、依据说明**必须逐字一致 ——
@@ -956,7 +956,7 @@
   }
 
   /* ============================================================
-   * 触达时间线（与小程序 utils/reachlist.js / wxnotify.js 同源）
+   * 提醒时间（与小程序 utils/reachlist.js / wxnotify.js 同源）
    * ------------------------------------------------------------
    * 回答"你说会主动提醒我，凭什么信"：
    *   把一条通知从发布到截止的全过程摊开，标出哪一天会主动找你、找你几次。
@@ -1388,7 +1388,7 @@
   }
 
   /**
-   * 办事日历（与小程序 ask.buildCalendar 同源）。
+   * 日历（与小程序 ask.buildCalendar 同源）。
    * 返回 { year, month, weeks, weekdays, today, busyDays, busyCount, monthItems, monthCount, summary }
    */
   function buildCalendar(notices, year, month, profile) {
@@ -1524,17 +1524,17 @@
     hitKeyword: hitKeyword,
     sanitizeKeywords: sanitizeKeywords,
     MAX_KEYWORDS: MAX_KEYWORDS,
-    /* 问知时 · 问答引擎 */
+    /* 问答 · 问答引擎 */
     askQuestions: QUESTIONS,
     askQuestionGroups: askQuestionGroups,
     askAnswer: askAnswer,
     askHeadline: askHeadline,
     relatedNotices: relatedNotices,
-    /* 办事日历 */
+    /* 日历 */
     buildCalendar: buildCalendar,
     shiftMonth: shiftMonth,
     splitMaterials: splitMaterials,
-    /* 触达时间线（与小程序 reachlist.js 同源） */
+    /* 提醒时间（与小程序 reachlist.js 同源） */
     advanceDays: advanceDays,
     planReach: planReach,
     buildReach: buildReach

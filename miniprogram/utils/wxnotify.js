@@ -37,7 +37,7 @@ const store = require('./store.js');
 const TEMPLATES = {
   deadline:  { tmplId: '', name: '截止提醒', scene: '你订阅的事项临近截止时提醒', fields: ['事项名称', '截止时间', '剩余天数'] },
   newnotice: { tmplId: '', name: '新通知提醒', scene: '命中你关注类别的新通知出现时提醒', fields: ['通知标题', '发布时间', '来源'] },
-  weekly:    { tmplId: '', name: '每周简报', scene: '每周汇总本周与你相关的通知', fields: ['本周事项数', '最紧急一项', '截止日'] }
+  weekly:    { tmplId: '', name: '每周汇总', scene: '每周汇总本周与你相关的通知', fields: ['本周事项数', '最紧急一项', '截止日'] }
 };
 
 /* 用户可选的"提前几天提醒"（与 push.js 的 advance 口径一致） */

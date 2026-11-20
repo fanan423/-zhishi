@@ -568,7 +568,7 @@ body{
 .kwsug-w{font-size:12px;color:var(--brand);background:var(--brand-soft);padding:4px 11px;border-radius:14px}
 .srow-hint{font-size:11.5px;color:var(--txt-3);line-height:1.6;margin-top:9px}
 
-/* ---------- 知时指数卡（时间轴 / 简报共用） ---------- */
+/* ---------- 知时指数卡（日程 / 汇总共用） ---------- */
 .idxcard{background:linear-gradient(160deg,var(--brand-2),var(--brand));
   border-radius:16px;padding:16px 17px 14px;margin-bottom:14px;
   box-shadow:0 8px 22px rgba(0,101,62,.26)}
@@ -586,7 +586,7 @@ body{
 .idxmets .imn{display:block;font-size:17px;font-weight:800;color:#fff;line-height:1.2}
 .idxmets .iml{display:block;font-size:11px;color:rgba(255,255,255,.78);margin-top:2px}
 
-/* ---------- 时间轴分箱 ---------- */
+/* ---------- 日程分箱 ---------- */
 .bk{margin-bottom:5px}
 .bhd{display:flex;align-items:center;background:var(--surface);
   border:1px solid var(--border);border-radius:14px;padding:11px 13px;
@@ -603,7 +603,7 @@ body{
 .bhd .bnum{font-size:11px;color:var(--txt-3);margin-top:1px}
 .bhd .barrow{font-size:12px;color:var(--txt-3);flex-shrink:0}
 
-/* 时间轴主体：左侧竖线 + 节点圆点 */
+/* 日程主体：左侧竖线 + 节点圆点 */
 .tl{position:relative;padding-left:18px;margin-bottom:8px}
 .tline{position:absolute;left:5px;top:8px;bottom:8px;width:1px;background:var(--border)}
 .titem{position:relative;margin-bottom:8px}
@@ -629,7 +629,7 @@ body{
 .tcard .tg.g{color:var(--brand);background:var(--brand-soft);border-color:transparent}
 .tcard .tg.o{color:var(--gold-ink);background:var(--gold-soft);border-color:transparent}
 
-/* ---------- 简报 ---------- */
+/* ---------- 汇总 ---------- */
 .bhead{display:flex;align-items:center;gap:10px;padding-bottom:12px;
   border-bottom:1px solid var(--border);margin-bottom:14px}
 .bhead .lg{width:44px;height:44px;border-radius:50%;flex:0 0 44px;position:relative;
@@ -726,7 +726,7 @@ body{
 .idxstrip .isn{font-size:24px;font-weight:800;color:#fff;line-height:1}
 .idxstrip .isg{font-size:9.5px;color:rgba(255,255,255,.82);margin-top:3px}
 
-/* ===== 问知时（⑫）===== */
+/* ===== 问答（⑫）===== */
 .hcard{background:linear-gradient(160deg,var(--brand-2),var(--brand));border-radius:14px;
   padding:14px 15px;box-shadow:0 5px 16px rgba(0,101,62,.22);margin-bottom:10px}
 .hcard.tone-alert{background:linear-gradient(160deg,#E77844,#B04A1C)}
@@ -810,7 +810,7 @@ body{
   background:var(--surface);border:1px solid var(--border);color:var(--txt-2);font-weight:600}
 .acts .ab.primary{background:var(--brand);border-color:var(--brand);color:#fff}
 
-/* ===== 办事日历（⑬）===== */
+/* ===== 日历（⑬）===== */
 .mbar{display:flex;align-items:center;justify-content:space-between;background:var(--surface);
   border:1px solid var(--border);border-radius:12px;padding:9px 11px;margin-bottom:9px;
   box-shadow:var(--shadow)}
@@ -997,13 +997,13 @@ body{
       <div class="pc-one">勾选标签 + 输入关键词，命中就推给你，实时看到能收到几条。</div>
       <div class="pc-go">点开看全文 <span class="ar">›</span></div>
     </div>
-    <div class="pcard" data-no="6" data-nm="时间轴" data-rt="pages/timeline">
-      <div class="pc-top"><span class="pc-no">06</span><span class="pc-nm">时间轴</span><span class="pc-rt">pages/timeline</span></div>
+    <div class="pcard" data-no="6" data-nm="日程" data-rt="pages/timeline">
+      <div class="pc-top"><span class="pc-no">06</span><span class="pc-nm">日程</span><span class="pc-rt">pages/timeline</span></div>
       <div class="pc-one">按截止日排开，五档分组，一眼看清轻重缓急。</div>
       <div class="pc-go">点开看全文 <span class="ar">›</span></div>
     </div>
-    <div class="pcard" data-no="7" data-nm="今日简报" data-rt="pages/digest">
-      <div class="pc-top"><span class="pc-no">07</span><span class="pc-nm">今日简报</span><span class="pc-rt">pages/digest</span></div>
+    <div class="pcard" data-no="7" data-nm="今日汇总" data-rt="pages/digest">
+      <div class="pc-top"><span class="pc-no">07</span><span class="pc-nm">今日汇总</span><span class="pc-rt">pages/digest</span></div>
       <div class="pc-one">一句话读完今天，该办的排在前面。</div>
       <div class="pc-go">点开看全文 <span class="ar">›</span></div>
     </div>
@@ -1027,13 +1027,13 @@ body{
       <div class="pc-one">凭什么推给你、什么程度才配打扰你，都摆给你看。</div>
       <div class="pc-go">点开看全文 <span class="ar">›</span></div>
     </div>
-    <div class="pcard" data-no="12" data-nm="问知时（自问自答）" data-rt="pages/ask">
-      <div class="pc-top"><span class="pc-no">12</span><span class="pc-nm">问知时</span><span class="pc-rt">pages/ask</span></div>
+    <div class="pcard" data-no="12" data-nm="问答（自问自答）" data-rt="pages/ask">
+      <div class="pc-top"><span class="pc-no">12</span><span class="pc-nm">问答</span><span class="pc-rt">pages/ask</span></div>
       <div class="pc-one">有问题直接问，每个答案都附一行「依据」，算不出就不编。</div>
       <div class="pc-go">点开看全文 <span class="ar">›</span></div>
     </div>
-    <div class="pcard" data-no="13" data-nm="办事日历（哪天忙 / 哪天空）" data-rt="pages/calendar">
-      <div class="pc-top"><span class="pc-no">13</span><span class="pc-nm">办事日历</span><span class="pc-rt">pages/calendar</span></div>
+    <div class="pcard" data-no="13" data-nm="日历（哪天忙 / 哪天空）" data-rt="pages/calendar">
+      <div class="pc-top"><span class="pc-no">13</span><span class="pc-nm">日历</span><span class="pc-rt">pages/calendar</span></div>
       <div class="pc-one">具体哪天忙、哪天能空出来，一眼看清整月节奏。</div>
       <div class="pc-go">点开看全文 <span class="ar">›</span></div>
     </div>
@@ -1080,7 +1080,7 @@ body{
             <div class="it"><div class="n gold">41</div><div class="l">通知总量</div></div>
           </div>
 
-          <!-- 知时指数条（点进简报） -->
+          <!-- 知时指数条（点进汇总） -->
           <div class="idxstrip lv-mid">
             <div class="isl">
               <div class="is1">今日知时指数</div>
@@ -1088,14 +1088,14 @@ body{
             </div>
             <div class="isr">
               <div class="isn">52</div>
-              <div class="isg">看简报 ›</div>
+              <div class="isg">看汇总 ›</div>
             </div>
           </div>
 
           <!-- 快捷入口 -->
           <div class="quick">
-            <div class="qb"><span class="qbi">🕒</span><span class="qbt">时间轴</span><span class="qbs">5 件待办</span></div>
-            <div class="qb"><span class="qbi">📋</span><span class="qbt">今日简报</span><span class="qbs">一句话读完</span></div>
+            <div class="qb"><span class="qbi">🕒</span><span class="qbt">日程</span><span class="qbs">5 件待办</span></div>
+            <div class="qb"><span class="qbi">📋</span><span class="qbt">今日汇总</span><span class="qbs">一句话读完</span></div>
             <div class="qb"><span class="qbi">🔍</span><span class="qbt">搜通知</span><span class="qbs">一搜就到</span></div>
           </div>
 
@@ -1147,9 +1147,9 @@ body{
 
         </div>
         <div class="tabbar">
-          <div class="tb on"><span class="i">📡</span>雷达</div>
-          <div class="tb"><span class="i">🕒</span>时间轴</div>
-          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb on"><span class="i">📡</span>通知</div>
+          <div class="tb"><span class="i">🕒</span>日程</div>
+          <div class="tb"><span class="i">📋</span>汇总</div>
           <div class="tb"><span class="i">⭐</span>订阅</div>
         </div>
       </div>
@@ -1224,9 +1224,9 @@ body{
 
         </div>
         <div class="tabbar">
-          <div class="tb on"><span class="i">📡</span>雷达</div>
-          <div class="tb"><span class="i">🕒</span>时间轴</div>
-          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb on"><span class="i">📡</span>通知</div>
+          <div class="tb"><span class="i">🕒</span>日程</div>
+          <div class="tb"><span class="i">📋</span>汇总</div>
           <div class="tb"><span class="i">⭐</span>订阅</div>
         </div>
       </div>
@@ -1338,9 +1338,9 @@ body{
 
         </div>
         <div class="tabbar">
-          <div class="tb on"><span class="i">📡</span>雷达</div>
-          <div class="tb"><span class="i">🕒</span>时间轴</div>
-          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb on"><span class="i">📡</span>通知</div>
+          <div class="tb"><span class="i">🕒</span>日程</div>
+          <div class="tb"><span class="i">📋</span>汇总</div>
           <div class="tb"><span class="i">⭐</span>订阅</div>
         </div>
       </div>
@@ -1381,9 +1381,9 @@ body{
 
         </div>
         <div class="tabbar">
-          <div class="tb"><span class="i">📡</span>雷达</div>
-          <div class="tb"><span class="i">🕒</span>时间轴</div>
-          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">📡</span>通知</div>
+          <div class="tb"><span class="i">🕒</span>日程</div>
+          <div class="tb"><span class="i">📋</span>汇总</div>
           <div class="tb"><span class="i">⭐</span>订阅</div>
         </div>
       </div>
@@ -1413,8 +1413,8 @@ body{
           </div>
 
           <div class="quick">
-            <div class="qb"><span class="qbi">🕒</span><span class="qbt">看时间轴</span><span class="qbs">5 件待办</span></div>
-            <div class="qb"><span class="qbi">📋</span><span class="qbt">今日简报</span><span class="qbs">一句话读完</span></div>
+            <div class="qb"><span class="qbi">🕒</span><span class="qbt">看日程</span><span class="qbs">5 件待办</span></div>
+            <div class="qb"><span class="qbi">📋</span><span class="qbt">今日汇总</span><span class="qbs">一句话读完</span></div>
           </div>
 
           <div class="sec">关注事项（9 个标签，勾选即订阅）</div>
@@ -1487,17 +1487,17 @@ body{
 
         </div>
         <div class="tabbar">
-          <div class="tb"><span class="i">📡</span>雷达</div>
-          <div class="tb"><span class="i">🕒</span>时间轴</div>
-          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">📡</span>通知</div>
+          <div class="tb"><span class="i">🕒</span>日程</div>
+          <div class="tb"><span class="i">📋</span>汇总</div>
           <div class="tb on"><span class="i">⭐</span>订阅</div>
         </div>
       </div>
     </div>
 
-    <!-- ========== ⑥ 时间轴 ========== -->
+    <!-- ========== ⑥ 日程 ========== -->
     <div class="col" data-no="6">
-      <div class="col-h"><span><b>⑥ 时间轴</b></span><span class="route">pages/timeline</span></div>
+      <div class="col-h"><span><b>⑥ 日程</b></span><span class="route">pages/timeline</span></div>
       <div class="phone light" id="p6">
         <div class="pbar"><span class="t">15:32</span><span class="ti">知时 · 数字安农信息雷达</span><span class="d">••• ⊙</span></div>
         <div class="psub">按截止日排开 · 五档分组，一眼看清轻重缓急</div>
@@ -1608,27 +1608,27 @@ body{
 
         </div>
         <div class="tabbar">
-          <div class="tb"><span class="i">📡</span>雷达</div>
-          <div class="tb on"><span class="i">🕒</span>时间轴</div>
-          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">📡</span>通知</div>
+          <div class="tb on"><span class="i">🕒</span>日程</div>
+          <div class="tb"><span class="i">📋</span>汇总</div>
           <div class="tb"><span class="i">⭐</span>订阅</div>
         </div>
       </div>
     </div>
 
-    <!-- ========== ⑦ 今日简报 ========== -->
+    <!-- ========== ⑦ 今日汇总 ========== -->
     <div class="col" data-no="7">
-      <div class="col-h"><span><b>⑦ 今日简报</b></span><span class="route">pages/digest</span></div>
+      <div class="col-h"><span><b>⑦ 今日汇总</b></span><span class="route">pages/digest</span></div>
       <div class="phone light" id="p7">
         <div class="pbar"><span class="t">15:32</span><span class="ti">知时 · 数字安农信息雷达</span><span class="d">••• ⊙</span></div>
         <div class="psub">一句话读完今天 · 该办的排在前面</div>
         <div class="pbody">
 
-          <!-- 简报头 -->
+          <!-- 汇总头 -->
           <div class="bhead">
             <div class="lg"><span class="sun"></span><span class="aa">AAU</span><span class="book"></span><span class="y">1928</span></div>
             <div class="bx">
-              <div class="t1">今日简报</div>
+              <div class="t1">今日汇总</div>
               <div class="t2">2025级 · 大一 · 信息与人工智能学院 · 2026-11-05 15:32</div>
             </div>
           </div>
@@ -1693,21 +1693,21 @@ body{
 
           <!-- 快捷入口 -->
           <div class="quick">
-            <div class="qb"><span class="qbi">🕒</span><span class="qbt">看时间轴</span><span class="qbs">5 件待办</span></div>
+            <div class="qb"><span class="qbi">🕒</span><span class="qbt">看日程</span><span class="qbs">5 件待办</span></div>
             <div class="qb"><span class="qbi">⭐</span><span class="qbt">我的收藏</span><span class="qbs">2 条</span></div>
             <div class="qb"><span class="qbi">🔍</span><span class="qbt">搜通知</span><span class="qbs">一搜就到</span></div>
           </div>
 
           <div class="whybox">
-            简报全部由当前数据<b>当场派生</b>：份数、命中数、可信度比例都随订阅变化实时重算，<b>不是写死的文案</b>。
-            点右上「复制简报」可把这几行文字贴到班群。
+            汇总全部由当前数据<b>当场派生</b>：份数、命中数、可信度比例都随订阅变化实时重算，<b>不是写死的文案</b>。
+            点右上「复制汇总」可把这几行文字贴到班群。
           </div>
 
         </div>
         <div class="tabbar">
-          <div class="tb"><span class="i">📡</span>雷达</div>
-          <div class="tb"><span class="i">🕒</span>时间轴</div>
-          <div class="tb on"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">📡</span>通知</div>
+          <div class="tb"><span class="i">🕒</span>日程</div>
+          <div class="tb on"><span class="i">📋</span>汇总</div>
           <div class="tb"><span class="i">⭐</span>订阅</div>
         </div>
       </div>
@@ -1832,9 +1832,9 @@ body{
 
         </div>
         <div class="tabbar">
-          <div class="tb on"><span class="i">📡</span>雷达</div>
-          <div class="tb"><span class="i">🕒</span>时间轴</div>
-          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb on"><span class="i">📡</span>通知</div>
+          <div class="tb"><span class="i">🕒</span>日程</div>
+          <div class="tb"><span class="i">📋</span>汇总</div>
           <div class="tb"><span class="i">⭐</span>订阅</div>
         </div>
       </div>
@@ -1903,9 +1903,9 @@ body{
 
         </div>
         <div class="tabbar">
-          <div class="tb"><span class="i">📡</span>雷达</div>
-          <div class="tb"><span class="i">🕒</span>时间轴</div>
-          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">📡</span>通知</div>
+          <div class="tb"><span class="i">🕒</span>日程</div>
+          <div class="tb"><span class="i">📋</span>汇总</div>
           <div class="tb on"><span class="i">⭐</span>订阅</div>
         </div>
       </div>
@@ -2014,9 +2014,9 @@ body{
 
         </div>
         <div class="tabbar">
-          <div class="tb"><span class="i">📡</span>雷达</div>
-          <div class="tb"><span class="i">🕒</span>时间轴</div>
-          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">📡</span>通知</div>
+          <div class="tb"><span class="i">🕒</span>日程</div>
+          <div class="tb"><span class="i">📋</span>汇总</div>
           <div class="tb"><span class="i">⭐</span>订阅</div>
         </div>
       </div>
@@ -2044,7 +2044,7 @@ body{
             <div class="trow">
               <div class="tl">
                 <div class="tt">推送总开关</div>
-                <div class="td">已开启 —— 进入即自动按档案排好推送流</div>
+                <div class="td">已开启 —— 进入即自动按档案排好通知列表</div>
               </div>
               <div class="sw on"><div class="swd"></div></div>
             </div>
@@ -2098,7 +2098,7 @@ body{
             <div class="hint">「新收录」就是拿这份记录比出来的——推过的不会再标新，所以不会天天拿同一条烦你。</div>
           </div>
 
-          <div class="sec">当前推送流 <span class="secsub">· 前 6 条</span></div>
+          <div class="sec">当前通知列表 <span class="secsub">· 前 6 条</span></div>
 
           <div class="pc lv-now">
             <div class="prow">
@@ -2151,19 +2151,19 @@ body{
 
         </div>
         <div class="tabbar">
-          <div class="tb"><span class="i">📡</span>雷达</div>
-          <div class="tb"><span class="i">🕒</span>时间轴</div>
-          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">📡</span>通知</div>
+          <div class="tb"><span class="i">🕒</span>日程</div>
+          <div class="tb"><span class="i">📋</span>汇总</div>
           <div class="tb"><span class="i">⭐</span>订阅</div>
         </div>
       </div>
     </div>
 
-    <!-- ========== ⑫ 问知时（学生自问自答引擎） ========== -->
+    <!-- ========== ⑫ 问答（学生自问自答引擎） ========== -->
     <div class="col" data-no="12">
-      <div class="col-h"><span><b>⑫ 问知时（自问自答）</b></span><span class="route">pages/ask（新增）</span></div>
+      <div class="col-h"><span><b>⑫ 问答（自问自答）</b></span><span class="route">pages/ask（新增）</span></div>
       <div class="phone light" id="p12">
-        <div class="pbar"><span class="t">15:37</span><span class="ti">问知时</span><span class="d">••• ⊙</span></div>
+        <div class="pbar"><span class="t">15:37</span><span class="ti">问答</span><span class="d">••• ⊙</span></div>
         <div class="psub">有问题直接问 · 每个答案都附「依据」一行</div>
         <div class="pbody">
 
@@ -2334,8 +2334,8 @@ body{
           </div>
 
           <div class="acts">
-            <div class="ab primary">看办事日历 ›</div>
-            <div class="ab">回推送流</div>
+            <div class="ab primary">看日历 ›</div>
+            <div class="ab">回通知列表</div>
           </div>
 
           <div class="whybox">
@@ -2345,19 +2345,19 @@ body{
 
         </div>
         <div class="tabbar">
-          <div class="tb"><span class="i">📡</span>雷达</div>
-          <div class="tb"><span class="i">🕒</span>时间轴</div>
-          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">📡</span>通知</div>
+          <div class="tb"><span class="i">🕒</span>日程</div>
+          <div class="tb"><span class="i">📋</span>汇总</div>
           <div class="tb"><span class="i">⭐</span>订阅</div>
         </div>
       </div>
     </div>
 
-    <!-- ========== ⑬ 办事日历（同一份数据的另一个视角） ========== -->
+    <!-- ========== ⑬ 日历（同一份数据的另一个视角） ========== -->
     <div class="col" data-no="13">
-      <div class="col-h"><span><b>⑬ 办事日历（哪天忙 / 哪天空）</b></span><span class="route">pages/calendar（新增）</span></div>
+      <div class="col-h"><span><b>⑬ 日历（哪天忙 / 哪天空）</b></span><span class="route">pages/calendar（新增）</span></div>
       <div class="phone light" id="p13">
-        <div class="pbar"><span class="t">15:38</span><span class="ti">办事日历</span><span class="d">••• ⊙</span></div>
+        <div class="pbar"><span class="t">15:38</span><span class="ti">日历</span><span class="d">••• ⊙</span></div>
         <div class="psub">具体哪天忙 · 哪天能空出来</div>
         <div class="pbody">
 
@@ -2493,14 +2493,14 @@ body{
 
           <div class="whybox">
             日历口径：<b>只落你关注标签 + 身份匹配上的通知</b>，按官方原文的截止日归档。已过期的标灰，不再占用待办位置。
-            时间轴回答「这周我还有几件事」，日历回答「具体哪天忙」——两者同一批数据，不是两套事实。
+            日程回答「这周我还有几件事」，日历回答「具体哪天忙」——两者同一批数据，不是两套事实。
           </div>
 
         </div>
         <div class="tabbar">
-          <div class="tb"><span class="i">📡</span>雷达</div>
-          <div class="tb"><span class="i">🕒</span>时间轴</div>
-          <div class="tb"><span class="i">📋</span>简报</div>
+          <div class="tb"><span class="i">📡</span>通知</div>
+          <div class="tb"><span class="i">🕒</span>日程</div>
+          <div class="tb"><span class="i">📋</span>汇总</div>
           <div class="tb"><span class="i">⭐</span>订阅</div>
         </div>
       </div>
@@ -2512,13 +2512,13 @@ body{
     <b>「农芯智」AI 智能体创新大赛</b> 参赛作品 · 知时 · 数字安农信息雷达<br>
     数据来自公网公开通知页聚合；仅聚合公开信息，不涉及教务后台 / 课表 / 成绩 / 学籍
     <div class="line">
-      十三屏对应十个真实页面：雷达(①) · 时间轴(⑥) · 简报(⑦) · 搜索(④) · 详情(③⑧) · 订阅(⑤⑨) · 数据自查(⑩) · 推送设置(⑪) · 问知时(⑫) · 办事日历(⑬)<br>
+      十三屏对应十个真实页面：通知(①) · 日程(⑥) · 汇总(⑦) · 搜索(④) · 详情(③⑧) · 订阅(⑤⑨) · 数据自查(⑩) · 推送设置(⑪) · 问答(⑫) · 日历(⑬)<br>
       ⑧⑨ 为本轮新增的「和我有关吗」「要办什么（办理清单）」「收藏按截止日排 + 办事进度」三项学生视角能力<br>
       ⑩ 为自查自纠系统：三条铁律（出处可举证 / 链接不伪造 / 引文可定位）+ 自动纠正 + 留痕，每次展示前先自己查一遍<br>
       ⑪ 为主动推送引擎：可解释评分排序 + 每条写明推送理由 + 只有三天内才打扰 + 留痕判定"新收录"，并可开启后台系统级推送<br>
-      ⑫ 为「问知时」自问自答引擎：13 个安农学生高频疑问（今天要办啥 / 先办哪个 / 我漏了什么 / 是不是给我的 / 要备什么材料 / 数据可靠吗），
+      ⑫ 为「问答」自问自答引擎：13 个安农学生高频疑问（今天要办啥 / 先办哪个 / 我漏了什么 / 是不是给我的 / 要备什么材料 / 数据可靠吗），
       每个答案都由真实字段算出并附「依据」一行说明算法，算不出就如实说算不出，不编结论<br>
-      ⑬ 为办事日历：把有截止的通知落到月历格子上，回答「具体哪天忙、哪天能空」，与时间轴同一批数据，不是两套事实<br>
+      ⑬ 为日历：把有截止的通知落到月历格子上，回答「具体哪天忙、哪天能空」，与日程同一批数据，不是两套事实<br>
       主题切换基于 CSS 变量，与小程序 <b>miniprogram/app.wxss</b> 的 .theme-light / .theme-dark 同源<br>
       本地查看：双击本文件即可 · 小程序真机预览：微信开发者工具导入 <b>miniprogram</b> 目录
     </div>

@@ -253,7 +253,7 @@ Page({
     const self = this;
     wx.showModal({
       title: '删除这条通知',
-      content: '删除后从推送流/列表里隐藏（云端公开数据不受影响），可在「我的 · 已删除」找回。',
+      content: '删除后从通知列表/列表里隐藏（云端公开数据不受影响），可在「我的 · 已删除」找回。',
       confirmText: '删除',
       confirmColor: '#C0392B',
       success(res) {

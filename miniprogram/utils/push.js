@@ -119,7 +119,7 @@ function resetState() {
  *
  * 这里只记两类极简信号，全部存在本地（zhishi_feedback），不涉及任何隐私上报：
  *   openedTags  { 标签: 次数 }   用户点开过的通知所属标签计数
- *   shownCount  { id: 次数 }     一条通知被展示（进过推送流）的次数
+ *   shownCount  { id: 次数 }     一条通知被展示（进过通知列表）的次数
  *   openedIds   [id...]          用户点开过的具体条目
  * 一条通知若 shownCount >= 3 且从未 openedIds，判为 stale（重复抑制）。
  */
@@ -153,7 +153,7 @@ function markOpened(n) {
   writeFb(s);
 }
 
-/* 一批通知进了推送流（真的展示给用户）→ 记展示次数 */
+/* 一批通知进了通知列表（真的展示给用户）→ 记展示次数 */
 function markShown(items) {
   const s = readFb();
   (items || []).forEach(n => {
@@ -282,7 +282,7 @@ const OPPORTUNITY_TAGS = ['学科竞赛', '奖助学金', '讲座培训', '图�
  *   这些词如果不在标签词表里，旧逻辑下就永远推不过来。
  *
  *   所以给用户一个"输入框"：把任意关键词存进 PROFILE.keywords，
- *   池子里凡命中该关键词的通知，都算"与我有关"，进推送流并走主动推送。
+ *   池子里凡命中该关键词的通知，都算"与我有关"，进通知列表并走主动推送。
  *
  * 【命中规则】（力求"宁缺勿滥"但不过度误伤）
  *   ① 归一化：去首尾空白、转小写（英文/数字词大小写不敏感）；
@@ -501,10 +501,10 @@ function scoreOf(n, profile, isNew, fb) {
   return scoreFromReasons(reasonsFor(n, profile, isNew, fb));
 }
 
-/* ============ 主入口：构建推送流 ============ */
+/* ============ 主入口：构建通知列表 ============ */
 
 /**
- * 构建"主动推送流"。
+ * 构建"主动通知列表"。
  *
  * @param opts { limit, profile }
  * @returns {
@@ -529,7 +529,7 @@ function buildPush(opts) {
   /* 候选池：只推"和我有关"的（订阅 + 身份），与 store.myFeed 同口径 */
   const feed = store.myFeed();
 
-  /* 非学生事项（纪委会议/巡察/值班表/经费公示/学校新闻…）不进推送流：
+  /* 非学生事项（纪委会议/巡察/值班表/经费公示/学校新闻…）不进通知列表：
    * 它们不是给学生办的待办，留在池里会挤掉真机会。仍在搜索/全库里可见。 */
   const feedStudent = feed.filter(n => String(n.audience || '').indexOf('非学生事项') < 0);
 
@@ -630,7 +630,7 @@ function shouldNotifyNow(profile) {
 }
 
 /**
- * 推送流的"分组视图"：按推送级别分箱，供页面渲染。
+ * 通知列表的"分组视图"：按推送级别分箱，供页面渲染。
  */
 function pushBuckets(profile) {
   const r = buildPush({ profile });
@@ -686,14 +686,14 @@ function tierOf(card) {
 /**
  * 今日头条：首屏最上方那张"一句话说清今天最要紧的事"的卡。
  *
- * 合并了原先重复的三块（紧急提示 / 推送小结 / 问知时一句话），
+ * 合并了原先重复的三块（紧急提示 / 推送小结 / 问答一句话），
  * 输出的每一条都从真实数据派生：
  *   line      —— 一句话结论（等价于推送小结，但只在头条里出现一次）
  *   lead      —— 最要紧的那一条（分数最高且三天内的），没有则为 null
  *   reasons   —— lead 的推送理由（"为什么推给你"，最多 3 条）
  *   tone      —— alert / new / calm，决定头条卡配色
  *   badge     —— 右上角徽标（如"3 条待办"）
- *   action    —— 直达按钮文案 + 目标（有 lead 进详情，否则进问知时）
+ *   action    —— 直达按钮文案 + 目标（有 lead 进详情，否则进问答）
  *   hint      —— 一句话副说明（无 lead 时用）
  */
 function heroCard(profile) {
@@ -742,7 +742,7 @@ function heroCard(profile) {
 }
 
 /**
- * 梯度列表：把推送流按"该占多大版面"分成三段，供页面分档渲染。
+ * 梯度列表：把通知列表按"该占多大版面"分成三段，供页面分档渲染。
  * 与 buildPush 同一份 cards，只是重新贴了个 tier 标签，不产生第二套事实。
  */
 function tieredFeed(profile) {

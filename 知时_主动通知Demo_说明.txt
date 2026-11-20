@@ -47,7 +47,7 @@
   "templates": {
     "deadline":  "模板ID_截止提醒",
     "newnotice": "模板ID_新通知提醒",
-    "weekly":    "模板ID_每周简报"
+    "weekly":    "模板ID_每周汇总"
   },
   "sendAt": "08:00",
   "jumpPage": "pages/detail/detail",

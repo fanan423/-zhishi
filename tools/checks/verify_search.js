@@ -206,9 +206,9 @@ if (target) {
   ok('KW_MATCH 权重为 20', pushMod2.WEIGHT.KW_MATCH === 20, 'w=' + pushMod2.WEIGHT.KW_MATCH);
   ok('KW_MATCH 理由写明命中词', !!kwR && kwR.label.indexOf(TEST_KW) >= 0, kwR ? kwR.label : '');
 
-  /* 进推送流 */
+  /* 进通知列表 */
   const pr = pushMod2.buildPush({ limit: 80 });
-  ok('命中关键词的通知进入推送流', pr.cards.some(c => c.id === target.id));
+  ok('命中关键词的通知进入通知列表', pr.cards.some(c => c.id === target.id));
 
   /* 关键词统计 */
   const ks = store.keywordStats(store.getProfile());

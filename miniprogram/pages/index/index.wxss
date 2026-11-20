@@ -67,7 +67,7 @@
 }
 .aln { color: var(--alert); font-weight: 700; font-size: 28rpx; }
 
-/* ---- 知时指数条（点进简报） ---- */
+/* ---- 知时指数条（点进汇总） ---- */
 .idxwrap {
   display: flex;
   align-items: center;
@@ -150,7 +150,7 @@
   margin-top: 4rpx;
 }
 
-/* ---- 问知时 · 今日一问 ---- */
+/* ---- 问答 · 今日一问 ---- */
 .hcard {
   border-radius: 22rpx;
   padding: 28rpx 30rpx;
@@ -366,7 +366,7 @@
 }
 .hero-sub { font-size: 21rpx; color: rgba(255, 255, 255, 0.86); flex: 1; }
 
-/* ============ 推送流梯度卡片 ============ */
+/* ============ 通知列表梯度卡片 ============ */
 
 /* 中卡（三天内）：信息全，比小卡厚一档 */
 .pc.major { padding: 26rpx 28rpx; }

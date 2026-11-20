@@ -173,7 +173,7 @@ await me.save();
 await new Promise(r => setTimeout(r, 200));
 const savedOk = !!storage['zhishi_profile'];
 
-/* ================= 跑页面 ⑤：推送设置（微信触达 + 触达时间线） ================= */
+/* ================= 跑页面 ⑤：推送设置（微信触达 + 提醒时间） ================= */
 const ps = load('pages/push/push');
 ps.onLoad();
 await new Promise(r => setTimeout(r, 300));
@@ -202,7 +202,7 @@ ps.simulateDeliver();
 await new Promise(r => setTimeout(r, 200));
 const pushAfterDeliver = clone(ps.data.wx);
 
-/* ================= 跑页面 ⑥：今日简报（含智能体主动送达区块） ================= */
+/* ================= 跑页面 ⑥：今日汇总（含智能体主动送达区块） ================= */
 const dg = load('pages/digest/digest');
 dg.onLoad();
 await new Promise(r => setTimeout(r, 700));
@@ -494,7 +494,7 @@ let s5 = `
   </table>
 `;
 
-/* --- 屏 6：推送设置（微信触达 + 触达时间线） --- */
+/* --- 屏 6：推送设置（微信触达 + 提醒时间） --- */
 const wxs = pushAfterAdvance.wx;
 const rch = pushAfterAdvance.reach;
 const days = pushAfterAdvance.reachDays || [];
@@ -549,11 +549,11 @@ let s6 = `
   <div class="sect-t">🔔 主动推送引擎 · 真跑一遍的结果</div>
   <div class="wx-tip" style="margin-bottom:10px">微信服务通知是痛点的最后一步 —— 关掉小程序也能收到提醒。下面是真跑一遍的授权、登记与推演结果。</div>
   ${wxBlockHtml()}
-  <div class="sect-t" style="margin-top:14px">📲 触达时间线 · 什么时候会主动找你</div>
+  <div class="sect-t" style="margin-top:14px">📲 提醒时间 · 什么时候会主动找你</div>
   ${reachBlockHtml()}
 `;
 
-/* --- 屏 7：今日简报 · 智能体主动送达 --- */
+/* --- 屏 7：今日汇总 · 智能体主动送达 --- */
 function agentBlockHtml(){
   const stt = digestSnap;
   if(!stt.agentReady && !stt.agentErr){
@@ -617,7 +617,7 @@ function agentBlockHtml(){
 
 let s7 = `
   <div class="bhead-mini">
-    <div class="bh-t">今日简报</div>
+    <div class="bh-t">今日汇总</div>
     <div class="bh-s">${esc(digestSnap.stamp)} 生成 · 知时 · 数字安农信息雷达</div>
   </div>
   <div class="sum-mini">
@@ -855,7 +855,7 @@ const html = `<!DOCTYPE html>
   .foot{margin-top:38px;text-align:center;font-size:11.5px;color:#5f6a78;line-height:2}
   .foot b{color:var(--ac)}
 
-  /* 屏6 · 推送设置（微信触达 + 触达时间线） */
+  /* 屏6 · 推送设置（微信触达 + 提醒时间） */
   .wx-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 13px}
   .wx-hd{display:flex;align-items:center;justify-content:space-between;gap:10px}
   .wx-lb{font-size:10.5px;color:var(--sub)}
@@ -888,7 +888,7 @@ const html = `<!DOCTYPE html>
   .tl-t{font-size:11.5px;line-height:1.5;color:#dfe6ee}
   .tl-m{font-size:10.5px;color:#5f6a78;margin-top:4px}
 
-  /* 屏7 · 今日简报 + 智能体主动送达 */
+  /* 屏7 · 今日汇总 + 智能体主动送达 */
   .bhead-mini{background:var(--panel);border:1px solid var(--line);border-radius:11px;
     padding:10px 13px;margin-bottom:11px}
   .bh-t{font-size:15px;font-weight:700}
@@ -991,11 +991,11 @@ const html = `<!DOCTYPE html>
     </div>
     <div class="col">
       <div class="col-h"><span><b>⑥ 推送设置</b></span><span class="route">pages/push</span></div>
-      ${phone('推送设置', '微信触达 + 触达时间线', s6)}
+      ${phone('推送设置', '微信触达 + 提醒时间', s6)}
     </div>
     <div class="col">
-      <div class="col-h"><span><b>⑦ 今日简报 · 智能体</b></span><span class="route">pages/digest</span></div>
-      ${phone('今日简报', '简报 + 智能体主动送达清单', s7)}
+      <div class="col-h"><span><b>⑦ 今日汇总 · 智能体</b></span><span class="route">pages/digest</span></div>
+      ${phone('今日汇总', '汇总 + 智能体主动送达清单', s7)}
     </div>
   </div>
 

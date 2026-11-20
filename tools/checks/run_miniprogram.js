@@ -246,10 +246,10 @@ log('='.repeat(64));
       idx.data.index.level + '/' + idx.data.index.label);
     log('  知时指数: ' + idx.data.index.score + ' (' + idx.data.index.level + ') — ' + idx.data.index.label);
 
-    /* 简报摘要一句话 */
-    ck('简报摘要一句话已生成', !!idx.data.briefLine && idx.data.briefLine.length > 4,
+    /* 汇总摘要一句话 */
+    ck('汇总摘要一句话已生成', !!idx.data.briefLine && idx.data.briefLine.length > 4,
       idx.data.briefLine);
-    log('  简报摘要: ' + idx.data.briefLine);
+    log('  汇总摘要: ' + idx.data.briefLine);
 
     /* 按标签分组 */
     ck('groups 已生成', idx.data.groups.length > 0, 'groups=' + idx.data.groups.length);
@@ -279,7 +279,7 @@ log('='.repeat(64));
     ck('goDetail 触发 navigateTo', navLog.some((n) => /detail\?id=/.test(n.url)),
       JSON.stringify(navLog.map((n) => n.url)));
 
-    /* 跳时间轴 / 简报（switchTab） */
+    /* 跳日程 / 汇总（switchTab） */
     navLog = [];
     idx.goTimeline();
     ck('goTimeline 走 switchTab', navLog.some((n) => n.type === 'switchTab' && /timeline/.test(n.url)),
@@ -296,15 +296,15 @@ log('='.repeat(64));
       JSON.stringify(navLog.map((n) => n.url)));
   }
 
-  /* ---- 2b. 【时间轴页】timeline ---- */
-  log('\n【2b】时间轴页 timeline');
+  /* ---- 2b. 【日程页】timeline ---- */
+  log('\n【2b】日程页 timeline');
   const tl = loadPage('pages/timeline/timeline');
   ck('timeline 页可加载并注册', !!tl);
   if (tl) {
     tl.onLoad();
     await new Promise((r) => setTimeout(r, 60));
 
-    ck('时间轴主题已注入', tl.data.theme === 'light' || tl.data.theme === 'dark');
+    ck('日程主题已注入', tl.data.theme === 'light' || tl.data.theme === 'dark');
     ck('分箱已生成（5 档）', (tl.data.buckets || []).length === 5,
       'buckets=' + (tl.data.buckets || []).length);
     log('  分箱: ' + tl.data.buckets.map((b) => `${b.label}=${b.count}`).join(' | '));
@@ -337,7 +337,7 @@ log('='.repeat(64));
       JSON.stringify(d3cd));
 
     /* 指数 */
-    ck('时间轴指数已注入', !!tl.data.index && typeof tl.data.index.score === 'number');
+    ck('日程指数已注入', !!tl.data.index && typeof tl.data.index.score === 'number');
     ck('有内容时 hasAny=true', tl.data.total > 0 ? tl.data.hasAny === true : true,
       'total=' + tl.data.total + ' hasAny=' + tl.data.hasAny);
 
@@ -356,25 +356,32 @@ log('='.repeat(64));
     ck('默认自动展开有内容的分箱', tl.data.openKeys.length > 0,
       JSON.stringify(tl.data.openKeys));
 
-    /* 进详情 */
+    /* 进详情：分箱会随日期推进而变化（如 d3 可能为空），
+       取任一有内容分箱的首条；原兜底变量 anyId 定义在别的块里、此处不可见，已移除。 */
     navLog = [];
-    tl.goDetail({ currentTarget: { dataset: { id: byKey.d3.items[0] ? byKey.d3.items[0].id : anyId } } });
-    ck('时间轴可进详情', navLog.some((n) => /detail\?id=/.test(n.url)),
-      JSON.stringify(navLog.map((n) => n.url)));
+    const firstFilledBucket = tl.data.buckets.find((b) => b.items && b.items.length > 0);
+    const goId = (byKey.d3.items[0]
+      || (firstFilledBucket && firstFilledBucket.items[0])
+      || {}).id;
+    if (goId) {
+      tl.goDetail({ currentTarget: { dataset: { id: goId } } });
+    }
+    ck('日程可进详情', navLog.some((n) => /detail\?id=/.test(n.url)),
+      JSON.stringify(navLog.map((n) => n.url)) + (goId ? '' : ' 无可用的通知 id'));
   }
 
-  /* ---- 2c. 【今日简报页】digest ---- */
-  log('\n【2c】今日简报页 digest');
+  /* ---- 2c. 【今日汇总页】digest ---- */
+  log('\n【2c】今日汇总页 digest');
   const dg = loadPage('pages/digest/digest');
   ck('digest 页可加载并注册', !!dg);
   if (dg) {
     dg.onLoad();
     await new Promise((r) => setTimeout(r, 60));
 
-    ck('简报已生成', !!dg.data.brief, dg.data.brief ? '' : 'brief 为空');
-    ck('简报含知时指数', !!(dg.data.brief && dg.data.brief.index),
+    ck('汇总已生成', !!dg.data.brief, dg.data.brief ? '' : 'brief 为空');
+    ck('汇总含知时指数', !!(dg.data.brief && dg.data.brief.index),
       JSON.stringify(dg.data.brief && dg.data.brief.index));
-    ck('简报含 must/watch 两段',
+    ck('汇总含 must/watch 两段',
       Array.isArray(dg.data.brief.must) && Array.isArray(dg.data.brief.watch),
       'must=' + (dg.data.brief.must || []).length + ' watch=' + (dg.data.brief.watch || []).length);
     log('  三天内要办 ' + dg.data.brief.must.length + ' 件 / 本周留意 ' + dg.data.brief.watch.length + ' 件');
@@ -398,7 +405,7 @@ log('='.repeat(64));
     ck('生成时间戳已填', /\d{4}-\d{2}-\d{2}/.test(dg.data.stamp), dg.data.stamp);
     ck('收藏数已读', typeof dg.data.favCount === 'number', 'favCount=' + dg.data.favCount);
 
-    /* 复制简报 */
+    /* 复制汇总 */
     toastLog = [];
     dg.copyBrief();
     ck('copyBrief 有反馈', toastLog.length > 0, JSON.stringify(toastLog));
@@ -406,16 +413,16 @@ log('='.repeat(64));
     /* 快捷跳转 */
     navLog = [];
     dg.goTimeline();
-    ck('简报可跳时间轴', navLog.some((n) => n.type === 'switchTab' && /timeline/.test(n.url)));
+    ck('汇总可跳日程', navLog.some((n) => n.type === 'switchTab' && /timeline/.test(n.url)));
     navLog = [];
     dg.goSearch();
-    ck('简报可跳搜索', navLog.some((n) => /search/.test(n.url)));
+    ck('汇总可跳搜索', navLog.some((n) => /search/.test(n.url)));
 
-    /* 简报内容随订阅变化 —— 取消一个标签后 must 应变（或至少重算不崩） */
+    /* 汇总内容随订阅变化 —— 取消一个标签后 must 应变（或至少重算不崩） */
     const storeM = require(path.join(MP, 'utils/store.js'));
     const bBefore = storeM.brief();
     dg.build();
-    ck('重新 build 后简报仍自洽', !!dg.data.brief && dg.data.brief.summary.length > 0);
+    ck('重新 build 后汇总仍自洽', !!dg.data.brief && dg.data.brief.summary.length > 0);
   }
 
   /* ---- 3. 【搜索页】search ---- */
@@ -819,9 +826,9 @@ log('='.repeat(64));
           kwR ? kwR.label : '');
         log('  推送理由:', kwR ? kwR.label : '(无)');
 
-        /* 推送流里也应出现这条（候选池按订阅 OR 关键词筛选） */
+        /* 通知列表里也应出现这条（候选池按订阅 OR 关键词筛选） */
         const pr = pushMod.buildPush({ limit: 60 });
-        ck('命中关键词的通知进入推送流',
+        ck('命中关键词的通知进入通知列表',
           pr.cards.some((c) => c.id === kwNotice.id));
       }
 
@@ -869,11 +876,11 @@ log('='.repeat(64));
     /* 快捷跳转 */
     navLog = [];
     me.goTimeline && me.goTimeline();
-    ck('订阅页可跳时间轴', navLog.some((n) => n.type === 'switchTab' && /timeline/.test(n.url)),
+    ck('订阅页可跳日程', navLog.some((n) => n.type === 'switchTab' && /timeline/.test(n.url)),
       JSON.stringify(navLog));
     navLog = [];
     me.goDigest && me.goDigest();
-    ck('订阅页可跳简报', navLog.some((n) => n.type === 'switchTab' && /digest/.test(n.url)));
+    ck('订阅页可跳汇总', navLog.some((n) => n.type === 'switchTab' && /digest/.test(n.url)));
   }
 
   /* ---- 6. 同源一致性：web 与 mp 算法是否同一套 ---- */
@@ -923,8 +930,8 @@ log('='.repeat(64));
       `mp=${mpHit.length} web=${webHit.length}`);
   }
 
-  /* ---- 6b. 跨页一致性：首页 / 时间轴 / 简报 三处的数字必须对得上 ---- */
-  log('\n【6b】跨页一致性（首页 ↔ 时间轴 ↔ 简报）');
+  /* ---- 6b. 跨页一致性：首页 / 日程 / 汇总 三处的数字必须对得上 ---- */
+  log('\n【6b】跨页一致性（首页 ↔ 日程 ↔ 汇总）');
   /* 首页：warmUp 同步渲染即可，云端是异步覆盖，不等它 */
   const idxP = loadPage('pages/index/index');
   idxP.onLoad();
@@ -938,35 +945,35 @@ log('='.repeat(64));
 
   /* 命中总数三处一致 */
   const idxFeed = idxP.data.urgent.length + idxP.data.soon.length + idxP.data.later.length;
-  log('  首页关注流 ' + idxFeed + ' 条 / 时间轴 ' + tlP.data.total + ' 条 / 简报统计 ' +
+  log('  首页关注流 ' + idxFeed + ' 条 / 日程 ' + tlP.data.total + ' 条 / 汇总统计 ' +
     (dgP.data.brief.stats && dgP.data.brief.stats.matched) + ' 条');
-  ck('首页与时间轴总量一致', idxFeed === tlP.data.total,
+  ck('首页与日程总量一致', idxFeed === tlP.data.total,
     `index=${idxFeed} timeline=${tlP.data.total}`);
-  ck('时间轴与简报统计一致',
+  ck('日程与汇总统计一致',
     tlP.data.total === (dgP.data.brief.stats && dgP.data.brief.stats.matched),
     `timeline=${tlP.data.total} brief=${dgP.data.brief.stats && dgP.data.brief.stats.matched}`);
 
   /* 知时指数三处同源 */
-  ck('知时指数首页 = 时间轴', idxP.data.index.score === tlP.data.index.score,
+  ck('知时指数首页 = 日程', idxP.data.index.score === tlP.data.index.score,
     `index=${idxP.data.index.score} timeline=${tlP.data.index.score}`);
-  ck('知时指数首页 = 简报', idxP.data.index.score === dgP.data.brief.index.score,
+  ck('知时指数首页 = 汇总', idxP.data.index.score === dgP.data.brief.index.score,
     `index=${idxP.data.index.score} brief=${dgP.data.brief.index.score}`);
 
-  /* 简报的「三天内要办」应 ⊆ 首页紧急区 */
+  /* 汇总的「三天内要办」应 ⊆ 首页紧急区 */
   const idxUrgentIds = idxP.data.urgent.map((n) => n.id);
   const briefMustIds = dgP.data.brief.must.map((n) => n.id);
-  ck('简报「三天内要办」⊆ 首页紧急区',
+  ck('汇总「三天内要办」⊆ 首页紧急区',
     briefMustIds.every((id) => idxUrgentIds.indexOf(id) >= 0),
     JSON.stringify({ briefMustIds, idxUrgentIds }));
 
-  /* 时间轴 d3 档 应 ⊆ 首页紧急区 */
+  /* 日程 d3 档 应 ⊆ 首页紧急区 */
   const tlD3Ids = (tlP.data.buckets.find((b) => b.key === 'd3') || { items: [] }).items.map((n) => n.id);
-  ck('时间轴 d3 档 ⊆ 首页紧急区',
+  ck('日程 d3 档 ⊆ 首页紧急区',
     tlD3Ids.every((id) => idxUrgentIds.indexOf(id) >= 0),
     JSON.stringify({ tlD3Ids, idxUrgentIds }));
 
-  /* 简报每句都用中文分号分隔 —— 保证 sentences 拆句正确 */
-  ck('简报一句话可拆成多句', dgP.data.sentences.length >= 1,
+  /* 汇总每句都用中文分号分隔 —— 保证 sentences 拆句正确 */
+  ck('汇总一句话可拆成多句', dgP.data.sentences.length >= 1,
     JSON.stringify(dgP.data.sentences));
 
   /* ---- 6c. 边界与健壮性 ---- */
@@ -1285,12 +1292,19 @@ log('='.repeat(64));
           push.scoreOf(opp, { interests: [] }, false) > push.scoreOf(plain, { interests: [] }, false);
       })());
 
-    /* —— 新近发布补偿：无截止日期条目不再永远沉底 —— */
+    /* —— 新近发布补偿：无截止日期条目不再永远沉底 ——
+       日期一律用「本地 YYYY-MM-DD」：push.js 的 publishAge 按本地自然日比较，
+       用 toISOString()（UTC）在 GMT+8 的 00:00–08:00 会差一天，导致偶发红灯。 */
+    const localISO = (() => {
+      const d = new Date();
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
+        + '-' + String(d.getDate()).padStart(2, '0');
+    })();
     ck('publishAge 解析正确（今天为 0）',
-      push.publishAge(new Date().toISOString().slice(0, 10)) === 0);
+      push.publishAge(localISO) === 0);
     ck('新近发布（14 天内）获得 FRESH 理由',
       (function () {
-        const n = { id: 'fr', event: '校内通知', title: 'x', countdown: null, publish: new Date().toISOString().slice(0, 10) };
+        const n = { id: 'fr', event: '校内通知', title: 'x', countdown: null, publish: localISO };
         return push.reasonsFor(n, { interests: [] }, false).some((r) => r.code === 'FRESH');
       })());
     ck('过期发布（>14 天）不给 FRESH',
@@ -1349,7 +1363,7 @@ log('='.repeat(64));
       r1.summary && r1.summary.line && typeof r1.summary.tone === 'string');
     ck('summary.tone 与是否有待办一致',
       (r1.hotCount > 0) === (r1.summary.tone === 'alert'), 'tone=' + r1.summary.tone);
-    log('  推送流:', r1.total, '条 · 打扰', r1.hotCount, '条 · 新收录', r1.newCount, '条');
+    log('  通知列表:', r1.total, '条 · 打扰', r1.hotCount, '条 · 新收录', r1.newCount, '条');
     log('  一句话:「' + r1.summary.line + '」');
 
     /* —— 新收录留痕 —— */
@@ -1461,7 +1475,7 @@ log('='.repeat(64));
     const exp20 = push.scoreOf(Object.assign({}, expN, { countdown: -20 }), store5.getProfile(), true, null);
     ck('过期越久分不高于刚过期（负权随天数递增）', exp20 <= exp3,
       '过期20天 ' + exp20 + ' vs 过期3天 ' + exp3);
-    /* 推送流排序：所有过期条目都排在所有未过期条目之后 */
+    /* 通知列表排序：所有过期条目都排在所有未过期条目之后 */
     const allCards = rFresh.cards;
     const lastFreshIdx = (() => {
       let k = -1;
@@ -1469,7 +1483,7 @@ log('='.repeat(64));
       return k;
     })();
     const firstExpIdx = allCards.findIndex((c) => typeof c.countdown === 'number' && c.countdown < 0);
-    ck('推送流：过期条目全部排在未过期之后',
+    ck('通知列表：过期条目全部排在未过期之后',
       firstExpIdx < 0 || lastFreshIdx < 0 || firstExpIdx > lastFreshIdx,
       'lastFresh=' + lastFreshIdx + ' firstExp=' + firstExpIdx);
     ck('过期卡带 isExpired 标记且 reasonLine 为"已截止…"',
@@ -1495,9 +1509,16 @@ log('='.repeat(64));
     ck('有截止的"说明"不视为纯说明（仍可给机会/待办理由）',
       !explDead.some((x) => x.code === 'EXPLAIN_ONLY'));
 
-    /* —— 远期折扣：cd>14 的软信号（机会/新鲜度）减半 —— */
+    /* —— 远期折扣：cd>14 的软信号（机会/新鲜度）减半 ——
+       publish 必须用「相对今天」的日期：FRESH 理由只在发布 ≤14 天内产生
+       （见 push.js publishAge）。写死 2026-11-01 会随日期推进失效
+       —— 11/16 起 age=15，两条夹具都拿不到 FRESH，断言便报 undefined。 */
+    const _t = new Date(); _t.setDate(_t.getDate() - 2);
+    const freshPublish = _t.getFullYear() + '-'
+      + String(_t.getMonth() + 1).padStart(2, '0') + '-'
+      + String(_t.getDate()).padStart(2, '0');
     const oppFar = { id: 'of', event: '学科竞赛', title: '某竞赛', countdown: 30,
-                     audience: '全体本科生', publish: '2026-11-01' };
+                     audience: '全体本科生', publish: freshPublish };
     const oppNear = Object.assign({}, oppFar, { countdown: 10 });
     const wFar = (push.reasonsFor(oppFar, store5.getProfile(), false, null)
       .filter((x) => x.code === 'OPPORTUNITY')[0] || {}).w;
@@ -1582,7 +1603,7 @@ log('='.repeat(64));
         pushPage.data.stats && pushPage.data.stats.pushing === push.buildPush({ profile: store5.getProfile() }).total,
         'page=' + (pushPage.data.stats && pushPage.data.stats.pushing) +
         ' engine=' + push.buildPush({ profile: store5.getProfile() }).total);
-      ck('推送页 有推送流卡片', pushPage.data.cards.length > 0,
+      ck('推送页 有通知列表卡片', pushPage.data.cards.length > 0,
         'cards=' + pushPage.data.cards.length);
       ck('推送页 卡片都带推送理由',
         pushPage.data.cards.every((c) => c.pushReasonLine && c.pushScore >= 0));
@@ -1639,7 +1660,7 @@ log('='.repeat(64));
       toastLog = []; navLog = [];
     }
 
-    /* —— 首页推送流渲染（新增能力） —— */
+    /* —— 首页通知列表渲染（新增能力） —— */
     const idxPage = loadPage('pages/index/index');
     if (idxPage) {
       idxPage.onLoad && idxPage.onLoad({});
@@ -1707,9 +1728,9 @@ log('='.repeat(64));
   }
 
   /* ================================================================
-   * 【4f】问知时 · 问答引擎 + 办事日历（新增能力）
+   * 【4f】问答 · 问答引擎 + 日历（新增能力）
    * ================================================================ */
-  log('\n【4f】问知时 · 问答引擎 + 办事日历');
+  log('\n【4f】问答 · 问答引擎 + 日历');
   {
     const ask = require(path.join(MP, 'utils/ask.js'));
     const store6 = require(path.join(MP, 'utils/store.js'));
@@ -1787,7 +1808,7 @@ log('='.repeat(64));
     ck('问答引擎 自评含 pool/questions/readyRate',
       st.pool >= 0 && st.questions >= 13 && typeof st.readyRate === 'number');
 
-    /* —— 办事日历 —— */
+    /* —— 日历 —— */
     const cal = ask.buildCalendar(2026, 11);
     ck('日历 返回完整周网格',
       cal.weeks.length >= 4 && cal.weeks.every((w) => w.length === 7),
@@ -1934,7 +1955,7 @@ log('='.repeat(64));
     if (idxAsk) {
       idxAsk.onLoad && idxAsk.onLoad({});
       await new Promise((r) => setTimeout(r, 120));
-      ck('首页 有问知时头条 headline',
+      ck('首页 有问答头条 headline',
         !!idxAsk.data.headline && !!idxAsk.data.headline.answer,
         'q=' + (idxAsk.data.headline && idxAsk.data.headline.q));
       navLog = [];
@@ -2057,7 +2078,7 @@ log('='.repeat(64));
     idX.passesIdentity(jgNotice, pXin) === false &&
     idX.passesIdentity(jgNotice, pJg) === true);
 
-  /* 端到端：把工学院考试安排塞进池子，信院学生的推送流里不该出现它 */
+  /* 端到端：把工学院考试安排塞进池子，信院学生的通知列表里不该出现它 */
   {
     const pushX = require(path.join(MP, 'utils/push.js'));
     const noticesMod = require(path.join(MP, 'data/notices.js'));
@@ -2076,14 +2097,14 @@ log('='.repeat(64));
       const feedIds = storeX.myFeed().map(x => x.id);
       const bp = pushX.buildPush({ limit: 999 });
       const ids = bp.cards.map(x => x.id);
-      /* 关注流与推送流都不该含跨院通知；图书馆（校级）应可见 */
+      /* 关注流与通知列表都不该含跨院通知；图书馆（校级）应可见 */
       e2eOk = feedIds.indexOf('test-gxy-exam') < 0 && feedIds.indexOf('test-jg') < 0 &&
               ids.indexOf('test-gxy-exam') < 0 && ids.indexOf('test-jg') < 0;
-      log('  端到端（信院档案）：关注流 ' + feedIds.length + ' 条 / 推送流 ' + ids.length +
+      log('  端到端（信院档案）：关注流 ' + feedIds.length + ' 条 / 通知列表 ' + ids.length +
         ' 条，工学院考试安排 ' + (feedIds.indexOf('test-gxy-exam') < 0 ? '未出现 ✅' : '误入 ❌') +
         '，图书馆通知 ' + (feedIds.indexOf('test-lib') >= 0 ? '可见 ✅' : '缺失') );
     } catch (e) { e2eOk = false; e2eErr = e.message; }
-    ck('端到端：信院推送流不含工学院/经管通知，且校级通知可见', e2eOk, e2eErr);
+    ck('端到端：信院通知列表不含工学院/经管通知，且校级通知可见', e2eOk, e2eErr);
     /* 还原池子 */
     noticesMod.NOTICES.length = before;
     storeX.useLocalNotices();
@@ -2207,8 +2228,8 @@ log('='.repeat(64));
     const orphan = all.filter(q => grpKeys.indexOf(q.group) < 0);
     let noAns = 0, noBasis = 0;
     all.forEach(q => { const a = askX.ask(q.id); if (!a || !a.answer) noAns++; if (!a || !a.basis) noBasis++; });
-    ck('问知时 13 问数量恒定', all.length === 13, String(all.length));
-    ck('问知时问题 id 唯一', uniq);
+    ck('问答 13 问数量恒定', all.length === 13, String(all.length));
+    ck('问答问题 id 唯一', uniq);
     ck('分组求和 = 问题总数', grpSum === all.length, `${grpSum} vs ${all.length}`);
     ck('无孤立问题（group 都有归属）', orphan.length === 0, orphan.map(q => q.id).join(','));
     ck('13 问全部有答案', noAns === 0, `缺 ${noAns}`);
@@ -2306,14 +2327,14 @@ log('='.repeat(64));
     const nsR = nonStud.filter(r => r.code === 'NOT_STUDENT');
     ck('推送理由 非学生事项 → 加 NOT_STUDENT 负权理由', nsR.length === 1 && nsR[0].w === -30);
 
-    /* (h2) 非学生事项不进推送流：真实池里若有，buildPush 结果不得出现其 id */
+    /* (h2) 非学生事项不进通知列表：真实池里若有，buildPush 结果不得出现其 id */
     const allX = storeX.allNotices();
     const nsIds = allX.filter(n => String(n.audience || '').indexOf('非学生事项') >= 0).map(n => n.id);
     const pushAll = pushX.buildPush({ profile: { identityType: '本科生', grade: '2025级 · 大一',
       interests: ['学科竞赛', '奖助学金', '考试安排', '选课', '讲座培训', '图书资源',
                   '转专业', '学工事务', '校内通知', '选课考试', '讲座活动', '竞赛'] }, limit: 60 });
     const leaked = pushAll.cards.filter(c => nsIds.indexOf(c.id) >= 0);
-    ck('推送流 不含非学生事项（行政/新闻已被剔除）',
+    ck('通知列表 不含非学生事项（行政/新闻已被剔除）',
       leaked.length === 0, leaked.length ? '漏进: ' + leaked.map(c => c.id).join(',') : '已剔除 ' + nsIds.length + ' 条');
 
     /* (h3) 受众字段质量：全池里"原文未明确说明"应为 0（要么读到对象，要么判非学生） */
@@ -2412,7 +2433,7 @@ log('='.repeat(64));
     ck('reset 清空已读/删除', rs.isRead('c1') === false && rs.isHidden('c2') === false);
 
     /* 页面级：首页 recompute 后推送卡带 read 标记且不含已删除。
-     * 探针必须取自推送流本身（buildPush 走 store.myFeed() 个性化过滤，
+     * 探针必须取自通知列表本身（buildPush 走 store.myFeed() 个性化过滤，
      * 与 allNotices() 不同源），否则统计口径对不上。 */
     const storeR = require(path.join(MP, 'utils/store.js'));
     const allR = storeR.allNotices();
@@ -2424,7 +2445,7 @@ log('='.repeat(64));
       const idxR = loadPage('pages/index/index');
       idxR.recompute();
       const idsInFeed = (idxR.data.pushCards || []).map(c => c.id);
-      ck('首页 已删除条目不出现在推送流', idsInFeed.indexOf(probeId) < 0);
+      ck('首页 已删除条目不出现在通知列表', idsInFeed.indexOf(probeId) < 0);
       ck('首页 推送卡均带 read 布尔标记',
         (idxR.data.pushCards || []).every(c => typeof c.read === 'boolean'));
       ck('首页 readStats 统计存在且自洽',

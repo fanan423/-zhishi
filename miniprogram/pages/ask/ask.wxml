@@ -65,7 +65,7 @@
               {{item.countdown === null ? '长期' : (item.countdown < 0 ? '已过期' : (item.countdown === 0 ? '今天' : '剩' + item.countdown + '天'))}}
             </view>
           </view>
-          <view class="imore" wx:if="{{opened.itemCount > opened.items.length}}">还有 {{opened.itemCount - opened.items.length}} 条，去首页推送流看全部 ›</view>
+          <view class="imore" wx:if="{{opened.itemCount > opened.items.length}}">还有 {{opened.itemCount - opened.items.length}} 条，去首页通知列表看全部 ›</view>
         </view>
       </block>
       <view class="iempty" wx:if="{{opened.items.length === 0 && !opened.materials}}">这条问题下没有需要处理的条目</view>
@@ -93,8 +93,8 @@
   </view>
 
   <view class="acts">
-    <button class="ab primary" bindtap="goCalendar">看办事日历 ›</button>
-    <button class="ab" bindtap="goIndex">回推送流</button>
+    <button class="ab primary" bindtap="goCalendar">看日历 ›</button>
+    <button class="ab" bindtap="goIndex">回通知列表</button>
   </view>
 
   <view class="foot">

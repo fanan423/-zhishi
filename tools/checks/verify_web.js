@@ -186,9 +186,9 @@ if (kwTarget) {
   ck('推送理由含 KW_MATCH', !!kwR, JSON.stringify(rs.map(r => r.code)));
   ck('KW_MATCH 理由写明命中词', !!kwR && kwR.label.indexOf(KW) >= 0, kwR ? kwR.label : '');
   const pr = ZS.buildPush(NOTICES, { profile: pKw, limit: 99 });
-  ck('命中关键词的通知进入推送流', pr.cards.some(c => c.id === kwTarget.id));
-  /* relatedNotices（问知时口径）也要把关键词命中的算进来 */
-  ck('问知时口径 relatedNotices 含关键词命中',
+  ck('命中关键词的通知进入通知列表', pr.cards.some(c => c.id === kwTarget.id));
+  /* relatedNotices（问答口径）也要把关键词命中的算进来 */
+  ck('问答口径 relatedNotices 含关键词命中',
     ZS.relatedNotices(NOTICES, pKw).some(n => n.id === kwTarget.id));
   /* 越权防线：关键词不能把别的学院专属通知带进来 */
   const other = NOTICES.filter(n => String(n.source || '').indexOf('工学院') >= 0)[0];

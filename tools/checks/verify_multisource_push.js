@@ -154,18 +154,18 @@ profiles.forEach(({ name, p }) => {
   // 信院档案不得出现工学院考试通知
   if (name.indexOf('信院') === 0 && gxyNotice) {
     const leaked = cards.some(c => c.id === gxyNotice.id);
-    ok(!leaked, '信院档案推送流不得含工学院考试通知');
+    ok(!leaked, '信院档案通知列表不得含工学院考试通知');
     console.log(`        含工学院考试通知：${leaked ? '✗ 泄漏' : '✓ 无'}`);
   }
   if (name.indexOf('工学院') === 0 && gxyNotice) {
     const has = cards.some(c => c.id === gxyNotice.id);
-    ok(has, '工学院档案推送流应含本学院考试通知');
+    ok(has, '工学院档案通知列表应含本学院考试通知');
     console.log(`        含工学院考试通知：${has ? '✓ 有' : '✗ 缺失'}`);
   }
 });
 
-ok(totalCards > 0, '推送流不应为空');
-ok(realCards > 0, '推送流应含真实抓取条目');
+ok(totalCards > 0, '通知列表不应为空');
+ok(realCards > 0, '通知列表应含真实抓取条目');
 ok(traceableReal === realCards, `真实推送卡片都应可溯源：${traceableReal}/${realCards}`);
 ok(scoredCards === totalCards, `所有推送卡片都应有 0-100 分数：${scoredCards}/${totalCards}`);
 ok(reasonedCards === totalCards, `所有推送卡片都应有推送理由：${reasonedCards}/${totalCards}`);
@@ -181,7 +181,7 @@ const kwHit = NOTICES.filter(n => subscribe.noticeHaystack(n).indexOf(KW) >= 0);
 ok(kwHit.length > 0, `池中应有命中「${KW}」的真实通知，实际 ${kwHit.length} 条`);
 
 if (kwHit.length > 0) {
-  /* 一条真实通知做端到端：订「正大杯」→ 进推送流 → 带 KW_MATCH 理由 → 仍可溯源 */
+  /* 一条真实通知做端到端：订「正大杯」→ 进通知列表 → 带 KW_MATCH 理由 → 仍可溯源 */
   const pKw = { identityType: '本科生', college: '信息与人工智能学院', grade: '2025级',
                 interests: ['转专业'],   /* 故意不勾"学科竞赛"，证明关键词单独也能把它拉进来 */
                 keywords: [KW] };
@@ -190,18 +190,30 @@ if (kwHit.length > 0) {
   const resKw = push.buildPush({ profile: pKw, limit: 999 });
   const cardsKw = resKw.cards || [];
   const kwCard = cardsKw.filter(c => c.id === kwHit[0].id)[0];
-  ok(!!kwCard, '订关键词后命中通知应进入推送流（即使标签未勾）');
+  ok(!!kwCard, '订关键词后命中通知应进入通知列表（即使标签未勾）');
   if (kwCard) {
     const kwR = (kwCard.pushReasons || []).filter(r => r.code === 'KW_MATCH')[0];
     ok(!!kwR, '命中关键词的卡片应带 KW_MATCH 理由');
     ok(!!kwR && kwR.label.indexOf(KW) >= 0, 'KW_MATCH 理由应写明命中词「' + KW + '」');
-    ok(typeof kwCard.pushScore === 'number' && kwCard.pushScore > 0,
-       '命中关键词的卡片应有正分：' + (kwCard ? kwCard.pushScore : '-'));
+    ok(typeof kwCard.pushScore === 'number',
+       '命中关键词的卡片应有分数：' + (kwCard ? kwCard.pushScore : '-'));
+    /* 真实通知会随日期推进而过期：产品对 cd<0 的条目给 EXPIRED 负权、压到 0 分
+     * 是正确的"过期沉底"设计（绝不把已截止的事继续顶在首页）。
+     * 因此"关键词命中应得正分"改用同一条通知的**未过期副本**验证机制本身，
+     * 断言用相对倒计时(countdown=2)，不再写死日期、不会随日期老化。 */
+    const futureKw = Object.assign({}, kwHit[0], { countdown: 2 });
+    const futureReasons = push.reasonsFor(futureKw, pKw, false);
+    const futureScore = push.scoreOf(futureKw, pKw, false);
+    ok(futureReasons.some((r) => r.code === 'KW_MATCH') && futureScore > 0,
+       '未过期时关键词命中应带 KW_MATCH 且得正分：' + futureScore);
     if (kwCard.real) {
       ok(!!kwCard.url && /^https?:\/\//.test(kwCard.url), '命中关键词的真实卡片仍可溯源到原文');
     }
+    const expiredNote = (kwCard.pushReasons || []).some((r) => r.code === 'EXPIRED')
+      ? `（真实通知已过截止日，EXPIRED 负权正确压到 0；未过期副本得 ${futureScore} 分）`
+      : '';
     console.log(`   「${KW}」命中 ${kwHit.length} 条 · 入流后分数 ${kwCard.pushScore} · ` +
-                `理由「${kwR ? kwR.label : '无'}」`);
+                `理由「${kwR ? kwR.label : '无'}」${expiredNote}`);
   }
   /* 越权防线：关键词不得越过学院过滤 */
   const gxyOnly = REALS.filter(n => /机械与车辆|工学院/.test(n.source || ''));

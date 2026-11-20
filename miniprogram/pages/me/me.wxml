@@ -61,7 +61,7 @@
   <view class="quick">
     <view class="qb" bindtap="goAsk">
       <text class="qbi">💬</text>
-      <text class="qbt">问知时</text>
+      <text class="qbt">问答</text>
     </view>
     <view class="qb" bindtap="goCalendar">
       <text class="qbi">📅</text>
@@ -69,11 +69,11 @@
     </view>
     <view class="qb" bindtap="goTimeline">
       <text class="qbi">🕒</text>
-      <text class="qbt">时间轴</text>
+      <text class="qbt">日程</text>
     </view>
     <view class="qb" bindtap="goDigest">
       <text class="qbi">📋</text>
-      <text class="qbt">今日简报</text>
+      <text class="qbt">今日汇总</text>
     </view>
   </view>
 
@@ -252,8 +252,8 @@
     <view class="favhint">删除只是本地隐藏，不改变云端公开数据；点「找回」即可恢复。</view>
   </block>
 
-  <!-- 问知时：把学生脑子里的疑问做成一问一答 -->
-  <view class="sec">问知时 <text class="secsub">· 有问题直接问，答案带依据</text></view>
+  <!-- 问答：把学生脑子里的疑问做成一问一答 -->
+  <view class="sec">问答 <text class="secsub">· 有问题直接问，答案带依据</text></view>
   <view class="scbox" bindtap="goAsk">
     <view class="scic">💬</view>
     <view class="scbd">
@@ -263,8 +263,8 @@
     <view class="scar">›</view>
   </view>
 
-  <!-- 办事日历 -->
-  <view class="sec">办事日历 <text class="secsub">· 哪天忙一目了然</text></view>
+  <!-- 日历 -->
+  <view class="sec">日历 <text class="secsub">· 哪天忙一目了然</text></view>
   <view class="scbox" bindtap="goCalendar">
     <view class="scic">📅</view>
     <view class="scbd">

@@ -21,6 +21,7 @@
  *   GET  /api/profile          读当前/默认画像
  *   PUT  /api/profile          写画像（存内存 + 可选落盘）
  *   POST /api/understand       理解单条通知（真调大模型，可禁用）
+ *   POST /api/recommend        按画像做 AI 推荐（真调大模型，失败自动降级规则）
  *   POST /api/run              跑完整一轮（六步链路）
  *   GET  /api/digest           今日主动送达清单（人可读 + 机器可读）
  *   POST /api/digest/deliver   把清单"落盘送达"（写 push_out/，返回落盘路径）
@@ -44,6 +45,7 @@ const fs = require('fs');
 const path = require('path');
 
 const core = require('./core.js');
+const recommendMod = require('./recommend.js');
 
 /* ══════════════════════════════════════════════════════════
  * 配置（环境变量 > 命令行 > 默认）
@@ -475,6 +477,138 @@ async function handleDigest(reqId, query) {
   };
 }
 
+/**
+ * AI 推荐（POST /api/recommend）
+ * ----------------------------------------------------------------
+ * 设计要点：
+ *   ① 规则结果**始终先算**，既是降级保底，也是模型的候选池来源；
+ *   ② 模型只对候选池前 N 条做「通知 × 画像」相关性判断，产出分 + 理由 + 逐字引文；
+ *   ③ 模型不可用 / 全失败 → 如实返回 mode=rule + degraded，绝不拿规则分冒充模型分；
+ *   ④ 成功时按 relevance 重排，但**保留规则分 score** 供对照与可解释性；
+ *   ⑤ 每次运行写 push_out/ai_recommend_run.json，可逐条举证。
+ *
+ * 入参：{ useLLM?:bool, limit?:1..20, profile?:{...} }
+ */
+async function handleRecommend(reqId, body) {
+  const useLLM = asBool(body.useLLM, CONFIG.llmDefaultEnabled);
+  const limit = asInt(body.limit, 12, 1, CONFIG.llmMaxBatch);
+
+  let profile;
+  try {
+    profile = body.profile
+      ? validateProfile(body.profile)
+      : (RUNTIME.profile || core.loadProfile({}).profile);
+  } catch (e) {
+    throw ERR.BAD_REQUEST('画像不合法：' + (e && e.message));
+  }
+
+  /* 规则基线：与 /api/digest 同源，保证两种模式口径一致 */
+  const base = await handleDigest(reqId, { useLLM: 'false', llmLimit: '0' });
+  const cards = (base.notify || []).concat(base.silent || []);
+  const full = (await getNotices(false)).notices || [];
+  const rawById = {};
+  full.forEach((n) => { rawById[String(n.id)] = n; });
+
+  const toItem = (c, ai) => ({
+    id: c.id,
+    title: c.title,
+    score: c.score,                                   // 规则分，保留可对照
+    relevance: ai ? ai.relevance : c.score,
+    reason: ai ? ai.reason : (c.reasonLine || ''),
+    evidence: ai ? ai.evidence : null,
+    source: ai ? 'llm' : 'rule',
+    level: c.level,
+    levelLabel: c.levelLabel,
+    countdown: c.countdown,
+    deadline: c.deadline,
+    event: c.event || '',
+    digestOne: c.digestOne || '',
+    url: c.url || '',
+    sourceUnit: c.source || '',
+  });
+
+  /* limit 同时约束「返回条数」与「模型判断条数」，两端契约一致 */
+  const scoped = cards.slice(0, limit);
+  const ruleItems = scoped.map((c) => toItem(c, null));
+  const meta = {
+    ranAt: new Date().toISOString(),
+    profile,
+    counts: { pool: cards.length, returned: scoped.length, ai: 0, rule: scoped.length },
+  };
+
+  if (!useLLM) {
+    return {
+      ok: true, mode: 'rule', aiPowered: false, via: 'remote',
+      model: null, promptVersion: null,
+      reason: '未启用大模型（useLLM=false）',
+      items: ruleItems, meta,
+    };
+  }
+  if (!core.cloudAvailable()) {
+    return {
+      ok: true, mode: 'rule', aiPowered: false, via: 'remote',
+      degraded: true, degradeReason: '云服务不可用，已降级规则推荐',
+      model: null, promptVersion: null, items: ruleItems, meta,
+    };
+  }
+
+  /* 候选：规则排序靠前的 N 条，补上原文供模型逐字引用 */
+  const candidates = scoped.map((c) => {
+    const f = rawById[String(c.id)] || {};
+    return {
+      id: c.id, title: c.title,
+      event: c.event || f.event,
+      deadline: c.deadline || f.deadline,
+      countdown: c.countdown,
+      audience: f.audience || null,
+      raw: f.raw || f.digest || c.digestOne || '',
+      digestOne: c.digestOne || '',
+      llm_fields: f.llm_fields || null,
+    };
+  });
+
+  const r = await core.withTimeout(
+    recommendMod.recommend(candidates, profile, { limit }),
+    CONFIG.reqTimeoutMs, 'api.recommend'
+  );
+  RUNTIME.counters.llmCalls += r.tried || 0;
+  recommendMod.writeRunLog(r, profile);
+
+  if (!r.ok || r.mode !== 'llm' || r.okCount === 0) {
+    return {
+      ok: true, mode: 'rule', aiPowered: false, via: 'remote',
+      degraded: true,
+      degradeReason: (r.reason || '模型未返回有效结果') + '，已降级规则推荐',
+      model: r.model || null, promptVersion: r.promptVersion,
+      items: ruleItems,
+      meta: Object.assign({}, meta, {
+        llmAttempt: { tried: r.tried, okCount: r.okCount, failed: r.failed, elapsedMs: r.elapsedMs },
+      }),
+    };
+  }
+
+  const aiById = {};
+  r.results.forEach((x) => { if (x.ok) aiById[String(x.id)] = x; });
+  const items = scoped.map((c) => toItem(c, aiById[String(c.id)] || null));
+  items.sort((a, b) => b.relevance - a.relevance);
+  const aiCount = items.filter((x) => x.source === 'llm').length;
+
+  log('info', reqId, 'recommend done', {
+    mode: 'llm', model: r.model, tried: r.tried, okCount: r.okCount,
+    ms: r.elapsedMs,
+  });
+  return {
+    ok: true, mode: 'llm', aiPowered: true, via: 'remote',
+    model: r.model, modelName: r.modelName, promptVersion: r.promptVersion,
+    items,
+    meta: Object.assign({}, meta, {
+      ranAt: r.ranAt, elapsedMs: r.elapsedMs,
+      counts: { pool: cards.length, returned: items.length, ai: aiCount, rule: items.length - aiCount },
+      llmAttempt: { tried: r.tried, okCount: r.okCount, failed: r.failed },
+    }),
+  };
+}
+
 async function handleDeliver(reqId, body) {
   const useLLM = asBool(body.useLLM, false);
   const digest = await handleDigest(reqId, { useLLM: String(useLLM), llmLimit: String(body.llmLimit || 6) });
@@ -553,6 +687,7 @@ function handleVersion() {
     capabilities: {
       notices: true, tags: true, understand: core.cloudAvailable(),
       run: true, digest: true, deliver: true,
+      recommend: core.cloudAvailable(),
     },
   };
 }
@@ -588,6 +723,7 @@ const ROUTES = {
   'POST /api/run': (reqId, body) => handleRun(reqId, body),
   'GET /api/digest': (reqId, body, query) => handleDigest(reqId, query),
   'POST /api/digest/deliver': (reqId, body) => handleDeliver(reqId, body),
+  'POST /api/recommend': (reqId, body) => handleRecommend(reqId, body),
 };
 
 function matchRoute(method, pathname) {

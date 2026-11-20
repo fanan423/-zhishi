@@ -18,7 +18,7 @@
     <view class="trow">
       <view class="tl">
         <view class="tt">推送总开关</view>
-        <view class="td">{{flags.pushOn ? '已开启 —— 进入即自动按档案排好推送流' : '已关闭 —— 首页不再自动排序推送'}}</view>
+        <view class="td">{{flags.pushOn ? '已开启 —— 进入即自动按档案排好通知列表' : '已关闭 —— 首页不再自动排序推送'}}</view>
       </view>
       <view class="sw {{flags.pushOn ? 'on' : ''}}" data-k="pushOn" bindtap="toggleFlag">
         <view class="swd"></view>
@@ -107,8 +107,8 @@
     </view>
   </view>
 
-  <!-- ★ 触达时间线（可演示、可复核的"主动找你"闭环） -->
-  <view class="sec">触达时间线 <text class="secsub">· 什么时候会主动找你</text></view>
+  <!-- ★ 提醒时间（可演示、可复核的"主动找你"闭环） -->
+  <view class="sec">提醒时间 <text class="secsub">· 什么时候会主动找你</text></view>
   <view class="box">
     <view class="reachsum">
       与你相关 <text class="rsn">{{reach.mine}}</text> 条 · 已规划提醒 <text class="rsn">{{reach.scheduled}}</text> 条 ·
@@ -145,8 +145,8 @@
     </view>
   </view>
 
-  <!-- 推送流预览 -->
-  <view class="sec">当前推送流 <text class="secsub">· 前 {{cards.length}} 条</text></view>
+  <!-- 通知列表预览 -->
+  <view class="sec">当前通知列表 <text class="secsub">· 前 {{cards.length}} 条</text></view>
 
   <block wx:if="{{cards.length > 0}}">
     <view class="pcard lv-{{item.pushLevel}}" wx:for="{{cards}}" wx:key="id"
@@ -173,7 +173,7 @@
   <view class="empty" wx:else>当前档案下暂无推送</view>
 
   <view class="acts">
-    <button class="ab primary" bindtap="goIndex">看完整推送流 ›</button>
+    <button class="ab primary" bindtap="goIndex">看完整通知列表 ›</button>
   </view>
 
   <view class="foot">

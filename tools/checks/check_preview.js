@@ -24,10 +24,10 @@ t('默认全是浅色主题', doc.querySelectorAll('.phone.light').length === 13
   'light ' + doc.querySelectorAll('.phone.light').length + ' / dark ' + doc.querySelectorAll('.phone.dark').length);
 
 /* 3. 校徽（双圆形 + AAU 展开书页 + 麦金朝阳点 + 田野横纹 + 建校 1928）
-      —— 首页 / 订阅页 / 简报页各一个，依《安徽农业大学章程》第 75 条 */
+      —— 首页 / 订阅页 / 汇总页各一个，依《安徽农业大学章程》第 75 条 */
 const styleTxt = doc.querySelector('style').textContent;
 const crests = doc.querySelectorAll('.lg .aa');
-t('校徽意象 logo 存在', crests.length === 3, '共 ' + crests.length + ' 处（首页 + 订阅页 + 简报页）');
+t('校徽意象 logo 存在', crests.length === 3, '共 ' + crests.length + ' 处（首页 + 订阅页 + 汇总页）');
 t('校徽 AAU 文案', Array.from(crests).every(function(e){ return e.textContent.trim() === 'AAU'; }));
 t('校徽麦金朝阳点', doc.querySelectorAll('.lg .sun').length === 3);
 t('校徽展开书页（AAU 构成书籍）', doc.querySelectorAll('.lg .book').length === 3,
@@ -92,22 +92,22 @@ t('屏5 推荐词', doc.querySelectorAll('#p5 .kwsug-w').length >= 2);
 t('屏5 收藏行', doc.querySelectorAll('#p5 .frow').length === 2);
 t('屏5 收益变化表', doc.querySelectorAll('#p5 .chg tr').length === 5);
 
-/* 8b. 屏⑥ 时间轴 */
+/* 8b. 屏⑥ 日程 */
 t('屏6 知时指数卡', doc.querySelectorAll('#p6 .idxcard').length === 1);
 t('屏6 指数三项指标', doc.querySelectorAll('#p6 .idxmets .im').length === 3);
 t('屏6 指数分档 lv-mid', doc.querySelectorAll('#p6 .idxcard.lv-mid').length === 1);
 t('屏6 五档分箱', doc.querySelectorAll('#p6 .bk').length === 5,
   '档 ' + doc.querySelectorAll('#p6 .bk').length);
-t('屏6 时间轴竖线', doc.querySelectorAll('#p6 .tl .tline').length === 3);
+t('屏6 日程竖线', doc.querySelectorAll('#p6 .tl .tline').length === 3);
 t('屏6 节点标记', doc.querySelectorAll('#p6 .tnode').length === 5,
   '节点 ' + doc.querySelectorAll('#p6 .tnode').length);
-t('屏6 时间轴卡片', doc.querySelectorAll('#p6 .tcard').length === 5,
+t('屏6 日程卡片', doc.querySelectorAll('#p6 .tcard').length === 5,
   '卡片 ' + doc.querySelectorAll('#p6 .tcard').length);
 t('屏6 今天到期档高亮', doc.querySelectorAll('#p6 .bhd.now').length === 1);
 t('屏6 更远档存在', doc.querySelectorAll('#p6 .bhd.far').length === 1);
 
-/* 8c. 屏⑦ 今日简报 */
-t('屏7 简报头', doc.querySelectorAll('#p7 .bhead').length === 1);
+/* 8c. 屏⑦ 今日汇总 */
+t('屏7 汇总头', doc.querySelectorAll('#p7 .bhead').length === 1);
 t('屏7 一句话总结卡', doc.querySelectorAll('#p7 .sumcard').length === 1);
 t('屏7 总结分句 3 行', doc.querySelectorAll('#p7 .sumcard .sumtx').length === 3,
   '句 ' + doc.querySelectorAll('#p7 .sumcard .sumtx').length);
@@ -234,12 +234,12 @@ t('屏11 卡有推送分数', doc.querySelectorAll('#p11 .tg.s').length === 3);
 t('屏11 卡有排名', doc.querySelectorAll('#p11 .prank').length === 3);
 t('屏11 说明三条不变式', /三条不变式/.test(doc.querySelector('#p11').textContent));
 
-/* 9g. 屏⑫ 问知时（学生自问自答引擎） */
+/* 9g. 屏⑫ 问答（学生自问自答引擎） */
 const p12 = doc.querySelector('#p12');
 t('屏12 卡片存在', !!p12);
 t('屏12 今日一问大卡', doc.querySelectorAll('#p12 .hcard').length === 1);
 t('屏12 大卡为告急态（今天有要办）', doc.querySelectorAll('#p12 .hcard.tone-alert').length === 1);
-t('屏12 大卡以「问知时」开头', /问知时/.test(p12.textContent));
+t('屏12 大卡以「问答」开头', /问答/.test(p12.textContent));
 t('屏12 大卡给出真实结论（今天有 1 件要办）', /今天有 1 件要办/.test(p12.textContent));
 t('屏12 大卡有追问入口', doc.querySelectorAll('#p12 .hcard .hm').length === 1);
 t('屏12 问答自评条', doc.querySelectorAll('#p12 .askstat').length === 1);
@@ -280,9 +280,9 @@ t('屏12 六组高频疑问覆盖学生视角',
 t('屏12 明示「算不出来也不编结论」答问原则',
   /算不出来/.test(p12.textContent) && /不编结论/.test(p12.textContent));
 t('屏12 有行动按钮 2 个', doc.querySelectorAll('#p12 .acts .ab').length === 2);
-t('屏12 有跳日历入口', /看办事日历/.test(p12.textContent));
+t('屏12 有跳日历入口', /看日历/.test(p12.textContent));
 
-/* 9h. 屏⑬ 办事日历 */
+/* 9h. 屏⑬ 日历 */
 const p13 = doc.querySelector('#p13');
 t('屏13 卡片存在', !!p13);
 t('屏13 月份切换条', doc.querySelectorAll('#p13 .mbar').length === 1);
@@ -327,11 +327,11 @@ t('屏13 本月条目 5 条', doc.querySelectorAll('#p13 .ibox').length === 2,
 t('屏13 条目有倒计时徽标', doc.querySelectorAll('#p13 .ibox .idd').length >= 5);
 t('屏13 明示日历口径（只落关注的标签 + 身份匹配）',
   /只落你关注标签/.test(p13.textContent));
-t('屏13 明示与时间轴同源不是两套事实',
+t('屏13 明示与日程同源不是两套事实',
   /同一批数据/.test(p13.textContent) && /不是两套事实/.test(p13.textContent));
 t('屏13 明示已过期不再占用待办位置', /不再占用待办位置/.test(p13.textContent));
 
-/* 9i. 两屏共用「问知时」口径一致性 */
+/* 9i. 两屏共用「问答」口径一致性 */
 t('屏12/13 均未出现编造的假结论',
   !/预计|大概|可能是|估计/.test(doc.querySelector('#p12').textContent + doc.querySelector('#p13').textContent));
 
@@ -427,7 +427,7 @@ t('点另一张 → p3 已放回网格',
 t('点另一张 → 高亮转移到新卡片',
   card7.classList.contains('open') && !card3.classList.contains('open'));
 t('点另一张 → 舞台标题/序号同步',
-  stageNm.textContent.trim() === '今日简报' && stageNo.textContent.trim() === '07',
+  stageNm.textContent.trim() === '今日汇总' && stageNo.textContent.trim() === '07',
   stageNm.textContent.trim() + ' / ' + stageNo.textContent.trim());
 
 /* —— 收起 —— */

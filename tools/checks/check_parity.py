@@ -401,8 +401,8 @@ if not ok:
     errors.append("关键词上限 MAX_KEYWORDS 不一致或缺失")
 
 
-# ---------- 4. 问知时问答引擎 + 办事日历 同源 ----------
-print("\n【4】问知时问答引擎 / 办事日历 同源")
+# ---------- 4. 问答问答引擎 + 日历 同源 ----------
+print("\n【4】问答问答引擎 / 日历 同源")
 MP_ASK = ROOT / "miniprogram" / "utils" / "ask.js"
 ask_src = MP_ASK.read_text(encoding="utf-8")
 
@@ -436,14 +436,14 @@ print(f"  小程序 {len(mp_qs_d)} 问 · 网页 {len(web_qs_d)} 问")
 ok = len(mp_qs_d) == len(web_qs_d) == 13
 print(f"  {'✓' if ok else '✗'} 用户可见问题数量一致（13）")
 if not ok:
-    errors.append(f"问知时问题数量不一致：mp {len(mp_qs_d)} vs web {len(web_qs_d)}（期望 13）")
+    errors.append(f"问答问题数量不一致：mp {len(mp_qs_d)} vs web {len(web_qs_d)}（期望 13）")
 
 mp_ids = [x[0] for x in mp_qs_d]
 web_ids = [x[0] for x in web_qs_d]
 ok = mp_ids == web_ids
 print(f"  {'✓' if ok else '✗'} 问题 id 顺序一致")
 if not ok:
-    errors.append(f"问知时问题 id 不一致：mp {mp_ids} vs web {web_ids}")
+    errors.append(f"问答问题 id 不一致：mp {mp_ids} vs web {web_ids}")
 
 mp_qmap = dict(mp_qs_d)
 web_qmap = dict(web_qs_d)
@@ -452,7 +452,7 @@ ok = not q_text_diff
 print(f"  {'✓' if ok else '✗'} 逐问「学生原话」文案逐字一致")
 if not ok:
     for i in q_text_diff:
-        errors.append(f"问知时问题文案不一致 [{i}]：mp「{mp_qmap[i]}」vs web「{web_qmap[i]}」")
+        errors.append(f"问答问题文案不一致 [{i}]：mp「{mp_qmap[i]}」vs web「{web_qmap[i]}」")
 
 # 六组分组标签一致
 GRP_PAT = r"label:\s*'([^']+)'"
@@ -465,7 +465,7 @@ web_g = [g for g in web_groups if g in ("今天 / 这周", "先办哪个", "我�
 ok = mp_g == web_g and len(mp_g) == 6
 print(f"  {'✓' if ok else '✗'} 六组分组标签一致")
 if not ok:
-    errors.append(f"问知时分组不一致：mp {mp_g} vs web {web_g}")
+    errors.append(f"问答分组不一致：mp {mp_g} vs web {web_g}")
 
 # 机会类标签白名单一致（这是本轮修过的真实逻辑缺陷）
 OPP_MP = re.search(r"OPPORTUNITY\s*=\s*\[([^\]]+)\]", ask_src)
@@ -491,7 +491,7 @@ for name, pat in [("依据说明（统计口径/筛选口径）", r"统计口径
     ok = a and b
     print(f"  {'✓' if ok else '✗'} {name}")
     if not ok:
-        errors.append(f"问知时口径缺失：{name}（mp={a} web={b}）")
+        errors.append(f"问答口径缺失：{name}（mp={a} web={b}）")
 
 # 导出接口一致
 EXPORTS = ["askAnswer", "askQuestionGroups", "askHeadline", "buildCalendar",
@@ -500,7 +500,7 @@ for name in EXPORTS:
     has_web = re.search(r"\b" + name + r"\b", core_src) is not None
     print(f"  {'✓' if has_web else '✗'} 网页导出 {name}")
     if not has_web:
-        errors.append(f"网页 zhishi-core.js 缺少问知时接口：{name}")
+        errors.append(f"网页 zhishi-core.js 缺少问答接口：{name}")
 
 # 倒计时实时刷新：两端都要有（这是防"过期数字误事"的真修复）
 _shell_path = ROOT / "tools" / "app_shell.html"
@@ -534,7 +534,7 @@ idx_js_p = ROOT / "miniprogram" / "pages" / "index" / "index.js"
 idx_src = idx_js_p.read_text(encoding="utf-8")
 
 # ① 小程序首页：调 ask.headline() 取头条结论，首屏渲染为合并后的「今日头条」大卡 .hero
-#    （原设计把 headline 直接渲染成 .hcard；现改版为 .hero，把紧急提示/推送小结/问知时三卡合一。
+#    （原设计把 headline 直接渲染成 .hcard；现改版为 .hero，把紧急提示/推送小结/问答三卡合一。
 #     headline 数据仍在小程序首页计算，只是不再单独占一张卡。）
 mp_head = re.search(r"ask\.headline\s*\(", idx_src) is not None
 _idx_wxml = (ROOT / "miniprogram" / "pages" / "index" / "index.wxml").read_text(encoding="utf-8")

@@ -25,11 +25,11 @@ const marks = {
   'localStorage 持久化':          c.includes('zhishi_preview_theme'),
   '无外链资源':                   !/<link[^>]+stylesheet/.test(c) && !/<script[^>]+src=/.test(c),
   'tabBar 四 tab × 十三屏':       (c.match(/class="tb[ "]/g) || []).length >= 52,
-  '时间轴五档样式':               c.includes('.bhd.now') && c.includes('.bhd.far'),
-  '时间轴节点样式':               /\.tnode\.hi/.test(c) && /\.tnode\.md/.test(c),
-  '时间轴卡片三档':               /\.tcard\.hi/.test(c) && /\.tcard\.md/.test(c) && /\.tcard\.lo/.test(c),
+  '日程五档样式':               c.includes('.bhd.now') && c.includes('.bhd.far'),
+  '日程节点样式':               /\.tnode\.hi/.test(c) && /\.tnode\.md/.test(c),
+  '日程卡片三档':               /\.tcard\.hi/.test(c) && /\.tcard\.md/.test(c) && /\.tcard\.lo/.test(c),
   '指数卡分档':                   /\.idxcard\.lv-high/.test(c) && /\.idxcard\.lv-mid/.test(c),
-  '简报总结卡分档':               /\.sumcard\.lv-high/.test(c) && /\.sumcard\.lv-mid/.test(c),
+  '汇总总结卡分档':               /\.sumcard\.lv-high/.test(c) && /\.sumcard\.lv-mid/.test(c),
   '可信度三档':                   /\.trust-high/.test(c) && /\.trust-mid/.test(c) && /\.trust-low/.test(c),
   '到办卡 now/hi':                /\.icard\.now/.test(c) && /\.icard\.hi/.test(c),
   '快捷入口样式':                 /\.quick \.qb\b/.test(c),
@@ -69,7 +69,7 @@ const marks = {
   '关键词推荐词样式':             /\.kwsug\b/.test(c) && /\.kwsug-w\b/.test(c),
   '关键词说明行样式':             /\.srow-hint\b/.test(c),
 
-  /* ⑫ 问知时（自问自答引擎） */
+  /* ⑫ 问答（自问自答引擎） */
   '问答今日一问大卡样式':         /\.hcard\b/.test(c) && /\.hcard \.hq\b/.test(c) &&
                                   /\.hcard \.ha\b/.test(c) && /\.hcard \.hm\b/.test(c),
   '问答大卡告急态':               /\.hcard\.tone-alert\b/.test(c),
@@ -91,7 +91,7 @@ const marks = {
   '已答问题高亮样式':             /\.qrow\.on\b/.test(c),
   '行动按钮样式':                 /\.acts \.ab\b/.test(c) && /\.acts \.ab\.primary\b/.test(c),
 
-  /* ⑬ 办事日历 */
+  /* ⑬ 日历 */
   '月份切换条样式':               /\.mbar \.mnav\b/.test(c) && /\.mbar \.ml\b/.test(c) &&
                                   /\.mbar \.mtoday\b/.test(c),
   '月历网格样式':                 /\.calbox \.wkrow\b/.test(c) && /\.calbox \.crow\b/.test(c) &&

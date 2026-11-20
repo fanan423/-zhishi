@@ -15,10 +15,25 @@ dist/
 push_out/
 _backups/
 _probe*.js
+_probe*.py
 _diag.js
+_wxml_lint.js
 接管_checks*.log
 _checks*.log
 _collect.log
+_svc_*.log
+知时服务.log
+
+# ── 一次性工具 / UI 改名脚本（含旧词映射，仅本地回滚用，不入库）──
+tools/_rename_ui.py
+tools/_rename_ui_report.txt
+tools/_rename_backup/
+tools/cloud/_export_note.py
+_verify*.py
+_audit*.py
+
+# ── 旧版归档 PDF（正文口径已过时，仅本地留档，不入库）──
+docs/_原始材料/
 
 # ── 云端真实配置（只提交 example 模板）──
 config/cloud.local.json

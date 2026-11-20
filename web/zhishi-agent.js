@@ -205,6 +205,78 @@
       });
     },
 
+    /* AI 推荐：本地模式优先读「构建期 AI 快照」（断网也能展示模型结果，但如实标
+     * offline / 非实时调用）；无快照则如实降级为规则推荐，绝不假装调了模型。 */
+    recommend: function (query) {
+      var C = core();
+      var p = localProfile();
+      var all = localNotices();
+      var BR = global.ZS_AGENT_BRIDGE;
+      var st = (BR && typeof BR.pushState === 'function') ? (BR.pushState() || {}) : {};
+      var built = C.buildPush(all, { profile: p, seenIds: st.pushedIds || [], limit: 60 });
+      var cards = (built.notify || []).concat(built.silent || []);
+      var limit = (query && query.limit) || 12;
+      var picked = cards.slice(0, limit);
+
+      function itemOf(c, ai) {
+        return {
+          id: c.id, title: c.title,
+          score: c.pushScore,
+          relevance: ai ? ai.relevance : c.pushScore,
+          reason: ai ? (ai.reason || '') : (c.pushReasonLine || ''),
+          evidence: ai ? (ai.evidence || null) : null,
+          source: ai ? 'llm' : 'rule',
+          level: c.pushLevel, levelLabel: c.pushLevelLabel,
+          countdown: (typeof c.countdown === 'number') ? c.countdown
+                    : (typeof c._cd === 'number' ? c._cd : null),
+          deadline: c.deadline || null, event: c.event || '',
+          digestOne: c.digestOne || '', url: c.url || '',
+          sourceUnit: c.source || c.unit || ''
+        };
+      }
+
+      var snap = global.ZS_AI;
+      if (snap && snap.mode === 'llm' && snap.items && snap.items.length) {
+        var byId = {};
+        snap.items.forEach(function (x) {
+          if (x && x.id && x.ok !== false) byId[String(x.id)] = x;
+        });
+        /* 对全部卡片匹配快照后按模型分重排 —— 让 AI 真正改变顺序，
+         * 而不是只给规则前 N 条换个说法。 */
+        var aiItems = cards.map(function (c) { return itemOf(c, byId[String(c.id)] || null); });
+        aiItems.sort(function (a, b) { return b.relevance - a.relevance; });
+        aiItems = aiItems.slice(0, limit);
+        var aiN = aiItems.filter(function (x) { return x.source === 'llm'; }).length;
+        return Promise.resolve({
+          ok: true, source: 'offline-snapshot', via: 'offline-snapshot',
+          mode: 'llm', aiPowered: true, offline: true,
+          model: snap.model || null, modelName: snap.modelName || null,
+          promptVersion: snap.promptVersion || null, generatedAt: snap.generatedAt || null,
+          reason: '构建期大模型预计算结果（非实时调用）',
+          items: aiItems,
+          meta: {
+            ranAt: snap.generatedAt || new Date().toISOString(),
+            mode: 'llm', model: snap.model || null, elapsedMs: 0,
+            counts: { pool: cards.length, ai: aiN, rule: aiItems.length - aiN },
+            profile: p, summaryLine: built.summary && built.summary.line
+          }
+        });
+      }
+
+      return Promise.resolve({
+        ok: true, source: 'local', via: 'local',
+        mode: 'rule', aiPowered: false, offline: false,
+        model: null, promptVersion: null,
+        reason: '本地模式不调用大模型（未部署智能体服务）',
+        items: picked.map(function (c) { return itemOf(c, null); }),
+        meta: {
+          ranAt: new Date().toISOString(), mode: 'rule', model: null, elapsedMs: 0,
+          counts: { pool: cards.length, ai: 0, rule: picked.length },
+          profile: p, summaryLine: built.summary && built.summary.line
+        }
+      });
+    },
+
     notices: function (query) {
       var list = localNotices().slice();
       var q = (query && query.q) || '';
@@ -244,6 +316,15 @@
       return request('GET', '/api/notices' + (qs.length ? '?' + qs.join('&') : '')).then(function (r) {
         return Object.assign({}, r, { via: 'remote' });
       });
+    },
+
+    recommend: function (query) {
+      var q = query || {};
+      return request('POST', '/api/recommend', {
+        useLLM: q.useLLM !== false,
+        limit: q.limit || 12,
+        profile: q.profile || undefined
+      }).then(function (r) { return Object.assign({}, r, { via: 'remote' }); });
     },
 
     understand: function (idOrNotice, useLLM) {
@@ -313,6 +394,27 @@
     });
   }
 
+  /** AI 推荐（与 digest 同样的降级语义：远端失败 → 本地规则/离线快照） */
+  function recommend(query) {
+    return resolveImpl().then(function (r) {
+      return r.impl.recommend(query).then(function (out) {
+        var o = Object.assign({ ok: true }, out);
+        if (r.mode === 'local' && isConfigured()) {
+          o.degraded = true;
+          o.degradeReason = r.error || '智能体服务不可达';
+        }
+        return o;
+      }).catch(function (e) {
+        return localImpl.recommend(query).then(function (lr) {
+          return Object.assign(lr, {
+            degraded: true,
+            degradeReason: '远端推荐失败：' + ((e && e.message) || e)
+          });
+        });
+      });
+    });
+  }
+
   function understand(idOrNotice, useLLM) {
     return resolveImpl().then(function (r) {
       if (r.mode !== 'remote') {
@@ -360,6 +462,7 @@
     isConfigured: isConfigured,
     resolveImpl: resolveImpl,
     digest: digest,
+    recommend: recommend,
     notices: notices,
     understand: understand,
     status: status,

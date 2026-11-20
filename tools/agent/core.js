@@ -872,6 +872,7 @@ module.exports = {
   extractJson,
   withTimeout,
   withRetry,
+  pickModel,
   stripCard,
   DEFAULT_PROFILE,
   todayStr,

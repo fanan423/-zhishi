@@ -316,7 +316,7 @@ button{font-family:inherit;cursor:pointer}
 .tgl.on{background:var(--brand)}
 .tgl.on .tgld{left:22px}
 
-/* ============ 问知时 ============ */
+/* ============ 问答 ============ */
 .hcard{border-radius:18px;padding:17px 18px;margin-bottom:14px;cursor:pointer;
   background:linear-gradient(160deg,var(--brand-2),var(--brand));
   box-shadow:0 4px 14px rgba(0,101,62,.20)}
@@ -392,7 +392,7 @@ button{font-family:inherit;cursor:pointer}
 .qrow .qa{font-size:12.5px;color:var(--brand);font-weight:600;flex-shrink:0}
 .qrow.on .qa{color:var(--txt-3)}
 
-/* ============ 办事日历 ============ */
+/* ============ 日历 ============ */
 .mbar{display:flex;align-items:center;justify-content:space-between;
   background:linear-gradient(160deg,var(--brand-2),var(--brand));border-radius:16px;
   padding:11px 14px;box-shadow:0 4px 13px rgba(0,101,62,.18)}
@@ -472,6 +472,31 @@ button{font-family:inherit;cursor:pointer}
 .agentbox.warn .aglab{color:var(--gold-ink)}
 .agvia{font-size:11.5px;color:var(--txt-3);background:var(--border-soft);border-radius:8px;padding:3px 9px}
 
+/* ===== AI 推荐（实用版新增）===== */
+.airecbox{background:var(--surface);border:1px solid var(--border);border-left:5px solid var(--txt-3);
+  border-radius:13px;padding:14px 15px 12px;margin-bottom:8px;box-shadow:var(--shadow)}
+.airecbox.ai{border-left-color:#6C5CE7;
+  background:linear-gradient(180deg,rgba(108,92,231,0.06),var(--surface))}
+.airechead{display:flex;align-items:center;gap:9px;padding-bottom:10px;border-bottom:1px dashed var(--border);flex-wrap:wrap}
+.airecd{width:11px;height:11px;border-radius:50%;background:var(--txt-3);flex-shrink:0}
+.airecbox.ai .airecd{background:#6C5CE7;box-shadow:0 0 0 4px rgba(108,92,231,0.16)}
+.aireclab{flex:1;font-size:13.5px;font-weight:600;color:var(--txt)}
+.airecbox.ai .aireclab{color:#6C5CE7}
+.airecmeta{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px;font-size:11.5px;color:var(--txt-3)}
+.airecmeta span{background:var(--border-soft);border-radius:8px;padding:3px 9px}
+.airecitem{margin-top:9px;border:1px solid var(--border);border-radius:10px;padding:10px 11px;cursor:pointer}
+.airecitem:hover{border-color:#6C5CE7}
+.airecr1{display:flex;align-items:baseline;gap:9px}
+.airect{flex:1;font-size:13px;font-weight:600;color:var(--txt)}
+.airecs{font-size:12px;font-weight:700;color:#6C5CE7;white-space:nowrap}
+.airecrs{margin-top:5px;font-size:12px;line-height:1.6;color:var(--txt-3)}
+.airecq{margin-top:4px;font-size:11.5px;line-height:1.55;color:var(--txt-3);
+  border-left:2px solid var(--border);padding-left:8px}
+.airecrule{margin-top:9px;font-size:12px;line-height:1.65;color:var(--gold-ink);
+  background:rgba(224,138,22,0.09);border:1px solid rgba(224,138,22,0.28);
+  border-radius:9px;padding:9px 11px}
+.airecmore{margin-top:9px;font-size:11.5px;color:var(--txt-3);text-align:center}
+
 .agwarn{margin-top:11px;font-size:12px;line-height:1.65;color:var(--gold-ink);
   background:rgba(224,138,22,0.09);border:1px solid rgba(224,138,22,0.28);
   border-radius:9px;padding:9px 11px}
@@ -526,9 +551,9 @@ button{font-family:inherit;cursor:pointer}
   </div>
   <div class="screen" id="screen"></div>
   <div class="tabbar" id="tabbar">
-    <div class="tb on" data-tab="radar"><span class="i">📡</span>雷达</div>
-    <div class="tb" data-tab="timeline"><span class="i">🕒</span>时间轴</div>
-    <div class="tb" data-tab="digest"><span class="i">📋</span>简报</div>
+    <div class="tb on" data-tab="radar"><span class="i">📡</span>通知</div>
+    <div class="tb" data-tab="timeline"><span class="i">🕒</span>日程</div>
+    <div class="tb" data-tab="digest"><span class="i">📋</span>汇总</div>
     <div class="tb" data-tab="mine"><span class="i">👤</span>我的</div>
   </div>
   <div class="toast" id="toast"></div>
@@ -539,6 +564,9 @@ button{font-family:inherit;cursor:pointer}
 </script>
 <script>
 /*__AGENT__*/
+</script>
+<script>
+/*__AI__*/
 </script>
 <script>
 /*__CORE__*/
@@ -702,6 +730,9 @@ var AGENT = {
   ready: false,        // 是否已至少拉到一次
   loading: false,
   result: null,        // digest() 的返回
+  recommend: null,     // recommend() 的返回（AI 推荐，单独取、单独渲染）
+  recLoading: false,
+  recErr: '',
   status: null,        // status() 的返回
   err: '',
   cfgOpen: false       // "改地址"面板是否展开
@@ -719,9 +750,27 @@ function loadAgentData(){
   }).then(function(r){
     AGENT.result = r; AGENT.ready = true; AGENT.loading = false;
     if(STATE.tab==='digest' || STATE.sub==='push') render();
+    /* 顺手取一次 AI 推荐：本地模式读构建期快照，联网且配置了服务时走实时模型。
+     * 与清单共用同一次服务探测，不额外打探针；也不阻塞首屏渲染。 */
+    loadRecommendData();
   }).catch(function(e){
     AGENT.err = (e && e.message) || '智能体清单获取失败';
     AGENT.loading = false;
+    if(STATE.tab==='digest' || STATE.sub==='push') render();
+    loadRecommendData();
+  });
+}
+
+/* AI 推荐：与 digest 解耦，单独取、单独渲染，失败不影响主动送达清单。 */
+function loadRecommendData(){
+  if(!window.ZS_AGENT || !window.ZS_AGENT.recommend || AGENT.recLoading) return;
+  AGENT.recLoading = true; AGENT.recErr = '';
+  window.ZS_AGENT.recommend({ useLLM:true, limit:12, profile:PROFILE }).then(function(r){
+    AGENT.recommend = r; AGENT.recLoading = false;
+    if(STATE.tab==='digest' || STATE.sub==='push') render();
+  }).catch(function(e){
+    AGENT.recErr = (e && e.message) || 'AI 推荐获取失败';
+    AGENT.recLoading = false;
     if(STATE.tab==='digest' || STATE.sub==='push') render();
   });
 }
@@ -782,7 +831,7 @@ function buildPushCards(){
     limit: 60
   });
 }
-/* 问知时：今日一问（与小程序 ask.headline 同源策略） */
+/* 问答：今日一问（与小程序 ask.headline 同源策略） */
 function askHeadline(){
   return CORE.askHeadline({
     notices: NOTICES,
@@ -792,7 +841,7 @@ function askHeadline(){
 }
 
 /* ================================================================
- * 视图：雷达（主动推送）
+ * 视图：通知（主动推送）
  * ================================================================ */
 function viewRadar(){
   var interests = PROFILE.interests || [];
@@ -808,7 +857,7 @@ function viewRadar(){
    * —— 原「今日一问卡」「推送总览卡」「推送小结条」三张合一张，首屏不再堆三层。 */
   var HL = askHeadline();
   h += '<div class="hcard tone-'+HL.tone+'" onclick="APP.goSub(\'ask\')">'
-    + '<div class="hq"><span class="hqi">💬</span><span class="hqt">问知时 · '+esc(HL.q)+'</span></div>'
+    + '<div class="hq"><span class="hqi">💬</span><span class="hqt">问答 · '+esc(HL.q)+'</span></div>'
     + '<div class="ha">'+esc(HL.answer)+'</div>'
     + '<div class="hmeta">共 '+total+' 条与你有关'
     + (urgent? ' · <b>'+urgent+' 条 3 天内要办</b>' : '')
@@ -821,7 +870,7 @@ function viewRadar(){
     return h;
   }
 
-  /* 推送流：首屏只摊开"最要紧的 3 条"，其余折叠 —— 一屏看完，不刷屏 */
+  /* 通知列表：首屏只摊开"最要紧的 3 条"，其余折叠 —— 一屏看完，不刷屏 */
   var OPEN = 3;
   h += '<div class="sec">🔔 最要紧的先看<span class="secsub">· 已按你的档案排序</span>'
     + '<span class="seclink" onclick="APP.goSub(\'push\')">推送设置 ›</span></div>';
@@ -889,7 +938,7 @@ function pushCard(n){
 }
 
 /* ================================================================
- * 视图：时间轴
+ * 视图：日程
  * ================================================================ */
 function viewTimeline(){
   var interests = PROFILE.interests || [];
@@ -932,7 +981,7 @@ function viewTimeline(){
 }
 
 /* ================================================================
- * 视图：简报（自动整合）
+ * 视图：汇总（自动整合）
  * ================================================================ */
 function viewDigest(){
   var interests = PROFILE.interests || [];
@@ -951,7 +1000,7 @@ function viewDigest(){
 
   var h = '';
   h += '<div class="bhead"><div class="lg"><span class="sun"></span><span class="aa">AAU</span><span class="book"></span><span class="y">1928</span></div>'
-    + '<div><div class="t1">今日简报</div><div class="t2">'+stamp+' 生成 · 知时 · 数字安农信息雷达</div></div></div>';
+    + '<div><div class="t1">今日汇总</div><div class="t2">'+stamp+' 生成 · 知时 · 数字安农信息雷达</div></div></div>';
 
   var sents = [];
   if(must.length) sents.push('今天起 '+must.length+' 条在三天内截止');
@@ -999,7 +1048,7 @@ function viewDigest(){
 
   h += viewAgentBlock();
 
-  h += '<div class="acts"><button class="ab primary" onclick="APP.copyDigest()">复制简报</button></div>';
+  h += '<div class="acts"><button class="ab primary" onclick="APP.copyDigest()">复制汇总</button></div>';
   h += appFoot();
   return h;
 }
@@ -1007,8 +1056,8 @@ function viewDigest(){
 /* ================================================================
  * ★ 智能体主动送达区块（网页侧，与小程序 digest 页同构）
  * ----------------------------------------------------------------
- * 与上面「本地简报」的区别，必须让用户看得见：
- *   本地简报 = 你打开页面时现算（"我来了它才想"）
+ * 与上面「本地汇总」的区别，必须让用户看得见：
+ *   本地汇总 = 你打开页面时现算（"我来了它才想"）
  *   智能体清单 = 服务端常驻按点自己跑（"你不来它也想"）
  * 状态点如实标识：绿=连上服务端 / 灰=本地模式 / 橙=配了却没连上
  * ================================================================ */
@@ -1093,6 +1142,76 @@ function viewAgentBlock(){
       + '<div class="agbtn" onclick="APP.rerunAgent()">🔄 让它重算一遍</div>'
       + '<div class="agbtn" onclick="APP.copyAgent()">📋 复制清单</div>'
       + '</div>';
+  }
+  h += '</div>';
+  h += viewAIRecommendBlock();
+  return h;
+}
+
+/* ================================================================
+ * AI 推荐区块（实用版新增；演示版构建链不注入 ZS_AI，故天然不受影响）
+ * ----------------------------------------------------------------
+ * 三种状态都如实标注，绝不把规则结果说成 AI：
+ *   mode=llm + offline  构建期大模型预计算（断网可演，非实时调用）
+ *   mode=llm + !offline 实时模型推荐（已连智能体服务）
+ *   mode=rule           规则推荐（未启用 AI / 已降级）
+ * ================================================================ */
+function viewAIRecommendBlock(){
+  if(!window.ZS_AGENT || !window.ZS_AGENT.recommend) return '';
+  var rec = AGENT.recommend;
+  var h = '';
+  h += '<div class="sec">✨ AI 推荐 <span class="secsub">· 按你的画像重新排序</span></div>';
+
+  if(!rec){
+    h += '<div class="airecbox"><div class="agloading">'
+      + (AGENT.recLoading ? '正在获取 AI 推荐…' : '正在准备 AI 推荐…') + '</div></div>';
+    return h;
+  }
+  if(!rec.ok){
+    h += '<div class="airecbox"><div class="agwarn">AI 推荐获取失败：'
+      + esc(AGENT.recErr || '未知原因') + '（主动送达清单不受影响）</div></div>';
+    return h;
+  }
+
+  var isAI = rec.mode === 'llm';
+  var label = isAI
+    ? (rec.offline ? 'AI 推荐 · 构建期预计算（非实时调用）' : 'AI 推荐 · 实时大模型')
+    : '规则推荐（未启用 AI）';
+  h += '<div class="airecbox'+(isAI?' ai':'')+'">';
+  h += '<div class="airechead"><span class="airecd"></span><span class="aireclab">'+esc(label)+'</span>'
+    + '<span class="agvia">'+esc(rec.via || rec.source || 'local')+'</span></div>';
+
+  var meta = rec.meta || {};
+  h += '<div class="airecmeta">'
+    + (rec.model ? '<span>模型 '+esc(rec.model)+'</span>' : '')
+    + (rec.promptVersion ? '<span>提示词 v'+esc(rec.promptVersion)+'</span>' : '')
+    + (rec.generatedAt ? '<span>生成于 '+esc(String(rec.generatedAt).slice(0,16).replace('T',' '))+'</span>' : '')
+    + (meta.counts ? '<span>AI '+(meta.counts.ai||0)+' 条 · 规则 '+(meta.counts.rule||0)+' 条</span>' : '')
+    + (meta.elapsedMs ? '<span>耗时 '+meta.elapsedMs+' ms</span>' : '')
+    + '</div>';
+
+  if(!isAI){
+    h += '<div class="airecrule">当前是规则加权推荐（可解释、可复跑）。'
+      + '部署 tools/agent/server.js 并在「我的 → 智能体服务」填入地址，即可开启实时 AI 推荐。'
+      + (rec.degradeReason ? '本次降级原因：'+esc(rec.degradeReason) : '') + '</div>';
+  } else if(rec.degraded){
+    h += '<div class="airecrule">远端 AI 推荐不可用，已降级：'+esc(rec.degradeReason||'')+'</div>';
+  }
+
+  var items = (rec.items || []).slice(0, 6);
+  items.forEach(function(x){
+    var ai = x.source === 'llm';
+    h += '<div class="airecitem" onclick="APP.openDetail(\''+esc(x.id)+'\')">'
+      + '<div class="airecr1"><div class="airect">'+esc(x.title)+'</div>'
+      + '<div class="airecs">'+(typeof x.relevance==='number'?x.relevance+' 分':'—')+'</div></div>'
+      + (x.reason ? '<div class="airecrs">'+(ai?'🤖 ':'📐 ')+esc(x.reason)+'</div>' : '')
+      + (ai && x.evidence ? '<div class="airecq">依据：'+esc(x.evidence)+'</div>' : '')
+      + (typeof x.score === 'number' && ai ? '<div class="airecq">规则分对照：'+x.score+' 分</div>' : '')
+      + '</div>';
+  });
+  if(!items.length) h += '<div class="airecmore">当前画像下没有可推荐的通知。</div>';
+  if((rec.items||[]).length > items.length){
+    h += '<div class="airecmore">共 '+(rec.items||[]).length+' 条，显示前 '+items.length+' 条</div>';
   }
   h += '</div>';
   return h;
@@ -1200,12 +1319,12 @@ function viewMine(){
   h += selRow('提醒方式','channel',['小程序服务通知 + 群内播报','仅小程序服务通知','仅群内播报']);
   h += '</div>';
 
-  h += '<div class="sec">问知时 <span class="secsub">· 有问题直接问，答案带依据</span></div>';
+  h += '<div class="sec">问答 <span class="secsub">· 有问题直接问，答案带依据</span></div>';
   h += '<div class="ncard" style="border-left:4px solid var(--brand)" onclick="APP.goSub(\'ask\')">'
     + '<div class="r1"><div class="tt">13 个高频疑问，一问一答</div><div class="arrow" style="color:var(--brand);font-size:20px">›</div></div>'
     + '<div class="dgo">"这周还剩几件事""先办哪个""我漏了什么""哪些是全校能报的"——每个答案都由真实字段算出，并附一行「依据」说明算法。</div></div>';
 
-  h += '<div class="sec">办事日历 <span class="secsub">· 哪天忙一目了然</span></div>';
+  h += '<div class="sec">日历 <span class="secsub">· 哪天忙一目了然</span></div>';
   h += '<div class="ncard" style="border-left:4px solid var(--brand)" onclick="APP.goSub(\'calendar\')">'
     + '<div class="r1"><div class="tt">按月看截止日分布</div><div class="arrow" style="color:var(--brand);font-size:20px">›</div></div>'
     + '<div class="dgo">把有截止的通知落到对应日期格子上，红橙黄绿代表紧急度，今天高亮。回答「具体哪天我忙、哪天能空出来」。</div></div>';
@@ -1343,12 +1462,12 @@ function viewAbout(){
     + '<b style="color:var(--txt)">四项能力：</b><br>'
     + '① 自主完善档案 —— 身份类型 / 年级 / 学院 / 专业 / 校区 + 关注标签，全由你自己选<br>'
     + '② 按档案自动推送 —— 只推和你身份、关注相符的通知，每条都能在详情页核对「是否与我有关」<br>'
-    + '③ 自动整合信息 —— 一屏简报，把临近截止的事压成一段话<br>'
+    + '③ 自动整合信息 —— 一屏汇总，把临近截止的事压成一段话<br>'
     + '④ 贴明出处 —— 每条标「可核对原文 / 真实采集 / 演示样例」，有链接的可逐字比对<br><br>'
     + '<b style="color:var(--txt)">主动推送引擎：</b>按可解释的分数排序（今天截止 +40、三天内 +28、点名学院 +22、'
     + '自定关键词 +20、订阅标签 +16、新收录 +8…），只有三天内截止的才允许「打扰」，其余静默进流。排序理由可核对，不是黑箱。<br><br>'
     + '<b style="color:var(--txt)">自定义关键词订阅：</b>除了固定的关注标签，你还可以输入任意关键词（如「正大杯」）——'
-    + '池子里凡命中该词的通知（标题 / 浓缩 / 要点 / 原文任一处出现）都会进入你的推送流并主动推送，'
+    + '池子里凡命中该词的通知（标题 / 浓缩 / 要点 / 原文任一处出现）都会进入你的通知列表并主动推送，'
     + '理由里会如实写明「你订的关键词「正大杯」」。<br><br>'
     + '<b style="color:var(--txt)">合规边界：</b>仅聚合 ahau.edu.cn 公网公开通知页面；'
     + '身份信息只采集你自己选择的标签，不采集身份证号、学号、成绩、课表等任何私域或敏感数据。<br><br>'
@@ -1381,7 +1500,7 @@ function viewPushSettings(){
   h += '<div class="sec">应用内推送 <span class="secsub">· 打开 知时.html 时生效</span></div>';
   h += '<div class="kv" style="padding:2px 14px">';
   h += tglRow('推送总开关', 'pushOn', daemon,
-    daemon ? '已开启 —— 进入应用即自动按档案排好推送流' : '已关闭 —— 首页不再自动排序推送');
+    daemon ? '已开启 —— 进入应用即自动按档案排好通知列表' : '已关闭 —— 首页不再自动排序推送');
   h += tglRow('新收录提醒', 'pushNew', ps.newBadge !== false,
     ps.newBadge !== false ? '有新增条目时标红点并排到最前' : '不区分新旧，按紧急度排');
   h += tglRow('计分排序', 'pushScore', ps.scoreSort !== false,
@@ -1425,8 +1544,8 @@ function viewPushSettings(){
     + '</div>'
     + '</div>';
 
-  /* ★ 触达时间线（可演示、可复核的"主动找你"闭环） */
-  h += '<div class="sec">触达时间线 <span class="secsub">· 什么时候会主动找你</span></div>';
+  /* ★ 提醒时间（可演示、可复核的"主动找你"闭环） */
+  h += '<div class="sec">提醒时间 <span class="secsub">· 什么时候会主动找你</span></div>';
   h += '<div class="kv" style="padding:14px">'
     + '<div style="font-size:13px;color:var(--txt-2);line-height:1.7">与你相关 <b>'+reach.stats.mine+'</b> 条 · 已规划提醒 <b>'+reach.stats.scheduled+'</b> 条 · 未来 14 天内会打扰 <b style="color:var(--brand)">'+reach.stats.upcoming+'</b> 次</div>'
     + '<div class="hint" style="font-size:12px;line-height:1.7;margin-top:6px">按你选的「'+reach.stats.advanceText+'」推演：每条通知在截止前会主动提醒几次、具体哪天提醒，全部由真实发布日与截止日算出。</div>';
@@ -1518,15 +1637,15 @@ function viewPushSettings(){
     + '<div class="acts" style="margin-top:10px"><button class="ab" onclick="APP.resetPush()">重置推送记录（全部标为未读）</button></div>'
     + '</div>';
 
-  /* 当前推送流预览 */
-  h += '<div class="sec">当前推送流 <span class="secsub">· 前 6 条</span></div>';
+  /* 当前通知列表预览 */
+  h += '<div class="sec">当前通知列表 <span class="secsub">· 前 6 条</span></div>';
   if(!P.cards.length){
     h += '<div class="empty">暂无推送</div>';
   } else {
     P.cards.slice(0,6).forEach(function(n){ h += pushCard(n); });
   }
 
-  h += '<div class="acts"><button class="ab primary" onclick="APP.goTab(\'radar\')">看完整推送流 ›</button>'
+  h += '<div class="acts"><button class="ab primary" onclick="APP.goTab(\'radar\')">看完整通知列表 ›</button>'
     + '<button class="ab" onclick="APP.goSub(\'main\')">‹ 返回我的</button></div>';
   h += appFoot();
   return h;
@@ -1546,7 +1665,7 @@ function fmtTs(ts){
 }
 
 /* ================================================================
- * 视图：问知时（把学生脑子里的疑问做成一问一答）
+ * 视图：问答（把学生脑子里的疑问做成一问一答）
  * ================================================================ */
 function viewAsk(){
   var opts = { notices: NOTICES, profile: PROFILE, pushResult: buildPushCards() };
@@ -1561,7 +1680,7 @@ function viewAsk(){
   var h = '';
 
   h += '<div class="hcard tone-'+HL.tone+'" onclick="APP.askGo(\''+HL.id+'\')">'
-    + '<div class="hq"><span class="hqi">💬</span><span class="hqt">问知时 · '+esc(HL.q)+'</span></div>'
+    + '<div class="hq"><span class="hqi">💬</span><span class="hqt">问答 · '+esc(HL.q)+'</span></div>'
     + '<div class="ha">'+esc(HL.answer)+'</div>'
     + (HL.more ? '<div class="hm">'+esc(HL.more)+'</div>' : '') + '</div>';
 
@@ -1595,7 +1714,7 @@ function viewAsk(){
           + '<div class="idd lv-'+levelOf(n)+'">'+levelLabel(n)+'</div></div>';
       });
       if(opened.itemCount > opened.items.length){
-        h += '<div class="imore">还有 '+(opened.itemCount-opened.items.length)+' 条，去雷达页推送流看全部 ›</div>';
+        h += '<div class="imore">还有 '+(opened.itemCount-opened.items.length)+' 条，去通知页通知列表看全部 ›</div>';
       }
       h += '</div>';
     } else if(!opened.materials){
@@ -1617,14 +1736,14 @@ function viewAsk(){
     h += '</div></div>';
   });
 
-  h += '<div class="acts"><button class="ab primary" onclick="APP.goSub(\'calendar\')">看办事日历 ›</button>'
-    + '<button class="ab" onclick="APP.goTab(\'radar\')">回推送流</button></div>';
+  h += '<div class="acts"><button class="ab primary" onclick="APP.goSub(\'calendar\')">看日历 ›</button>'
+    + '<button class="ab" onclick="APP.goTab(\'radar\')">回通知列表</button></div>';
   h += appFoot();
   return h;
 }
 
 /* ================================================================
- * 视图：办事日历（哪天忙一目了然）
+ * 视图：日历（哪天忙一目了然）
  * ================================================================ */
 function viewCalendar(){
   var now = new Date();
@@ -1694,8 +1813,8 @@ function viewCalendar(){
     h += '<div class="empty">这天没有截止事项，可以安排别的。</div>';
   }
 
-  h += '<div class="acts"><button class="ab primary" onclick="APP.goSub(\'ask\')">问知时 ›</button>'
-    + '<button class="ab" onclick="APP.goTab(\'radar\')">回推送流</button></div>';
+  h += '<div class="acts"><button class="ab primary" onclick="APP.goSub(\'ask\')">问答 ›</button>'
+    + '<button class="ab" onclick="APP.goTab(\'radar\')">回通知列表</button></div>';
   h += appFoot();
   return h;
 }
@@ -1832,17 +1951,17 @@ function render(){
     h = '<div class="wrap">'+viewDetail(STATE.detailId)+'</div>';
     title = '通知详情';
   } else if(STATE.sub==='ask'){
-    /* 问知时是"全屏子页"，与当前 tab 无关 —— 必须放在 tab 判断之前，
-     * 否则从雷达页点进问答会被雷达分支拦截（踩过的坑）。 */
-    h = '<div class="wrap">'+viewAsk()+'</div>'; title = '问知时 · 有问题直接问';
+    /* 问答是"全屏子页"，与当前 tab 无关 —— 必须放在 tab 判断之前，
+     * 否则从通知页点进问答会被通知分支拦截（踩过的坑）。 */
+    h = '<div class="wrap">'+viewAsk()+'</div>'; title = '问答 · 有问题直接问';
   } else if(STATE.sub==='calendar'){
-    h = '<div class="wrap">'+viewCalendar()+'</div>'; title = '办事日历 · 哪天忙一目了然';
+    h = '<div class="wrap">'+viewCalendar()+'</div>'; title = '日历 · 哪天忙一目了然';
   } else if(STATE.tab==='radar'){
     h = '<div class="wrap">'+viewRadar()+'</div>'; title = '知时 · 信息雷达';
   } else if(STATE.tab==='timeline'){
-    h = '<div class="wrap">'+viewTimeline()+'</div>'; title = '时间轴';
+    h = '<div class="wrap">'+viewTimeline()+'</div>'; title = '日程';
   } else if(STATE.tab==='digest'){
-    h = '<div class="wrap">'+viewDigest()+'</div>'; title = '今日简报';
+    h = '<div class="wrap">'+viewDigest()+'</div>'; title = '今日汇总';
   } else {
     h = '<div class="wrap">'+viewMine()+'</div>';
     title = STATE.sub==='selfcheck' ? '数据自查'
@@ -1858,7 +1977,7 @@ function render(){
   document.querySelectorAll('.tb').forEach(function(el){
     el.classList.toggle('on', !STATE.detailId && !subFull && el.dataset.tab===STATE.tab);
   });
-  /* 用户真的看到雷达页了 → 把当前推送流记为"已推送"
+  /* 用户真的看到通知页了 → 把当前通知列表记为"已推送"
    * 顺序很关键：必须先渲染（用旧的 isNew 状态），再标记。
    * 若反过来，用户第一次打开时"新"标记就已经被自己抹掉了。 */
   if(!STATE.detailId && STATE.tab==='radar'){
@@ -2000,10 +2119,10 @@ window.APP = {
     render();
   },
 
-  /* ---- 问知时 ---- */
+  /* ---- 问答 ---- */
   askGo:function(id){ STATE.askId = id; STATE.sub='ask'; STATE.detailId=null; render(); },
 
-  /* ---- 办事日历 ---- */
+  /* ---- 日历 ---- */
   calShift:function(d){
     var now = new Date();
     var y = STATE.calY || now.getFullYear();
@@ -2031,7 +2150,7 @@ window.APP = {
     var interests=PROFILE.interests||[];
     var items=NOTICES.filter(function(n){ return isRelevant(n, PROFILE); });
     var must=items.filter(function(n){return n._cd!==null && n._cd<=3;});
-    var s='【知时 · 今日简报】'+summary()+'\n';
+    var s='【知时 · 今日汇总】'+summary()+'\n';
     if(must.length) s+='三天内要办 '+must.length+' 件：\n';
     must.forEach(function(n){ s+='· '+n.title+'（'+levelLabel(n)+'，截止 '+n.deadline+'）\n'; });
     s+='共 '+items.length+' 条与你有关；每条均可溯源到安农官网原文。';
@@ -2088,7 +2207,7 @@ APP.toggleAgentCfg = function(){
 APP.runAgentRemote = function(){
   if(!window.ZS_AGENT){ toast('智能体客户端未加载'); return; }
   var st = AGENT.status;
-  if(!st || !st.reachable){ toast('本地模式：打开简报页即可看到最新清单'); return; }
+  if(!st || !st.reachable){ toast('本地模式：打开汇总页即可看到最新清单'); return; }
   window.ZS_AGENT.remoteImpl.saveProfile(PROFILE).catch(function(){})
     .then(function(){ return window.ZS_AGENT.remoteImpl.run({}); })
     .then(function(){ toast('已触发一轮计算'); AGENT.ready=false; loadAgentData(); })

@@ -10,7 +10,7 @@
  *   ③ 配了服务却没连上 → 必须**如实标降级**（degraded + degradeReason），不假装成功
  *   ④ 服务可达 → 走远端，原样透传服务端结论（含 LLM 元信息）
  *   ⑤ 无 fetch 环境（jsdom / 老 WebView）→ 优雅降级而非崩溃
- *   ⑥ 页面渲染：简报页出现「智能体主动送达」区块、推送设置页出现「智能体服务」卡
+ *   ⑥ 页面渲染：汇总页出现「智能体主动送达」区块、推送设置页出现「智能体服务」卡
  *   ⑦ 摘掉 agent 客户端文件后，页面仍能完整渲染（不留空壳、不报错）
  *
  * 为什么这些断言值得写死：
@@ -159,12 +159,12 @@ const sec = (t) => console.log('\n【' + t + '】');
   w.fetch = savedFetch;
   w.ZS_AGENT.setBase('');   // 复位
 
-  sec('页面渲染：简报页含智能体区块');
+  sec('页面渲染：汇总页含智能体区块');
   w.APP.goTab('digest');
   await new Promise(r => setTimeout(r, 700));
   const screen = w.document.getElementById('screen');
   const txt = screen.textContent || '';
-  ok(/智能体主动送达/.test(txt), '简报页出现「智能体主动送达」标题');
+  ok(/智能体主动送达/.test(txt), '汇总页出现「智能体主动送达」标题');
   ok(/你不打开它也在跑/.test(txt), '出现副标题「你不打开它也在跑」');
   ok(/本地算|服务端算/.test(txt), '出现执行者标识');
   ok(/命中 \d+ 条/.test(txt), '出现可核对的元信息（命中 N 条）');
@@ -235,7 +235,7 @@ const sec = (t) => console.log('\n【' + t + '】');
   w3.APP.goTab('digest');
   await new Promise(r => setTimeout(r, 300));
   const t3 = w3.document.getElementById('screen').textContent || '';
-  ok(/今日简报/.test(t3), '摘除后简报页仍渲染');
+  ok(/今日汇总/.test(t3), '摘除后汇总页仍渲染');
   ok(!/智能体主动送达/.test(t3), '摘除后不出现智能体区块（不留空壳）');
   dom3.window.close();
   dom2.window.close();

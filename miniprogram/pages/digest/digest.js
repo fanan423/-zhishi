@@ -4,17 +4,17 @@ const theme = require('../../utils/theme.js');
 const agent = require('../../utils/agent.js');
 
 /**
- * 今日简报页
+ * 今日汇总页
  * ========
  * 给「没时间一屏屏翻」的人一段能直接读完的东西。
- * 简报内容全部由 store.brief() 从当前数据派生 —— 没有一句是写死的结论，
- * 所以订阅改了、身份改了、云端数据更新了，简报会跟着变。
+ * 汇总内容全部由 store.brief() 从当前数据派生 —— 没有一句是写死的结论，
+ * 所以订阅改了、身份改了、云端数据更新了，汇总会跟着变。
  *
  * ★ 智能体区块（本页新增）
- *   上面那部分是「你打开小程序时，本地现算」的简报；
+ *   上面那部分是「你打开小程序时，本地现算」的汇总；
  *   下面「智能体主动送达」是**服务端智能体**按点自己跑出来的清单。
  *   两者的区别是真实存在的，所以界面里如实分开标注，不混为一谈：
- *     - 本地简报  → 你打开才更新（"我来了它才想"）
+ *     - 本地汇总  → 你打开才更新（"我来了它才想"）
  *     - 智能体清单 → 后台常驻，按点自己跑（"你不来它也想"）—— 这才是治"错过"的那一环
  *   agent.digest() 会自动择路：服务可达走服务、不可达降级本地，页面代码不分叉。
  */
@@ -22,7 +22,7 @@ Page({
   data: {
     theme: 'light',
     brief: null,
-    /* 简报里的「一句话总结」按句拆开，便于逐句排版 */
+    /* 汇总里的「一句话总结」按句拆开，便于逐句排版 */
     sentences: [],
     /* 数据可信度 */
     trustLevel: '',
@@ -52,7 +52,7 @@ Page({
     const t = theme.current();
     this.setData({ theme: t });
     this.applyNavTheme(t);
-    wx.setNavigationBarTitle({ title: '今日简报' });
+    wx.setNavigationBarTitle({ title: '今日汇总' });
     this.build();
     this.loadAgent();
   },
@@ -104,16 +104,16 @@ Page({
     wx.navigateTo({ url: `/pages/detail/detail?id=${id}` });
   },
 
-  /* 时间轴是 tabBar 页，必须用 switchTab（navigateTo 会失败） */
+  /* 日程是 tabBar 页，必须用 switchTab（navigateTo 会失败） */
   goTimeline() { wx.switchTab({ url: '/pages/timeline/timeline' }); },
   goMe() { wx.switchTab({ url: '/pages/me/me' }); },
   goSearch() { wx.navigateTo({ url: '/pages/search/search' }); },
 
-  /* 把简报复制出去，方便贴给自己/群 */
+  /* 把汇总复制出去，方便贴给自己/群 */
   copyBrief() {
     const b = this.data.brief;
     if (!b) return;
-    const lines = ['【知时 · 今日简报】' + this.data.stamp, ''];
+    const lines = ['【知时 · 今日汇总】' + this.data.stamp, ''];
     lines.push('知时指数 ' + b.index.score + '（' + b.index.label + '）');
     lines.push('');
     if (b.must.length) {
@@ -135,7 +135,7 @@ Page({
 
     wx.setClipboardData({
       data: lines.join('\n'),
-      success: () => wx.showToast({ title: '简报已复制', icon: 'success' })
+      success: () => wx.showToast({ title: '汇总已复制', icon: 'success' })
     });
   },
 
@@ -185,7 +185,7 @@ Page({
     }
   },
 
-  /** 倒计时 → 人话（与简报页口径一致） */
+  /** 倒计时 → 人话（与汇总页口径一致） */
   dueText(n) {
     const c = (n && typeof n.countdown === 'number') ? n.countdown : null;
     if (c === null) return '';
@@ -243,10 +243,10 @@ Page({
   },
 
   onShareAppMessage() {
-    return { title: '知时 · 今日简报', path: '/pages/digest/digest' };
+    return { title: '知时 · 今日汇总', path: '/pages/digest/digest' };
   },
 
   onShareTimeline() {
-    return { title: '知时 · 今日简报' };
+    return { title: '知时 · 今日汇总' };
   }
 });

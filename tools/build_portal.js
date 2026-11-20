@@ -60,7 +60,7 @@ const NAV = [
     items: [
       { key: 'app', file: '知时.html', icon: '📱', title: '可用应用',
         tag: '单文件·双击即用', star: true,
-        desc: '手机壳界面里真能点：雷达推送流 / 时间轴 / 简报 / 我的。每条贴出处、带主动推送引擎。' },
+        desc: '手机壳界面里真能点：通知列表 / 日程 / 汇总 / 我的。每条贴出处、带主动推送引擎。' },
       { key: 'demo', file: '交互Demo.html', icon: '🕹', title: '交互 Demo',
         tag: '五 Tab 可点', star: true,
         desc: '带完整数据源总览：百余条通知从哪来、怎么分布、被拦截的站点如实标。' },

@@ -28,15 +28,15 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "雷达"
+        "text": "通知"
       },
       {
         "pagePath": "pages/timeline/timeline",
-        "text": "时间轴"
+        "text": "日程"
       },
       {
         "pagePath": "pages/digest/digest",
-        "text": "简报"
+        "text": "汇总"
       },
       {
         "pagePath": "pages/me/me",

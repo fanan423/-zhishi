@@ -2,11 +2,11 @@ const store = require('../../utils/store.js');
 const theme = require('../../utils/theme.js');
 
 /**
- * 时间轴页
+ * 日程页
  * ========
  * 回答的问题跟首页不一样：
  *   首页 = 「今天该干什么」（按紧急度平铺）
- *   时间轴 = 「这周/这个月还有几件事、分别在哪天」（按截止日归集）
+ *   日程 = 「这周/这个月还有几件事、分别在哪天」（按截止日归集）
  *
  * 所有分箱都由 store.timelineBuckets() 产出，本页只负责渲染与交互。
  */
@@ -27,7 +27,7 @@ Page({
     const t = theme.current();
     this.setData({ theme: t });
     this.applyNavTheme(t);
-    wx.setNavigationBarTitle({ title: '截止时间轴' });
+    wx.setNavigationBarTitle({ title: '截止日程' });
     this.build();
   },
 
@@ -93,6 +93,6 @@ Page({
   },
 
   onShareAppMessage() {
-    return { title: '知时 · 我的截止时间轴', path: '/pages/timeline/timeline' };
+    return { title: '知时 · 我的截止日程', path: '/pages/timeline/timeline' };
   }
 });

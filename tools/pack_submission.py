@@ -204,10 +204,10 @@ def main():
         print("✅ 程序与文档齐备")
     if optional_absent:
         print("-" * 62)
-        print(f"ℹ 待生成的导出产物（{len(optional_absent)} 项，可再生，不算缺件）：")
+        print(f"ℹ 可选导出件（{len(optional_absent)} 项；官方允许 docx 或 pdf 二选一，不算缺件）：")
         for m in optional_absent:
             print("  ·", m)
-        print("  → 跑一次：python tools/export_docx.py --pdf")
+        print("  → 当前已交付 docx；如需 PDF，用 Word/WPS 打开 docx 后另存为 PDF。")
 
     if args.dry:
         print("=" * 62)
@@ -323,8 +323,8 @@ def main():
         for m in missing:
             lines.append(f"- [ ] `{m}`")
     if optional_absent:
-        lines += ["", "## 待生成的导出产物（可再生）", "",
-                  "跑一次 `python tools/export_docx.py --pdf` 即可产出：", ""]
+        lines += ["", "## 可选导出件（官方允许 docx / pdf 二选一）", "",
+                  "当前已交付 docx；如需 PDF，用 Word/WPS 打开 docx 后另存为 PDF：", ""]
         for m in optional_absent:
             lines.append(f"- [ ] `{m}`")
     (outdir / "提交清单.md").write_text("\n".join(lines) + "\n", encoding="utf-8")

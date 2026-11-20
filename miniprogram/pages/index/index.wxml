@@ -32,7 +32,7 @@
     <text class="sref" bindtap="onRefreshTap">刷新</text>
   </view>
 
-  <!-- ============ 今日头条（合并原先三张重复卡：紧急提示 / 推送小结 / 问知时一句话） ============ -->
+  <!-- ============ 今日头条（合并原先三张重复卡：紧急提示 / 推送小结 / 问答一句话） ============ -->
   <view class="hero tone-{{hero.tone}}" wx:if="{{hero}}" bindtap="heroTap">
     <view class="hero-hd">
       <text class="hero-k">今日头条</text>
@@ -60,7 +60,7 @@
     </view>
   </view>
 
-  <!-- 知时指数 + 简报摘要（点进简报）—— 与头条并存，但收敛为一条细条 -->
+  <!-- 知时指数 + 汇总摘要（点进汇总）—— 与头条并存，但收敛为一条细条 -->
   <view class="idxwrap lv-{{index.level}}" bindtap="goDigest">
     <view class="idl">
       <view class="idl1">今日知时指数</view>
@@ -68,7 +68,7 @@
     </view>
     <view class="idr">
       <view class="idn">{{index.score}}</view>
-      <view class="idg">看简报 ›</view>
+      <view class="idg">看汇总 ›</view>
     </view>
   </view>
 
@@ -76,22 +76,22 @@
   <view class="quick">
     <view class="qb" bindtap="goAsk">
       <text class="qbi">💬</text>
-      <text class="qbt">问知时</text>
+      <text class="qbt">问答</text>
       <text class="qbs">一问一答</text>
     </view>
     <view class="qb" bindtap="goCalendar">
       <text class="qbi">📅</text>
-      <text class="qbt">办事日历</text>
+      <text class="qbt">日历</text>
       <text class="qbs">哪天忙</text>
     </view>
     <view class="qb" bindtap="goTimeline">
       <text class="qbi">🕒</text>
-      <text class="qbt">时间轴</text>
+      <text class="qbt">日程</text>
       <text class="qbs">{{stats.urgent + soon.length}} 件待办</text>
     </view>
     <view class="qb" bindtap="goDigest">
       <text class="qbi">📋</text>
-      <text class="qbt">今日简报</text>
+      <text class="qbt">今日汇总</text>
       <text class="qbs">一句话读完</text>
     </view>
   </view>
@@ -106,12 +106,12 @@
 
   <!-- 视图切换 -->
   <view class="vsw">
-    <view class="vsb {{viewMode === 'feed' ? 'on' : ''}}" data-m="feed" bindtap="switchView">推送流<text class="vsb-n" wx:if="{{readStats.unread}}">{{readStats.unread}}</text></view>
+    <view class="vsb {{viewMode === 'feed' ? 'on' : ''}}" data-m="feed" bindtap="switchView">通知列表<text class="vsb-n" wx:if="{{readStats.unread}}">{{readStats.unread}}</text></view>
     <view class="vsb {{viewMode === 'tag' ? 'on' : ''}}" data-m="tag" bindtap="switchView">按标签</view>
     <view class="vsb lk" wx:if="{{readStats.hidden}}" bindtap="goHidden">已删除 {{readStats.hidden}}</view>
   </view>
 
-  <!-- ============ 推送流（梯度卡片：中卡 / 小卡归档） ============ -->
+  <!-- ============ 通知列表（梯度卡片：中卡 / 小卡归档） ============ -->
   <block wx:if="{{viewMode === 'feed'}}">
     <block wx:if="{{majorCards.length > 0 || minorCards.length > 0}}">
 

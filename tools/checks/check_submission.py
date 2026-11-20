@@ -224,7 +224,7 @@ ck("docs/演示视频脚本.md 存在", vscript.exists())
 if vscript.exists():
     v = vscript.read_text(encoding="utf-8")
     ck("含 10 个镜头", v.count("🎬 第") >= 10, f"实际 {v.count('🎬 第')} 镜")
-    ck("含时间轴（00:0x 格式）", bool(re.search(r"00:\d{2}", v)))
+    ck("含日程（00:0x 格式）", bool(re.search(r"00:\d{2}", v)))
     ck("覆盖创新性 30%", "创新性" in v and "30%" in v)
     ck("覆盖实用性 25%", "实用性" in v and "25%" in v)
     ck("覆盖技术实现 25%", "技术实现" in v and "25%" in v)

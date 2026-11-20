@@ -61,14 +61,14 @@
 
   <!-- 空态 -->
   <view class="empty" wx:else>
-    <view>时间轴还是空的</view>
+    <view>日程还是空的</view>
     <view style="margin-top:10rpx">说明你关注的范围里，最近没有需要盯截止日期的事</view>
     <view class="ebtn" bindtap="goMe">去调整我的订阅 ›</view>
   </view>
 
   <view class="foot">
     <view><text class="hl">怎么读这张图：</text>纵轴是「离截止还有多久」，越靠上越急。每张卡都链到详情，可核对原文。</view>
-    <view style="margin-top:8rpx">时间轴只呈现你自己勾选关注的通知，不含任何私域数据。</view>
+    <view style="margin-top:8rpx">日程只呈现你自己勾选关注的通知，不含任何私域数据。</view>
   </view>
 
 </view>

@@ -34,7 +34,7 @@ t('无外链 CSS/JS（真单文件）',
   !/<link[^>]+stylesheet/i.test(html) && !/<script[^>]+src=/i.test(html));
 t('内联了同源数据 ZS_DATA', html.includes('window.ZS_DATA'));
 t('内联了同源算法 ZS', /global\.ZS\s*=/.test(html));
-t('含四个 tab', ['雷达','时间轴','简报','我的'].every(x => html.includes(x)));
+t('含四个 tab', ['通知','日程','汇总','我的'].every(x => html.includes(x)));
 
 /* ---- 校徽元素（双圆形 + AAU 展开书页 + 田野 + 建校 1928）----
  * 依《安徽农业大学章程》第 75 条：整体双圆形、AAU 并列构成一把打开的书。 */
@@ -122,7 +122,7 @@ setTimeout(() => {
       doc.querySelectorAll('#screen .kwchip').length + ' 个关键词 chip');
     t('关键词 订阅后可删除（chips 带 × ）',
       doc.querySelectorAll('#screen .kwchip .kwx').length > 0);
-    /* 命中关键词的通知必须进推送流，且生成 KW_MATCH 理由 */
+    /* 命中关键词的通知必须进通知列表，且生成 KW_MATCH 理由 */
     const kwNotice = window.ZS_DATA.NOTICES.find(n =>
       window.ZS.noticeHaystack(n).indexOf('正大杯') >= 0);
     t('关键词 池中存在命中"正大杯"的通知', !!kwNotice, kwNotice ? kwNotice.id : 'none');
@@ -133,7 +133,7 @@ setTimeout(() => {
       t('关键词 推送理由含 KW_MATCH 且写明命中词',
         !!kwR && kwR.label.indexOf('正大杯') >= 0, kwR ? kwR.label : '无');
       const pr = window.ZS.buildPush(window.ZS_DATA.NOTICES, { profile: profNow, limit: 80 });
-      t('关键词 命中通知进入推送流', pr.cards.some(c => c.id === kwNotice.id));
+      t('关键词 命中通知进入通知列表', pr.cards.some(c => c.id === kwNotice.id));
     }
     /* 还原：删掉关键词，避免影响后续断言 */
     window.APP.removeKeyword('正大杯');
@@ -261,8 +261,8 @@ setTimeout(() => {
     t('推送设置页 有应用内推送开关', pushTxt.includes('应用内推送'));
     t('推送设置页 有微信服务通知说明（关掉页面也能提醒）',
       pushTxt.includes('微信服务通知') && pushTxt.includes('关掉页面也能提醒'));
-    t('推送设置页 有触达时间线（什么时候会主动找你）',
-      pushTxt.includes('触达时间线') && pushTxt.includes('什么时候会主动找你'));
+    t('推送设置页 有提醒时间（什么时候会主动找你）',
+      pushTxt.includes('提醒时间') && pushTxt.includes('什么时候会主动找你'));
     t('推送设置页 有订阅授权入口', pushTxt.includes('开启微信服务通知') || pushTxt.includes('更新订阅授权'));
     t('推送设置页 有打扰策略（只打扰三天内）', pushTxt.includes('打扰策略') && pushTxt.includes('三天内'));
     t('推送设置页 有推送留痕', pushTxt.includes('推送留痕'));
@@ -284,9 +284,9 @@ setTimeout(() => {
     /* ---- 能力③ 自动整合 ---- */
     window.APP.goTab('digest');
     const dt = doc.getElementById('screen').textContent;
-    t('能力③ 简报含「一句话总结」', dt.includes('一句话总结'));
-    t('能力③ 简报含知时指数', dt.includes('知时指数'));
-    t('能力③ 简报把信息压成可读句子', /条.*(截止|到期|命中)/.test(dt));
+    t('能力③ 汇总含「一句话总结」', dt.includes('一句话总结'));
+    t('能力③ 汇总含知时指数', dt.includes('知时指数'));
+    t('能力③ 汇总把信息压成可读句子', /条.*(截止|到期|命中)/.test(dt));
 
     /* ---- 能力④ 贴明出处 ---- */
     window.APP.goTab('mine');
@@ -336,19 +336,19 @@ setTimeout(() => {
     t('自查页结论与数据一致（零剔除）', sc.includes('未剔除任何条目'),
       DATA.filter(n => !n.real && n.url).length === 0 ? '无演示带链接' : '有异常');
 
-    /* ---- 问知时（问答引擎 + 页面） ---- */
+    /* ---- 问答（问答引擎 + 页面） ---- */
     window.APP.goSub('ask');
     const askTxt = doc.getElementById('screen').textContent;
-    t('问知时有今日一问大卡', /问知时/.test(askTxt) && /💬/.test(askTxt));
-    t('问知时有「依据」说明', askTxt.includes('依据'));
-    t('问知时有问题目录', askTxt.includes('还能问什么'));
-    t('问知时渲染 13 个问题',
+    t('问答有今日一问大卡', /问答/.test(askTxt) && /💬/.test(askTxt));
+    t('问答有「依据」说明', askTxt.includes('依据'));
+    t('问答有问题目录', askTxt.includes('还能问什么'));
+    t('问答渲染 13 个问题',
       (function () {
         var n = 0;
         doc.querySelectorAll('#screen .qrow').forEach(function () { n++; });
         return n >= 13;
       })(), 'qrow 计数');
-    t('问知时有分组标签',
+    t('问答有分组标签',
       askTxt.includes('今天 / 这周') && askTxt.includes('先办哪个') && askTxt.includes('数据可靠吗'));
 
     /* 点一个问题 → 答案变化 */
@@ -357,14 +357,14 @@ setTimeout(() => {
     if (qrows.length > 3) {
       window.APP.askGo('need_material');
       var askAfter = doc.getElementById('screen').textContent;
-      t('问知时点问题后答案区变化', askAfter !== askBefore, 'askGo 生效');
-      t('问知时「要准备什么」会列材料或如实说没有',
+      t('问答点问题后答案区变化', askAfter !== askBefore, 'askGo 生效');
+      t('问答「要准备什么」会列材料或如实说没有',
         /材料/.test(askAfter), '答案含材料语义');
     }
 
     /* 边界：不存在的问题 id 不崩 */
     window.APP.askGo('no_such_q');
-    t('问知时非法问题 id 不崩溃', doc.getElementById('screen').textContent.length > 0);
+    t('问答非法问题 id 不崩溃', doc.getElementById('screen').textContent.length > 0);
     window.APP.askGo('today');
 
     /* 纯函数：askAnswer 结构完整 */
@@ -380,7 +380,7 @@ setTimeout(() => {
     t('CORE.askQuestionGroups 分组非空',
       (function () { var C = window.ZS; var g = C && C.askQuestionGroups && C.askQuestionGroups(); return g && g.length >= 6; })());
 
-    /* ---- 办事日历 ---- */
+    /* ---- 日历 ---- */
     window.APP.goSub('calendar');
     const calTxt = doc.getElementById('screen').textContent;
     t('日历有大月份标题', /年/.test(calTxt) && /月/.test(calTxt));
@@ -566,10 +566,10 @@ setTimeout(() => {
         return true;
       })(), '命中项 category 全在机会类');
 
-    /* ⑨ 问知时答案与数据自洽 —— today/week 的 itemCount 必须等于
+    /* ⑨ 问答答案与数据自洽 —— today/week 的 itemCount 必须等于
      *    "与档案相关"（relatedNotices）里倒计时落入口径的条数。
      *    注意口径：不是全量 DATA，而是先过身份/标签过滤后的集合。 */
-    t('加固 问知时答案与数据自洽（today/week）',
+    t('加固 问答答案与数据自洽（today/week）',
       (function () {
         var prof = { interests: [] };
         var rel = CORE.relatedNotices(DATA, prof);

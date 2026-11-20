@@ -1,4 +1,4 @@
-/* 时间轴页 —— 数字安农风格（跟随主题变量） */
+/* 日程页 —— 数字安农风格（跟随主题变量） */
 
 /* ---- 知时指数卡 ---- */
 .idxcard {
@@ -89,7 +89,7 @@
 .bnum { font-size: 20rpx; color: var(--txt-3); margin-top: 2rpx; }
 .barrow { font-size: 24rpx; color: var(--txt-3); flex-shrink: 0; }
 
-/* ---- 时间轴主体 ---- */
+/* ---- 日程主体 ---- */
 .tl {
   position: relative;
   padding-left: 34rpx;

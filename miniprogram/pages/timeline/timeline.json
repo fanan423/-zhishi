@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "截止时间轴",
+  "navigationBarTitleText": "截止日程",
   "enablePullDownRefresh": true,
   "usingComponents": {}
 }

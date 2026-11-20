@@ -58,4 +58,63 @@ function buildUserPrompt(notice, maxChars) {
   );
 }
 
-module.exports = { VERSION, FIELD_SCHEMA, SYSTEM_PROMPT, buildUserPrompt };
+/* ============================================================
+ * 推荐层提示词（v1.0.0）—— 与上面的「理解层」刻意分开
+ * ------------------------------------------------------------
+ * 理解层回答「这条通知讲了什么」；推荐层回答「这条通知对**这个学生**
+ * 有多相关、为什么」。两者输入不同（推荐层多了用户画像），因此另立一套
+ * 常量，不复用 VERSION / SYSTEM_PROMPT，避免 check_llm_pipeline.js 的
+ * 两端同源守卫把「理解层版本」与「推荐层版本」混为一谈。
+ *
+ * 推荐层只在 Node 端运行（tools/agent/server.js 与构建期快照脚本调用），
+ * 小程序端不持有，故不进双端逐字比对；但仍守同一套规矩：带版本号、
+ * 字段契约固定、逐字引文、不得编造、严格 JSON。
+ * ============================================================ */
+const RECOMMEND_VERSION = '1.0.0';
+
+const RECOMMEND_FIELD_SCHEMA = Object.freeze({
+  relevance: '0-100 的整数：这条通知对该学生的相关 / 值得优先处理程度',
+  reason: '一句话（不超过 60 字）说明为什么这样判断，必须同时依据画像和通知原文',
+  evidence: '通知原文中支撑判断的连续片段，逐字复制、不得改写或省略；确实没有则填 null'
+});
+
+const RECOMMEND_SYSTEM_PROMPT =
+  '你是校园通知个性化推荐助手。依据「学生画像」和「通知原文」判断这条通知对该学生的相关程度。' +
+  '只依据给定的画像字段和通知原文，绝不编造画像里没有的信息，也不依据常识补全。' +
+  'relevance 只能是 0-100 的整数：与该学生直接相关、且临近截止或需本人办理的给高分；' +
+  '与该学生无关、面向学院/老师报送、或已过期的给低分。' +
+  'evidence 必须逐字复制原文中的连续片段，不得改写、概括、插入省略号或删减字符；没有合适片段就填 null。' +
+  'reason 用中文，一句话，不超过 60 字，必须能在画像或原文里找到依据。' +
+  '严格输出 JSON，不要任何额外文字。';
+
+/** 构造推荐层用户提示词。画像与原文都截断，避免上下文过长。 */
+function buildRecommendPrompt(notice, profile, maxChars) {
+  const cap = maxChars || 1800;
+  const p = profile || {};
+  const keys = Object.keys(RECOMMEND_FIELD_SCHEMA).join('/');
+  const interests = Array.isArray(p.interests) ? p.interests.join('、') : '';
+  const keywords = Array.isArray(p.keywords) ? p.keywords.join('、') : '';
+  return (
+    '请判断下面这条校园通知对「这位学生」的相关程度，输出 JSON：\n' +
+    '{"relevance":"0-100 整数","reason":"一句话理由（不超过60字）","evidence":"原文连续片段，逐字复制；无则 null"}\n' +
+    '字段集合固定为：' + keys + '。\n\n' +
+    '【学生画像】\n' +
+    '身份：' + (p.identityType || '未填') + '\n' +
+    '年级：' + (p.grade || '未填') + '\n' +
+    '学院：' + (p.college || '未填') + '\n' +
+    '兴趣标签：' + (interests || '无') + '\n' +
+    '订阅关键词：' + (keywords || '无') + '\n\n' +
+    '【通知】\n' +
+    '标题：' + (notice.title || '') + '\n' +
+    '事件类型：' + (notice.event || '未标注') + '\n' +
+    '截止时间：' + (notice.deadline || '无') + '\n' +
+    '倒计时天数：' + (typeof notice.countdown === 'number' ? notice.countdown : '无') + '\n' +
+    '适用人群：' + (notice.audience || (notice.llm_fields && notice.llm_fields.who) || '未标注') + '\n' +
+    '通知原文：\n' + String(notice.raw || notice.digest || notice.digestOne || '').slice(0, cap)
+  );
+}
+
+module.exports = {
+  VERSION, FIELD_SCHEMA, SYSTEM_PROMPT, buildUserPrompt,
+  RECOMMEND_VERSION, RECOMMEND_FIELD_SCHEMA, RECOMMEND_SYSTEM_PROMPT, buildRecommendPrompt,
+};

@@ -18,11 +18,11 @@ Page({
     stats: { collected: 0, realCnt: 0, matched: 0, urgent: 0, tagCnt: 0, siteCnt: 0 },
     /* 知时指数：把"今天有多少事"压成一个数 */
     index: { score: 0, level: 'calm', label: '', now: 0, d3: 0, week: 0, total: 0 },
-    /* 简报摘要一句话 */
+    /* 汇总摘要一句话 */
     briefLine: '',
     /* 三档分区 */
     urgent: [], soon: [], later: [],
-    /* 展示模式：feed（推送流） | tag（按标签分组） */
+    /* 展示模式：feed（通知列表） | tag（按标签分组） */
     viewMode: 'feed',
     groups: [],
     openTag: '',
@@ -31,15 +31,15 @@ Page({
     pushBuckets: [],
     pushSummary: { line: '', badge: '', tone: 'calm' },
     pushNewCount: 0,
-    /* 首屏头条（合并原先三张重复卡：紧急提示 / 推送小结 / 问知时一句话） */
+    /* 首屏头条（合并原先三张重复卡：紧急提示 / 推送小结 / 问答一句话） */
     hero: null,
-    /* 梯度推送流：major（三天内，中卡）/ minor（更远，小卡） */
+    /* 梯度通知列表：major（三天内，中卡）/ minor（更远，小卡） */
     majorCards: [],
     minorCards: [],
     minorOpen: false,
     /* 未读 / 已删除统计 */
     readStats: { read: 0, unread: 0, hidden: 0, total: 0 },
-    /* 问知时：今日一问（保留给快捷入口） */
+    /* 问答：今日一问（保留给快捷入口） */
     headline: null,
     /* 身份 */
     profile: {},
@@ -136,7 +136,7 @@ Page({
     const r = push.buildPush({ profile, limit: 40 });
     const buckets = push.pushBuckets(profile);
 
-    /* 已读/删除是本地用户状态：先从推送流剔除「已删除」，再给每卡注入 read 标记。
+    /* 已读/删除是本地用户状态：先从通知列表剔除「已删除」，再给每卡注入 read 标记。
      * 头条与梯度流用同一份过滤后的卡，保证三处口径一致（不产生第二套事实）。 */
     const visibleCards = readstate.visible(r.cards);
     const cardsRead = readstate.decorate(visibleCards);
@@ -157,7 +157,7 @@ Page({
     const majorCards = readstate.decorate(readstate.visible(tiered.major));
     const minorCards = readstate.decorate(readstate.visible(tiered.minor));
 
-    /* 问知时：算出今日一问，保留给快捷入口 */
+    /* 问答：算出今日一问，保留给快捷入口 */
     const headline = ask.headline();
 
     const readStats = readstate.stats(r.cards);
@@ -181,7 +181,7 @@ Page({
       headline
     });
 
-    /* 用户真的看到推送流了 → 记为已推送（决定下次哪些算"新收录"）
+    /* 用户真的看到通知列表了 → 记为已推送（决定下次哪些算"新收录"）
      * 注意顺序：先 setData 用旧的 isNew 状态渲染，再标记。
      * 反过来做的话，第一次打开时"新"标记就被自己抹掉了。
      * 同时记一次"展示"用于重复抑制：反复看到却没点开的，下次自动降权。 */
@@ -227,7 +227,7 @@ Page({
     if (!h || !h.action) return;
     if (h.action.kind === 'detail') { wx.navigateTo({ url: `/pages/detail/detail?id=${h.action.id}` }); }
     else if (h.action.kind === 'me') { wx.switchTab({ url: '/pages/me/me' }); }
-    /* kind === 'feed' 时不动（已经在推送流里） */
+    /* kind === 'feed' 时不动（已经在通知列表里） */
   },
 
   /* 头条卡右侧按钮：直达（详情 / 设置订阅） */

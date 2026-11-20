@@ -143,7 +143,7 @@
 .ovs { font-size: 22rpx; color: var(--txt-2); }
 .ovhl { color: var(--brand); font-weight: 600; }
 
-/* 快捷入口（时间轴 / 简报） */
+/* 快捷入口（日程 / 汇总） */
 .quick {
   display: flex;
   gap: 16rpx;

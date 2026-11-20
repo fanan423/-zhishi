@@ -249,7 +249,7 @@ HTML_TMPL = r"""<!DOCTYPE html>
   .kwsug-w{font-size:12px;color:#00653e;background:#e8f4ee;padding:4px 11px;border-radius:14px;cursor:pointer;}
   .kwsug-w:hover{background:#00653e;color:#fff;}
 
-  /* ---------- 问知时 / 日历 ---------- */
+  /* ---------- 问答 / 日历 ---------- */
   .qa{background:#fff;border:1px solid #e8eee9;border-radius:13px;padding:12px 13px;margin-bottom:10px;}
   .qa .q{font-size:12.5px;color:#00653e;font-weight:600;margin-bottom:7px;}
   .qa .a{font-size:13.5px;color:#1c2320;line-height:1.6;}
@@ -393,19 +393,19 @@ HTML_TMPL = r"""<!DOCTYPE html>
     <div class="ver">交互 Demo · 数据与算法同源于小程序</div>
     <p>一部能真正点开、搜索、追问的手机模拟器。左边这台"手机"里跑的就是小程序的逻辑，只是换了壳。</p>
     <ul class="feat">
-      <li><i>📡</i><div><b>推送流 + 定点排序</b><br>只推和你身份、关注相符的通知，主次分层，可已读/删除</div></li>
+      <li><i>📡</i><div><b>通知列表 + 定点排序</b><br>只推和你身份、关注相符的通知，主次分层，可已读/删除</div></li>
       <li><i>🔍</i><div><b>搜索 + 溯源</b><br>关键词检索、命中来源说明、点进详情看官网原文</div></li>
-      <li><i>🎫</i><div><b>切换档案看千人千面</b><br>换学院/年级/关注标签，推送流实时重排</div></li>
-      <li><i>💬</i><div><b>问知时 + 办事日历</b><br>自然语言问答，今天/本周要办一目了然</div></li>
+      <li><i>🎫</i><div><b>切换档案看千人千面</b><br>换学院/年级/关注标签，通知列表实时重排</div></li>
+      <li><i>💬</i><div><b>问答 + 日历</b><br>自然语言问答，今天/本周要办一目了然</div></li>
       <li><i>📊</i><div><b>数据源总览</b><br>百余条真实公开通知的采集来源与分布，逐条可回官网核对</div></li>
     </ul>
     <div class="tip">
       试试这些：<br>
       · 长按任意推送卡 → 标记已读 / 删除<br>
-      · 在「订阅」页把年级从 2025级 换成 2022级，回「雷达」看排序变化<br>
+      · 在「订阅」页把年级从 2025级 换成 2022级，回「通知」看排序变化<br>
       · 搜索框输入「科技文化节」回车，点结果看原文出处<br>
       · 切到「数据源」看百余条通知从哪来、怎么分布<br>
-      · 「问知时」问一句"今天有什么非要办的？"
+      · 「问答」问一句"今天有什么非要办的？"
     </div>
   </div>
 
@@ -417,14 +417,14 @@ HTML_TMPL = r"""<!DOCTYPE html>
         <span>安农 · 5G · 100%</span>
       </div>
       <div class="navbar">
-        <span id="navTitle">雷达</span>
+        <span id="navTitle">通知</span>
         <span class="nb-sub" id="navSub"></span>
       </div>
       <div class="body" id="view"></div>
       <div class="tabbar" id="tabbar">
-        <div class="tab on" data-tab="index"><span class="ti">📡</span>雷达</div>
+        <div class="tab on" data-tab="index"><span class="ti">📡</span>通知</div>
         <div class="tab" data-tab="search"><span class="ti">🔍</span>搜索</div>
-        <div class="tab" data-tab="ask"><span class="ti">💬</span>问知时</div>
+        <div class="tab" data-tab="ask"><span class="ti">💬</span>问答</div>
         <div class="tab" data-tab="data"><span class="ti">📊</span>数据源</div>
         <div class="tab" data-tab="me"><span class="ti">👤</span>订阅</div>
       </div>
@@ -509,7 +509,7 @@ HTML_TMPL = r"""<!DOCTYPE html>
       v.scrollTop=0; return;
     }
     document.getElementById('navTitle').textContent =
-      ({index:'雷达', search:'搜索', ask:'问知时', data:'数据源', me:'订阅'})[S.tab];
+      ({index:'通知', search:'搜索', ask:'问答', data:'数据源', me:'订阅'})[S.tab];
     if (S.tab==='index') { document.getElementById('navSub').textContent='数字安农'; v.innerHTML=pageIndex(); }
     else if (S.tab==='search'){ document.getElementById('navSub').textContent=''; v.innerHTML=pageSearch(); }
     else if (S.tab==='ask'){ document.getElementById('navSub').textContent=''; v.innerHTML=pageAsk(); }
@@ -520,7 +520,7 @@ HTML_TMPL = r"""<!DOCTYPE html>
       el.classList.toggle('on', el.getAttribute('data-tab')===S.tab); });
   }
 
-  /* ---------- ① 雷达（推送流） ---------- */
+  /* ---------- ① 通知（通知列表） ---------- */
   /* 中卡阈值直接取逻辑层的常量，不写死 —— 逻辑层调阈值，Demo 自动跟上 */
   var MAJOR = (typeof ZS.PUSH_MAJOR_SCORE === 'number') ? ZS.PUSH_MAJOR_SCORE : 35;
   function pageIndex(){
@@ -555,7 +555,7 @@ HTML_TMPL = r"""<!DOCTYPE html>
         + '</div>';
     }
     /* 推送条 */
-    h += '<div class="vsb">推送流'
+    h += '<div class="vsb">通知列表'
       + (unread? '<span class="vsb-n">'+unread+'</span>' : '')
       + (stats.hidden? '<span class="lk" data-act="hidden">已删除 '+stats.hidden+' ›</span>' : '')
       + '</div>';
@@ -684,7 +684,7 @@ HTML_TMPL = r"""<!DOCTYPE html>
     return h + '</div>';
   }
 
-  /* ---------- ③ 问知时 + 日历 ---------- */
+  /* ---------- ③ 问答 + 日历 ---------- */
   function pageAsk(){
     var p = pool();
     var h = '<div class="pad">';
@@ -719,7 +719,7 @@ HTML_TMPL = r"""<!DOCTYPE html>
       }
     }
     /* 日历 */
-    h += '<div class="sec-k" style="margin-top:14px">办事日历</div>';
+    h += '<div class="sec-k" style="margin-top:14px">日历</div>';
     h += calHtml(p);
     return h + '</div>';
   }
@@ -880,7 +880,7 @@ HTML_TMPL = r"""<!DOCTYPE html>
     var pf = S.profile;
     var h = '<div class="pf-head"><div class="pt">'+esc(pf.identityType)+' · '+esc(pf.grade)+'</div>'
       + '<div class="ps">'+esc(pf.college)+' · '+esc(pf.campus||'')+'</div></div><div class="pad" style="padding-top:0">';
-    h += '<div class="pf-note">改下面的选项，回「雷达」看推送流实时重排 —— 这就是千人千面。'
+    h += '<div class="pf-note">改下面的选项，回「通知」看通知列表实时重排 —— 这就是千人千面。'
       + '当前命中 <b>'+ZS.getStats(pool(), pf.interests).matched+'</b> 条。</div>';
 
     h += '<div class="pf-row" style="margin-top:14px"><div class="pl">身份类型</div><div class="seg">';
@@ -975,7 +975,7 @@ HTML_TMPL = r"""<!DOCTYPE html>
               : '<div style="font-size:11px;color:#9aa4a0;margin-top:6px">本条未留存官网链接（已在数据源页如实标注）</div>')
       + '</div>';
 
-    /* 时间轴：发布 → 今天 → 截止 */
+    /* 日程：发布 → 今天 → 截止 */
     h += timelineHtml(n);
 
     /* 浓缩要点 + 原文出处 */
@@ -1027,7 +1027,7 @@ HTML_TMPL = r"""<!DOCTYPE html>
     try { return String(u).replace(/^https?:\/\//,'').split('/')[0]; } catch(e){ return '官网'; }
   }
 
-  /* 时间轴：发布 · 今天 · 截止（三点一线，一眼看出"还差多久"） */
+  /* 日程：发布 · 今天 · 截止（三点一线，一眼看出"还差多久"） */
   function timelineHtml(n){
     if (!n.deadline) return '';
     var pub = n.publish || '', ddl = n.deadline;
@@ -1114,7 +1114,7 @@ HTML_TMPL = r"""<!DOCTYPE html>
     if (el.hasAttribute('data-day') && el.getAttribute('data-has')==='1'){
       S.calDay=+el.getAttribute('data-day'); render(); return; }
     /* 档案维度 */
-    if (el.hasAttribute('data-set')){ S.profile[el.getAttribute('data-set')]=el.getAttribute('data-v'); render(); notify('档案已更新，去雷达看看'); return; }
+    if (el.hasAttribute('data-set')){ S.profile[el.getAttribute('data-set')]=el.getAttribute('data-v'); render(); notify('档案已更新，去通知看看'); return; }
     if (el.hasAttribute('data-tag')){ var k=el.getAttribute('data-tag'), i=S.profile.interests.indexOf(k);
       if (i>=0) S.profile.interests.splice(i,1); else S.profile.interests.push(k); render(); return; }
   });

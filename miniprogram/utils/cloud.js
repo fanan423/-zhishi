@@ -15,7 +15,7 @@
  *   静态解析 `require('@tencent-ai/workbuddy-cloud-sdk/miniprogram')` 时
  *   会直接报「模块不存在」——try/catch 拦不住**编译期**的模块解析。
  *   因此默认关闭，保证「导入 → 编译」一次通过、零配置可跑。
- *   本地模式数据来自 data/notices.js（打包进代码），推送/溯源/问知时/日历全可用。
+ *   本地模式数据来自 data/notices.js（打包进代码），推送/溯源/问答/日历全可用。
  *
  * 【依赖声明已归档】
  *   为避免开发者工具弹出「构建 npm」提示，miniprogram/package.json 已改为

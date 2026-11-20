@@ -30,7 +30,7 @@ const R = (p) => path.join(ROOT, p);
 /* 通用排除规则（与 .gitignore / pack_submission.py 对齐） */
 const EXCLUDE_DIRS = new Set([
   'node_modules', '__pycache__', '.git', 'dist', '_backups',
-  '_原始材料', '_extract', 'push_out',
+  '_原始材料', '_extract', 'push_out', '_rename_backup',
   // 历史快照目录
   '正大杯', '知时_web', '知时_带智能体小程序', '知时_收集卡',
   '知时_体验版', '知时_线上', '知时_整体Demo', '知时_主动通知Demo',
@@ -43,8 +43,10 @@ const EXCLUDE_NAMES = new Set([
   // 内部评估/复核材料：含自评与风险判断，不进任何提交包
   '扣分点优化复核_2026-11-15.md',
   '_diag.js', 'push_state.json', '_tmpl.docx',
+  // 一次性文案改名工具与其报告（含旧词映射），仅本地留档，不进交付包
+  '_rename_ui.py', '_rename_ui_report.txt',
 ]);
-const isProbe = (name) => /^_probe\d*\.js$/.test(name);
+const isProbe = (name) => /^_probe.*\.(js|py)$/.test(name);
 
 function shouldInclude(rel) {
   const parts = rel.split(/[\\/]/);
@@ -165,9 +167,9 @@ function main() {
       '知时 · 安农校园信息雷达 —— 可用版（完整可运行程序）',
       '',
       '最快上手：双击「知时_可用版.html」，零依赖、断网可用。',
-      '  · 在「我的」完善身份/学院/关注 → 「雷达」看定向推送',
+      '  · 在「我的」完善身份/学院/关注 → 「通知」看定向推送',
       '  · 点卡片看浓缩要点、原文出处、大模型理解与依据引文',
-      '  · 「简报」一屏汇总 / 「问知时」自然语言问答 / 办事日历',
+      '  · 「汇总」一屏汇总 / 「问答」自然语言问答 / 日历',
       '',
       '其它形态：',
       '  · 小程序：微信开发者工具导入 miniprogram/ 目录编译',

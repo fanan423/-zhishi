@@ -1,8 +1,8 @@
 /**
- * 知时 · 办事日历
+ * 知时 · 日历
  * ================
  *
- * 时间轴回答"这周我还有几件事"；日历回答更直接的问题：
+ * 日程回答"这周我还有几件事"；日历回答更直接的问题：
  *   「具体哪天忙、哪天能空出来？」
  *
  * 学生看截止日期的方式不是"还剩几天"这种抽象数字 ——
@@ -122,6 +122,6 @@ Page({
   goIndex() { wx.switchTab({ url: '/pages/index/index' }); },
 
   onShareAppMessage() {
-    return { title: '知时 · 办事日历，哪天忙一目了然', path: '/pages/index/index' };
+    return { title: '知时 · 日历，哪天忙一目了然', path: '/pages/index/index' };
   }
 });

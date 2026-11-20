@@ -3,7 +3,7 @@
  * ==================
  *
  * 这一页要回答用户三个真实疑问：
- *   ① 你到底推了什么给我？（→ 当前推送流预览）
+ *   ① 你到底推了什么给我？（→ 当前通知列表预览）
  *   ② 凭什么推？（→ 每条写明理由，附打分）
  *   ③ 我不想被打扰怎么办？（→ 打扰级别开关 + 后台推送说明）
  *
@@ -22,7 +22,7 @@ Page({
     /* 引擎状态 */
     stats: null,
     summary: null,
-    /* 推送流（前若干条） */
+    /* 通知列表（前若干条） */
     cards: [],
     buckets: [],
     /* 开关 */
@@ -37,7 +37,7 @@ Page({
     wx: null,
     advanceOptions: [],
     advanceIdx: 1,
-    /* ★ 触达时间线 */
+    /* ★ 提醒时间 */
     reach: null,
     reachDays: [],
     busy: false
@@ -75,7 +75,7 @@ Page({
     const advanceOptions = wxnotify.ADVANCE_OPTIONS;
     const advIdx = Math.max(0, advanceOptions.findIndex(o => o.key === (wxSummary.advance || '3,1')));
 
-    /* 触达时间线（用已登记的提前量算） */
+    /* 提醒时间（用已登记的提前量算） */
     const reach = reachlist.build(profile, { advance: wxSummary.advance, limit: 40 });
 
     this.setData({

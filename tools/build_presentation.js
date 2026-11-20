@@ -497,7 +497,7 @@ const TEMPLATE = `<!DOCTYPE html>
         <iframe id="appFrame" title="知时可用版应用预览" loading="lazy"></iframe>
       </div>
     </div>
-    <div class="foot-note">答辩现场动线：门户 → 可用应用 → 推送卡片 → 详情溯源高亮 → 触达时间线 → 问知时。全程离线可跑。</div>
+    <div class="foot-note">答辩现场动线：门户 → 可用应用 → 推送卡片 → 详情溯源高亮 → 提醒时间 → 问答。全程离线可跑。</div>
   </section>
 
   <!-- ===================== 屏 7 · 边界与诚实 ===================== -->

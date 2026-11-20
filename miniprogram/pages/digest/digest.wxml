@@ -1,11 +1,11 @@
 <view class="screen theme-{{theme}}">
 <view class="wrap">
 
-  <!-- 简报头 -->
+  <!-- 汇总头 -->
   <view class="bhead">
     <view class="lg"><view class="sun"></view><text class="aa">AAU</text><view class="book"></view><text class="y">1928</text></view>
     <view class="bx">
-      <view class="t1">今日简报</view>
+      <view class="t1">今日汇总</view>
       <view class="t2">{{stamp}} 生成 · 知时 · 数字安农信息雷达</view>
     </view>
   </view>
@@ -60,7 +60,7 @@
   <view class="empty" wx:else>
     <view>今天没有临近截止的事</view>
     <view style="margin-top:10rpx">去看看还有哪些通知可以关注</view>
-    <view class="ebtn" bindtap="goTimeline">看完整时间轴 ›</view>
+    <view class="ebtn" bindtap="goTimeline">看完整日程 ›</view>
   </view>
 
   <!-- 数据可信度 -->
@@ -151,18 +151,18 @@
 
   <!-- 快捷入口 -->
   <view class="quick">
-    <view class="qbtn" bindtap="goTimeline">🕒 时间轴</view>
+    <view class="qbtn" bindtap="goTimeline">🕒 日程</view>
     <view class="qbtn" bindtap="goSearch">🔍 搜通知</view>
     <view class="qbtn" bindtap="goMe">⭐ 我的订阅</view>
   </view>
 
   <view class="acts">
-    <button class="ab primary" bindtap="copyBrief">复制简报</button>
+    <button class="ab primary" bindtap="copyBrief">复制汇总</button>
   </view>
 
   <view class="foot">
-    <view><text class="hl">简报怎么来的：</text>把你自己关注范围内、按身份筛过的通知，按「几天内截止」压成一段话。</view>
-    <view style="margin-top:8rpx">内容全部实时派生，不预置结论；订阅一改，简报立刻跟着变。</view>
+    <view><text class="hl">汇总怎么来的：</text>把你自己关注范围内、按身份筛过的通知，按「几天内截止」压成一段话。</view>
+    <view style="margin-top:8rpx">内容全部实时派生，不预置结论；订阅一改，汇总立刻跟着变。</view>
   </view>
 
 </view>

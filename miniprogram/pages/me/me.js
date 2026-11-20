@@ -228,7 +228,7 @@ Page({
       await this.loadAgent();
       wx.hideLoading();
       wx.showToast({
-        title: (st && st.reachable) ? '已触发一轮计算' : '本地模式：打开简报页即可看到最新清单',
+        title: (st && st.reachable) ? '已触发一轮计算' : '本地模式：打开汇总页即可看到最新清单',
         icon: 'none', duration: 2600
       });
     } catch (e) {
@@ -359,7 +359,7 @@ Page({
     const self = this;
     wx.showModal({
       title: '清空已删除',
-      content: '清空后这些通知会重新出现在推送流里，确定吗？',
+      content: '清空后这些通知会重新出现在通知列表里，确定吗？',
       success(res) {
         if (!res.confirm) return;
         readstate.hiddenList().forEach(id => readstate.unhide(id));
@@ -489,7 +489,7 @@ Page({
   /* ============ 自定义关键词订阅 ============ */
   /*
    * 用户在输入框里敲一个词（如"正大杯"），保存进画像的 keywords；
-   * 之后池中命中该词的通知就进推送流并主动推送。
+   * 之后池中命中该词的通知就进通知列表并主动推送。
    * 这一层与"关注标签"并列：标签是选的分好的类，关键词是自己敲的具体名词。
    */
 

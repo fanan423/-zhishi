@@ -263,78 +263,78 @@ else:
     errors.append("首页未实现按标签分组的推送视图")
     print("  ✗ 首页未分组")
 
-# ---------- 9b. 新增能力：时间轴 / 知时指数 / 今日简报 ----------
-print("【9b】时间轴与简报能力")
+# ---------- 9b. 新增能力：日程 / 知时指数 / 今日汇总 ----------
+print("【9b】日程与汇总能力")
 sj2 = (ROOT / "utils" / "store.js").read_text(encoding="utf-8")
 new_ok = {
-    "有截止时间轴归集 timelineBuckets": "function timelineBuckets" in sj2,
-    "时间轴分五档（今天/三天/一周/本月/更远）": "今天到期" in sj2 and "三天内" in sj2 and "更远 / 长期有效" in sj2,
+    "有截止日程归集 timelineBuckets": "function timelineBuckets" in sj2,
+    "日程分五档（今天/三天/一周/本月/更远）": "今天到期" in sj2 and "三天内" in sj2 and "更远 / 长期有效" in sj2,
     "有知时指数 urgencyIndex": "function urgencyIndex" in sj2,
     "指数归一化到 0-100": "Math.round(100 *" in sj2,
-    "有今日简报 brief": "function brief" in sj2,
-    "简报内容全部派生自当前数据": "generatedFrom" in sj2,
+    "有今日汇总 brief": "function brief" in sj2,
+    "汇总内容全部派生自当前数据": "generatedFrom" in sj2,
 }
 for k, v in new_ok.items():
     print(f"  {'✓' if v else '✗'} {k}")
     if not v:
         errors.append(f"store.js 新能力缺失: {k}")
 
-# 时间轴页
+# 日程页
 tl_wxml = ROOT / "pages" / "timeline" / "timeline.wxml"
 tl_js = ROOT / "pages" / "timeline" / "timeline.js"
 if tl_wxml.exists() and tl_js.exists():
     tw = tl_wxml.read_text(encoding="utf-8")
     tj = tl_js.read_text(encoding="utf-8")
     tl_ok = {
-        "时间轴页有指数卡": "idxcard" in tw,
-        "时间轴页渲染分箱": "buckets" in tw,
-        "时间轴页支持折叠/展开": "toggleBucket" in tw and "openKeys" in tw,
-        "时间轴页可进详情": "goDetail" in tw,
-        "时间轴页数据来自 store": "store.timelineBuckets" in tj,
+        "日程页有指数卡": "idxcard" in tw,
+        "日程页渲染分箱": "buckets" in tw,
+        "日程页支持折叠/展开": "toggleBucket" in tw and "openKeys" in tw,
+        "日程页可进详情": "goDetail" in tw,
+        "日程页数据来自 store": "store.timelineBuckets" in tj,
     }
     for k, v in tl_ok.items():
         print(f"  {'✓' if v else '✗'} {k}")
         if not v:
-            errors.append(f"时间轴页: {k} 未满足")
+            errors.append(f"日程页: {k} 未满足")
 else:
-    errors.append("缺少时间轴页 pages/timeline/timeline")
-    print("  ✗ 缺少时间轴页")
+    errors.append("缺少日程页 pages/timeline/timeline")
+    print("  ✗ 缺少日程页")
 
-# 简报页
+# 汇总页
 dg_wxml = ROOT / "pages" / "digest" / "digest.wxml"
 dg_js = ROOT / "pages" / "digest" / "digest.js"
 if dg_wxml.exists() and dg_js.exists():
     dw = dg_wxml.read_text(encoding="utf-8")
     dj = dg_js.read_text(encoding="utf-8")
     dg_ok = {
-        "简报页有「一句话总结」": "一句话总结" in dw,
-        "简报页分「三天内要办/本周留意」": "三天内要办" in dw and "本周留意" in dw,
-        "简报页有数据可信度条": "trust" in dw,
-        "简报页可复制简报": "copyBrief" in dw and "setClipboardData" in dj,
-        "简报页数据来自 store.brief": "store.brief" in dj,
+        "汇总页有「一句话总结」": "一句话总结" in dw,
+        "汇总页分「三天内要办/本周留意」": "三天内要办" in dw and "本周留意" in dw,
+        "汇总页有数据可信度条": "trust" in dw,
+        "汇总页可复制汇总": "copyBrief" in dw and "setClipboardData" in dj,
+        "汇总页数据来自 store.brief": "store.brief" in dj,
     }
     for k, v in dg_ok.items():
         print(f"  {'✓' if v else '✗'} {k}")
         if not v:
-            errors.append(f"简报页: {k} 未满足")
+            errors.append(f"汇总页: {k} 未满足")
 else:
-    errors.append("缺少简报页 pages/digest/digest")
-    print("  ✗ 缺少简报页")
+    errors.append("缺少汇总页 pages/digest/digest")
+    print("  ✗ 缺少汇总页")
 
 # tabBar 四tab
 tb2 = app.get("tabBar", {}).get("list", [])
 tb_route = [t["pagePath"] for t in tb2]
 need_tabs = ["pages/index/index", "pages/timeline/timeline", "pages/digest/digest", "pages/me/me"]
 if tb_route == need_tabs:
-    print("  ✓ tabBar 四 tab 顺序正确（雷达/时间轴/简报/订阅）")
+    print("  ✓ tabBar 四 tab 顺序正确（通知/日程/汇总/订阅）")
 else:
     warns.append(f"tabBar 当前为 {tb_route}，预期 {need_tabs}")
 
-# ---------- 9c. 问知时问答引擎 + 办事日历 ----------
-print("【9c】问知时问答引擎 + 办事日历")
+# ---------- 9c. 问答问答引擎 + 日历 ----------
+print("【9c】问答问答引擎 + 日历")
 aq = ROOT / "utils" / "ask.js"
 if not aq.exists():
-    errors.append("缺少 utils/ask.js（问知时问答引擎）")
+    errors.append("缺少 utils/ask.js（问答问答引擎）")
     print("  ✗ 缺少 utils/ask.js")
 else:
     at = aq.read_text(encoding="utf-8")
@@ -351,7 +351,7 @@ else:
             and "是不是给我的" in at and "要准备什么" in at and "数据可靠吗" in at,
         "有今日一问 headline": "function headline" in at,
         "有问答自评 askStats": "function askStats" in at,
-        "有办事日历 buildCalendar": "function buildCalendar" in at,
+        "有日历 buildCalendar": "function buildCalendar" in at,
         "月历周一起（lead 偏移）": "(first.getDay() + 6) % 7" in at,
         "月历补齐整周": "cells.length % 7 !== 0" in at,
         "有跨月切换 shiftMonth": "function shiftMonth" in at,
@@ -393,7 +393,7 @@ if ask_wxml.exists() and ask_js.exists():
         "问答页数据来自 utils/ask.js": "utils/ask.js" in aj or "'../../utils/ask.js'" in aj,
         "问答页可进详情": "goDetail" in aj,
         "问答页可进日历": "goCalendar" in aj,
-        "问答页可回推送流": "goIndex" in aj,
+        "问答页可回通知列表": "goIndex" in aj,
     }
     for k, v in ask_ok.items():
         print(f"  {'✓' if v else '✗'} {k}")
@@ -434,15 +434,15 @@ else:
 # 首页 / 我的页 入口接入
 idx_wxml3 = (ROOT / "pages" / "index" / "index.wxml").read_text(encoding="utf-8")
 idx_js3 = (ROOT / "pages" / "index" / "index.js").read_text(encoding="utf-8")
-# 首页首屏 = 今日头条大卡（合并原紧急提示/推送小结/问知时三卡）+ 问答/日历快捷入口。
-# 头条渲染 .hero（数据由 push.heroCard 产出），问知时通过快捷按钮 goAsk 进入。
+# 首页首屏 = 今日头条大卡（合并原紧急提示/推送小结/问答三卡）+ 问答/日历快捷入口。
+# 头条渲染 .hero（数据由 push.heroCard 产出），问答通过快捷按钮 goAsk 进入。
 _hero_ok = "hero.line" in idx_wxml3 and "hero.hasLead" in idx_wxml3
 _asks_ok = "goAsk" in idx_wxml3 and "goCalendar" in idx_wxml3
 if _hero_ok and _asks_ok:
     print("  ✓ 首页接入今日头条大卡 + 问答/日历入口")
 else:
     errors.append("首页未接入今日头条大卡或问答/日历入口")
-    print("  ✗ 首页未接入头条卡/问知时入口")
+    print("  ✗ 首页未接入头条卡/问答入口")
 
 me_wxml3 = (ROOT / "pages" / "me" / "me.wxml").read_text(encoding="utf-8")
 me_js3 = (ROOT / "pages" / "me" / "me.js").read_text(encoding="utf-8")
@@ -450,7 +450,7 @@ if "goAsk" in me_wxml3 and "goCalendar" in me_wxml3:
     print("  ✓ 「我的」页接入问答/日历入口")
 else:
     errors.append("「我的」页未接入问答/日历入口")
-    print("  ✗ 「我的」页未接入问知时入口")
+    print("  ✗ 「我的」页未接入问答入口")
 
 # ---------- 10. 云接入层检查 ----------
 print("【10】云接入层（utils/cloud.js）")

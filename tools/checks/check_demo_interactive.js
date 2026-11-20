@@ -3,12 +3,12 @@
  * ==================
  * 用 jsdom 真建 DOM、真加载「交互Demo.html」，断言：
  *  ① 首屏渲染出推送卡（含理由链、分数）
- *  ② tab 切换（搜索/问知时/订阅）都能渲染
+ *  ② tab 切换（搜索/问答/订阅）都能渲染
  *  ③ 搜索有结果且带"命中来源"
  *  ④ 详情页显示浓缩要点 + 原文出处定位
  *  ⑤ 长按 → ActionSheet 能打开；已读/删除生效
- *  ⑥ 切档案（年级）后推送流重排
- *  ⑦ 问知时回答 + 日历渲染
+ *  ⑥ 切档案（年级）后通知列表重排
+ *  ⑦ 问答回答 + 日历渲染
  * 退出码：0 全过 / 1 有失败
  */
 const fs = require('fs');
@@ -40,7 +40,7 @@ setTimeout(function () {
 
     /* ① 推送卡 + 来源/倒计时（不再展示"为什么推给你"理由链） */
     const cards = view.querySelectorAll('.card[data-open]');
-    ck('雷达页渲染出推送卡 >= 3 张', cards.length >= 3, '实际 ' + cards.length);
+    ck('通知页渲染出推送卡 >= 3 张', cards.length >= 3, '实际 ' + cards.length);
     ck('推送卡不再堆"为什么推给你"理由链',
       view.querySelectorAll('.whyb').length === 0 &&
       !view.innerHTML.includes('为什么推给你'),
@@ -73,7 +73,7 @@ setTimeout(function () {
     ck('切到搜索页：有搜索框与热词',
       hSearch.indexOf('searchbox') >= 0 && hSearch.indexOf('data-hot') >= 0);
     let hAsk = clickTab('ask');
-    ck('切到问知时：有今日一问 + 问题清单 + 日历',
+    ck('切到问答：有今日一问 + 问题清单 + 日历',
       hAsk.indexOf('今日一问') >= 0 && hAsk.indexOf('data-ask') >= 0 && hAsk.indexOf('cal-grid') >= 0);
     let hMe = clickTab('me');
     ck('切到订阅页：有档案维度（身份/年级/学院/标签）',
@@ -91,8 +91,8 @@ setTimeout(function () {
       hMe2.indexOf('data-rmkw') >= 0 && hMe2.indexOf('kwchip') >= 0, sugWord);
     ck('关键词 chip 显示命中条数或"暂无命中"',
       hMe2.indexOf('kwn') >= 0);
-    /* 关键词订阅要能影响推送流：确认 core 的 buildPush 把命中项算进来 */
-    ck('（逻辑层）命中关键词的通知会进推送流',
+    /* 关键词订阅要能影响通知列表：确认 core 的 buildPush 把命中项算进来 */
+    ck('（逻辑层）命中关键词的通知会进通知列表',
       (() => {
         try {
           const prof = JSON.parse(JSON.stringify(window.ZS_DATA.PROFILE));
@@ -147,7 +147,7 @@ setTimeout(function () {
     let hd2 = doc.getElementById('view').innerHTML;
     ck('点已读后按钮态变化（出现"已读"词）', hd2.indexOf('已读') >= 0);
 
-    /* ⑥ 档案切换 → 推送流重排 */
+    /* ⑥ 档案切换 → 通知列表重排 */
     clickTab('me');
     const before = window.__ZS_DEMO__.state.profile.grade;
     const gchip = Array.from(doc.querySelectorAll('[data-set="grade"]')).find(el => el.getAttribute('data-v') !== before);
@@ -156,10 +156,10 @@ setTimeout(function () {
       window.__ZS_DEMO__.state.profile.grade !== before,
       before + ' -> ' + window.__ZS_DEMO__.state.profile.grade);
     clickTab('index');
-    ck('切回雷达页仍能渲染推送卡',
+    ck('切回通知页仍能渲染推送卡',
       doc.getElementById('view').querySelectorAll('.card[data-open]').length >= 1);
 
-    /* ⑦ 问知时：点一个问题，出回答 + 依据 */
+    /* ⑦ 问答：点一个问题，出回答 + 依据 */
     clickTab('ask');
     const qb = doc.querySelector('[data-ask]');
     qb.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));

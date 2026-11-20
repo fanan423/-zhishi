@@ -163,6 +163,36 @@ const localImpl = {
     return { ok: true, source: 'local', total: list.length, items: list.slice(0, limit) };
   },
 
+  /** AI 推荐：本地模式不调模型，如实降级为规则推荐（与远端同构）。 */
+  async recommend(query) {
+    const profile = store.getProfile();
+    const built = push.buildPush({ profile, limit: 60 });
+    const cards = (built.notify || []).concat(built.silent || []);
+    const limit = (query && query.limit) || 12;
+    const picked = cards.slice(0, limit);
+    const itemOf = (c) => ({
+      id: c.id, title: c.title,
+      score: c.pushScore, relevance: c.pushScore,
+      reason: c.pushReasonLine || '', evidence: null, source: 'rule',
+      level: c.pushLevel, levelLabel: c.pushLevelLabel,
+      countdown: (typeof c.countdown === 'number') ? c.countdown : null,
+      deadline: c.deadline || null, event: c.event || '',
+      digestOne: c.digestOne || '', url: c.url || '',
+      sourceUnit: c.source || c.unit || '',
+    });
+    return {
+      ok: true, source: 'local', via: 'local',
+      mode: 'rule', aiPowered: false, offline: false,
+      model: null, promptVersion: null,
+      reason: '本地模式不调用大模型（未部署智能体服务）',
+      items: picked.map(itemOf),
+      meta: {
+        ranAt: new Date().toISOString(), mode: 'rule', model: null, elapsedMs: 0,
+        counts: { pool: cards.length, ai: 0, rule: picked.length }, profile,
+      },
+    };
+  },
+
   async understand() {
     // 本地不做真 LLM 抽取：如实返回 null（不假装）
     return { ok: true, mode: 'rule', fields: null,
@@ -193,6 +223,16 @@ const remoteImpl = {
     if (query && query.limit) qs.push('limit=' + query.limit);
     if (query && query.event) qs.push('event=' + encodeURIComponent(query.event));
     const r = await request('GET', '/api/notices' + (qs.length ? '?' + qs.join('&') : ''));
+    return Object.assign({}, r, { via: 'remote' });
+  },
+
+  async recommend(query) {
+    const q = query || {};
+    const r = await request('POST', '/api/recommend', {
+      useLLM: q.useLLM !== false,
+      limit: q.limit || 12,
+      profile: q.profile || undefined,
+    });
     return Object.assign({}, r, { via: 'remote' });
   },
 
@@ -313,6 +353,23 @@ async function understand(idOrNotice, useLLM) {
   }
 }
 
+/** AI 推荐：远端可达用模型，不可达/失败自动降级本地规则（与 digest 同语义）。 */
+async function recommend(query) {
+  const { impl, mode, error } = await resolveImpl();
+  try {
+    const r = await impl.recommend(query);
+    const out = Object.assign({ ok: true }, r);
+    if (mode === 'local' && isConfigured()) {
+      out.degraded = true;
+      out.degradeReason = error || '智能体服务不可达';
+    }
+    return out;
+  } catch (e) {
+    const r = await localImpl.recommend(query);
+    return Object.assign(r, { degraded: true, degradeReason: '远端推荐失败：' + e.message });
+  }
+}
+
 /**
  * 服务状态（供「我的」页如实显示"到底连没连上智能体"）
  */
@@ -350,6 +407,7 @@ module.exports = {
   isConfigured,
   resolveImpl,
   digest,
+  recommend,
   notices,
   understand,
   status,

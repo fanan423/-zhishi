@@ -31,13 +31,25 @@ try {
 } catch (e) {
   agentJs = '/* web/zhishi-agent.js 未找到 —— 智能体区块将不渲染（不影响其余功能） */';
 }
+/* 构建期 AI 推荐快照（网页实用版专用）：同样是可选注入。
+ * 关键在于它是**独立文件**，演示版构建器 tools/build_presentation.js
+ * 只读 zhishi-data.js，不引用本文件 —— 因此演示版保持零改动。 */
+let aiJs = '';
+try {
+  aiJs = fs.readFileSync(path.join(WEB, 'zhishi-ai.js'), 'utf8');
+} catch (e) {
+  aiJs = '/* web/zhishi-ai.js 未找到 —— 无构建期 AI 推荐快照，页面自动降级规则推荐 */';
+}
 const shell = fs.readFileSync(path.join(__dirname, 'app_shell.html'), 'utf8');
 
 const out = shell
   .replace('/*__DATA__*/', () => dataJs)
   .replace('/*__AGENT__*/', () => agentJs)
+  .replace('/*__AI__*/', () => aiJs)
   .replace('/*__CORE__*/', () => coreJs);
 
 fs.writeFileSync(OUT, out, 'utf8');
 const kb = (Buffer.byteLength(out, 'utf8') / 1024).toFixed(1);
-console.log('已生成 → ' + OUT + '（' + kb + ' KB）' + (agentJs.slice(0, 12) === '/* web/zhish' ? ' · 未含智能体客户端' : ' · 已含智能体客户端'));
+console.log('已生成 → ' + OUT + '（' + kb + ' KB）'
+  + (agentJs.slice(0, 12) === '/* web/zhish' ? ' · 未含智能体客户端' : ' · 已含智能体客户端')
+  + (aiJs.slice(0, 12) === '/* web/zhish' ? ' · 无 AI 快照' : ' · 已含 AI 推荐快照'));

@@ -234,6 +234,33 @@ function waitReady(timeoutMs) {
     r = await req('GET', '/api/profile');
     ok(r.json.profile.college === '信息与人工智能学院', '临时覆盖画像未污染服务端画像');
 
+    // ── F2. AI 推荐接口 ──
+    // 只验证「未启用模型」的规则降级路径：真模型调用由
+    // tools/agent/build_ai_snapshot.js 单独执行，避免在自检里产生调用费用。
+    console.log('\n【F2. AI 推荐接口（规则降级）】');
+    r = await req('POST', '/api/recommend', { useLLM: false, limit: 5 });
+    ok(r.status === 200 && r.json.ok === true, 'POST /api/recommend 成功');
+    ok(r.json.mode === 'rule' && r.json.aiPowered === false,
+      '未启用模型时如实返回 mode=rule（不伪装 AI）', 'mode=' + (r.json && r.json.mode));
+    ok(Array.isArray(r.json.items) && r.json.items.length > 0, '返回非空推荐列表');
+    ok((r.json.items || []).every((x) => typeof x.relevance === 'number' && x.relevance >= 0 && x.relevance <= 100),
+      '每条 relevance 为 0-100 数值');
+    ok((r.json.items || []).every((x) => typeof x.score === 'number'),
+      '保留规则分 score 供对照与可解释');
+    ok((r.json.items || []).every((x) => x.source === 'rule'),
+      '未调模型时每条 source=rule（不冒充模型）');
+    ok((r.json.items || []).every((x) => x.evidence === null),
+      '未调模型时不伪造逐字引文');
+    ok(r.json.meta && typeof r.json.meta.counts.pool === 'number', '含 meta.counts');
+    ok((r.json.items || []).length <= 5, 'limit 生效');
+
+    r = await req('POST', '/api/recommend', { useLLM: false, limit: 999 });
+    ok(r.status === 200 && (r.json.items || []).length <= 20, 'limit 超上限被夹到 20');
+
+    r = await req('POST', '/api/recommend', {});
+    ok(r.status === 200 && (r.json.items || []).length <= 12,
+      '默认 limit=12 生效且未触发模型调用');
+
     // ── G. 今日清单 ──
     console.log('\n【G. 今日送达清单】');
     r = await req('GET', '/api/digest');
