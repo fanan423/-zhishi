@@ -57,6 +57,7 @@ PROGRAM_ITEMS = [
     "打开总览.html",
     "打开小程序预览.html",
     "一键运行.bat",
+    "一键启动_AI版.bat",
     "web",
     "miniprogram",
 ]
@@ -75,6 +76,9 @@ DOC_ITEMS = [
     "docs/大模型理解层_接入与验证.md",
     "docs/数据血缘与单一事实来源.md",
     "docs/两版交付说明.md",
+    "docs/实用版实时AI_使用说明.md",
+    "docs/GitHub借鉴与优化说明.md",
+    "docs/功能成熟度.md",
 ]
 # B2. 说明文档的**导出产物**（由 tools/export_docx.py 生成；缺了不算"缺件"，
 #     但会在清单里如实提示"跑导出器"——它们是可再生的，不是源材料）
@@ -99,6 +103,10 @@ TOOL_ITEMS = [
     "tools/lib",                       # zip_writer.js（纯 Node 零依赖 ZIP 写入器）
     "tools/checks",                    # 全量自检 + 两版 zip 交叉守卫（可复跑举证）
     "config/cloud.example.json",       # 只带模板，不带 cloud.local.json
+    "config/llm.example.json",         # 自备模型配置模板（不带 llm.local.json）
+    "CHANGELOG.md",
+    "README.md",
+    ".gitignore",
     "data",
 ]
 
@@ -108,8 +116,9 @@ EXCLUDE_DIRS = {"node_modules", "__pycache__", ".git", "push_out", "dist", "_arc
 EXCLUDE_SUFFIX = {".pyc", ".log", ".zip", ".tmp"}
 EXCLUDE_NAMES = {
     "push_state.json", "_tmpl.docx",
-    # 云端真实配置（含公开标识）：只分发 config/cloud.example.json 模板
+    # 真实凭证：只分发 example 模板，绝不进提交包
     "cloud.local.json",
+    "llm.local.json",
     # 本地诊断/评估留痕，不进提交包
     "_probe.js", "_probe2.js", "_probe3.js", "_probe4.js", "_probe5.js",
     "_probe6.js", "_probe7.js", "_diag.js",

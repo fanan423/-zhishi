@@ -4,6 +4,29 @@
 
 ---
 
+## [v5.2] - 2026-11-21 · 实用版实时 AI（接大模型实际可用）
+
+### 新增
+
+- **双通道大模型直连**：理解层与推荐层新增「自备 API Key（OpenAI 兼容）」通道，支持 DeepSeek / 通义 / Kimi / 智谱 / OpenAI 及任意兼容端点；密钥只在服务端进程内、经 `/api/*` 代理，绝不下发浏览器。
+- **三通道自动择优**：自备 Key（优先，不依赖登录态）→ WorkBuddy 云 SDK（兜底，需登录态）→ 规则降级；来源如实标注 `channel`，规则结果不冒充 AI。
+- **一键启动**：`一键启动_AI版.bat` 探测 Node、引导配密钥、后台起服务、打开 `知时_可用版.html?agent=` 自动连接；普通打开仍是本地模式，零副作用。
+- **通道状态接口**：`GET /api/llm/status` 脱敏返回当前通道与就绪状态；`/api/version`、`/readyz` 同步反映任一通道可用。
+- **网页实时标注**：AI 推荐区块显示「实时大模型 · 自备模型 xxx / WorkBuddy」，数据自查页增加「当前通道」行。
+- **配置模板与文档**：`config/llm.example.json` 模板；`docs/实用版实时AI_使用说明.md` 完整配置与排障。
+
+### 变更
+
+- `.gitignore` 增加 `config/llm.local.json`（密钥不入库、不进提交包）。
+- `README.md` 更新「一眼看懂」与快速开始，说明实时 AI 用法与诚实边界。
+
+### 验证
+
+- 本地 mock OpenAI 端点端到端验证：SSE 解析、JSON 提取、推荐引擎 `mode=llm`/`channel=openai-compatible`、真起服务打 `/api/recommend` 全部通过。
+- `npm run checks`：27/27 全通过；两版 zip 交叉校验通过。
+
+---
+
 ## [v5.1] - 2026-11-21 · GitHub 借鉴优化版
 
 ### 新增

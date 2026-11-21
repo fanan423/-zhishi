@@ -1,0 +1,9 @@
+{
+  "_comment": "自备大模型配置模板。复制为 llm.local.json 后填 apiKey；llm.local.json 已被 .gitignore 与打包器排除，绝不进提交包。",
+  "_policy": "密钥只在本地服务端进程内使用，通过 /api/recommend 代理调用，绝不下发到浏览器。",
+  "_presets": "provider 可填 deepseek / dashscope(通义) / moonshot(Kimi) / zhipu(智谱) / openai，会自动补 baseUrl 与 model；也可完全自定义 baseUrl + model。",
+  "provider": "deepseek",
+  "baseUrl": "https://api.deepseek.com/v1",
+  "model": "deepseek-chat",
+  "apiKey": ""
+}

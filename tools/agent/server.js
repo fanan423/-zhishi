@@ -46,6 +46,7 @@ const path = require('path');
 
 const core = require('./core.js');
 const recommendMod = require('./recommend.js');
+const openai = require('./llm_openai.js');
 
 /* ══════════════════════════════════════════════════════════
  * 配置（环境变量 > 命令行 > 默认）
@@ -382,9 +383,9 @@ async function handleUnderstand(reqId, body) {
     };
   }
 
-  if (!core.cloudAvailable()) {
-    throw ERR.UPSTREAM_UNAVAILABLE('云服务不可用，无法调用大模型',
-      '检查 node_modules 是否装了 @tencent-ai/workbuddy-cloud-sdk，且 miniprogram/utils/cloud.js 里 publicConfig 有值');
+  if (!core.cloudAvailable() && !openai.available()) {
+    throw ERR.UPSTREAM_UNAVAILABLE('未配置自备 API Key，且云服务不可用，无法调用大模型',
+      '在 config/llm.local.json 填 apiKey，或配置 cloud.local.json / 登录 WorkBuddy');
   }
 
   const r = await core.understand([notice], { limit: 1, persistMemory: true });
@@ -558,11 +559,11 @@ async function handleRecommend(reqId, body) {
       items: ruleItems, meta,
     };
   }
-  if (!core.cloudAvailable()) {
+  if (!core.cloudAvailable() && !openai.available()) {
     return {
       ok: true, mode: 'rule', aiPowered: false, via: 'remote',
-      degraded: true, degradeReason: '云服务不可用，已降级规则推荐',
-      model: null, promptVersion: null, items: ruleItems, meta,
+      degraded: true, degradeReason: '未配置自备 API Key，且云服务不可用，已降级规则推荐',
+      model: null, promptVersion: null, channel: null, items: ruleItems, meta,
     };
   }
 
@@ -594,6 +595,7 @@ async function handleRecommend(reqId, body) {
       degraded: true,
       degradeReason: (r.reason || '模型未返回有效结果') + '，已降级规则推荐',
       model: r.model || null, promptVersion: r.promptVersion,
+      channel: r.channel || null,
       items: ruleItems,
       meta: Object.assign({}, meta, {
         llmAttempt: { tried: r.tried, okCount: r.okCount, failed: r.failed, elapsedMs: r.elapsedMs },
@@ -614,6 +616,7 @@ async function handleRecommend(reqId, body) {
   return {
     ok: true, mode: 'llm', aiPowered: true, via: 'remote',
     model: r.model, modelName: r.modelName, promptVersion: r.promptVersion,
+    channel: r.channel || null, provider: r.provider || null,
     items,
     meta: Object.assign({}, meta, {
       ranAt: r.ranAt, elapsedMs: r.elapsedMs,
@@ -664,8 +667,9 @@ function handleHealth() {
 
 async function handleReady() {
   const checks = {};
-  // 云服务
-  checks.cloud = { ok: core.cloudAvailable() };
+  // 云服务：自备 Key 或 WorkBuddy SDK，任一可用即视为 LLM 就绪
+  const llmReady = core.cloudAvailable() || openai.available();
+  checks.cloud = { ok: llmReady, via: openai.available() ? 'self-key' : (core.cloudAvailable() ? 'workbuddy' : 'none') };
   // 通知池（真读一次）
   try {
     const cache = await getNotices(true);
@@ -684,7 +688,30 @@ async function handleReady() {
   return { ok: allOk, checks, at: new Date().toISOString() };
 }
 
+/** LLM 通道状态（脱敏：绝不含 key / baseUrl 细节），供前端展示「AI 是否真能调」 */
+function handleLlmStatus() {
+  const selfKey = openai.publicStatus();
+  const wb = core.cloudAvailable();
+  let active = 'rule';
+  if (selfKey.available) active = 'openai-compatible';
+  else if (wb) active = 'workbuddy';
+  return {
+    ok: true,
+    active,
+    channels: {
+      selfKey,                                   // 自备 Key（OpenAI 兼容），第一优先
+      workbuddy: { available: wb, label: 'WorkBuddy 云 SDK（需登录态）' },
+      rule: { available: true, label: '规则加权（可解释降级）' },
+    },
+    recommendReady: selfKey.available || wb,
+    at: new Date().toISOString(),
+  };
+}
+
 function handleVersion() {
+  const selfKey = openai.publicStatus();
+  const wb = core.cloudAvailable();
+  const llmReady = selfKey.available || wb;
   return {
     ok: true,
     name: '知时·智能体服务',
@@ -699,9 +726,12 @@ function handleVersion() {
       noticeLimit: CONFIG.noticeLimit,
     },
     capabilities: {
-      notices: true, tags: true, understand: core.cloudAvailable(),
+      notices: true, tags: true, understand: llmReady,
       run: true, digest: true, deliver: true,
-      recommend: core.cloudAvailable(),
+      recommend: llmReady,
+      llmChannel: selfKey.available ? 'openai-compatible' : (wb ? 'workbuddy' : 'rule'),
+      llmProvider: selfKey.available ? selfKey.label : null,
+      llmModel: selfKey.available ? selfKey.model : null,
     },
   };
 }
@@ -729,6 +759,7 @@ const ROUTES = {
   'GET /healthz': (reqId) => handleHealth(),
   'GET /readyz': (reqId) => handleReady(),
   'GET /api/version': (reqId) => handleVersion(),
+  'GET /api/llm/status': (reqId) => handleLlmStatus(),
   'GET /api/notices': (reqId, body, query) => handleNotices(reqId, query),
   'GET /api/tags': (reqId) => handleTags(),
   'GET /api/profile': (reqId) => handleProfileGet(),

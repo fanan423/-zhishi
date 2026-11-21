@@ -8576,8 +8576,13 @@ function viewAIRecommendBlock(){
   }
 
   var isAI = rec.mode === 'llm';
+  var channel = rec.channel || '';
+  var chanName = channel === 'openai-compatible'
+    ? (rec.provider ? '自备模型 '+rec.provider : '自备模型')
+    : (channel === 'workbuddy' ? 'WorkBuddy 大模型' : '');
   var label = isAI
-    ? (rec.offline ? 'AI 推荐 · 构建期预计算（非实时调用）' : 'AI 推荐 · 实时大模型')
+    ? (rec.offline ? 'AI 推荐 · 构建期预计算（非实时调用）'
+       : ('AI 推荐 · 实时大模型' + (chanName ? ' · '+chanName : '')))
     : '规则推荐（未启用 AI）';
   h += '<div class="airecbox'+(isAI?' ai':'')+'">';
   h += '<div class="airechead"><span class="airecd"></span><span class="aireclab">'+esc(label)+'</span>'
@@ -8594,7 +8599,8 @@ function viewAIRecommendBlock(){
 
   if(!isAI){
     h += '<div class="airecrule">当前是规则加权推荐（可解释、可复跑）。'
-      + '部署 tools/agent/server.js 并在「我的 → 智能体服务」填入地址，即可开启实时 AI 推荐。'
+      + '双击「一键启动_AI版.bat」，或在「我的 → 智能体服务」填入本机地址 http://127.0.0.1:8787，'
+      + '即可开启实时 AI 推荐。'
       + (rec.degradeReason ? '本次降级原因：'+esc(rec.degradeReason) : '') + '</div>';
   } else if(rec.degraded){
     h += '<div class="airecrule">远端 AI 推荐不可用，已降级：'+esc(rec.degradeReason||'')+'</div>';
@@ -8850,10 +8856,20 @@ function viewSelfcheck(){
   }
   h += '</div>';
 
-  h += '<div class="sec">AI 运行留痕 <span class="secsub">· 构建期真调，端上只读</span></div>';
+  h += '<div class="sec">AI 运行留痕 <span class="secsub">· 构建期真调 / 实时通道，如实标注</span></div>';
   h += '<div class="kv" style="padding:14px"><div style="font-size:13px;line-height:1.95">';
   var aiSnap = window.ZS_AI || null;
   var llmCnt = NOTICES.filter(function(n){ return n.llm || n.llm_fields; }).length;
+  /* 实时通道（连本机服务且真调时）优先展示，让「实际可用」可被当场验证 */
+  var liveRec = AGENT.recommend;
+  if(liveRec && liveRec.ok && liveRec.mode==='llm' && !liveRec.offline){
+    h += '<div>· 当前通道：<b>实时大模型</b>'
+      + (liveRec.channel==='openai-compatible' ? '（自备模型 ' : (liveRec.channel==='workbuddy' ? '（WorkBuddy ' : '（'))
+      + esc(liveRec.provider||'—') + '）' + (liveRec.via==='remote'?' · 服务端代理':'')
+      + '</div>'
+      + '<div>· 本次模型 <b>'+esc(liveRec.model||'—')+'</b> · 提示词 <b>v'
+      + esc(liveRec.promptVersion||'—')+'</b> · 实时生成，非预计算</div>';
+  }
   if(aiSnap){
     h += '<div>· 推荐层：<b>'+esc(String(aiSnap.okCount||0))+'/'+esc(String(aiSnap.tried||0))
       + '</b> 条成功 · 模型 <b>'+esc(aiSnap.model||'—')+'</b> · 提示词 <b>v'+esc(aiSnap.promptVersion||'—')+'</b></div>'
@@ -9715,6 +9731,14 @@ $('#tabbar').addEventListener('click', function(e){
 });
 
 /* ---------- 启动 ---------- */
+/* 一键启动时用 ?agent=http://127.0.0.1:8787 让页面自动连本机服务。
+ * 只在带该参数时生效；普通打开（含所有自检）保持默认本地模式，零副作用。 */
+try{
+  var _q = new URLSearchParams(location.search).get('agent');
+  if(_q && window.ZS_AGENT && window.ZS_AGENT.setBase){
+    window.ZS_AGENT.setBase(_q === 'local' ? '' : _q);
+  }
+}catch(e){}
 decorateAll();
 PROFILE = getProfile();
 applyTheme();

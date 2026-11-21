@@ -22,6 +22,7 @@
 const fs = require('fs');
 const path = require('path');
 const core = require('./core.js');
+const openai = require('./llm_openai.js');
 const {
   RECOMMEND_VERSION,
   RECOMMEND_SYSTEM_PROMPT,
@@ -51,6 +52,7 @@ async function recommend(notices, profile, opts) {
 
   const out = {
     ok: false, mode: 'llm', model: null, modelName: null,
+    channel: null, provider: null,
     promptVersion: RECOMMEND_VERSION, ranAt: now(),
     tried: 0, okCount: 0, failed: 0, results: [],
     reason: null, elapsedMs: 0,
@@ -63,38 +65,72 @@ async function recommend(notices, profile, opts) {
 
   if (!todo.length) return done({ ok: true, reason: '没有待推荐的通知' });
 
-  const cloud = core.cloudClient();
-  if (!cloud) return done({ mode: 'rule', reason: '云服务不可用（SDK 未安装或 publicConfig 缺失）' });
+  /* ── 通道选择：自备 Key（openai 兼容）优先 → WorkBuddy SDK 兜底 → 规则降级 ──
+   * 优先自备 Key 的理由：它不依赖 WorkBuddy 登录态，换机器 / 登录过期照样能真调。
+   * 用户没配 key 时自动回落到原 SDK；两者都没有就如实降级规则，不冒充 AI。 */
+  const useOpenAI = openai.available();
+  const cloud = useOpenAI ? null : core.cloudClient();
 
-  let model;
-  try {
-    model = await core.pickModel(cloud, o.timeout || 20000);
-  } catch (e) {
-    return done({ mode: 'rule', reason: '取模型列表失败：' + (e && e.message) });
+  let model; // WorkBuddy 通道的 model 对象；openai 通道下为 null
+  if (useOpenAI) {
+    const st = openai.publicStatus();
+    out.channel = 'openai-compatible';
+    out.provider = st.provider;
+    out.model = st.model;
+    out.modelName = st.label + ' / ' + st.model;
+  } else {
+    if (!cloud) {
+      return done({ mode: 'rule', channel: null,
+        reason: '未配置自备 API Key，且云服务不可用（SDK 未安装或 publicConfig 缺失）' });
+    }
+    try {
+      model = await core.pickModel(cloud, o.timeout || 20000);
+    } catch (e) {
+      return done({ mode: 'rule', reason: '取模型列表失败：' + (e && e.message) });
+    }
+    if (!model) return done({ mode: 'rule', reason: '云端未返回可用模型' });
+    out.channel = 'workbuddy';
+    out.provider = 'workbuddy';
+    out.model = model.id;
+    out.modelName = model.name || model.id;
   }
-  if (!model) return done({ mode: 'rule', reason: '云端未返回可用模型' });
-  out.model = model.id;
-  out.modelName = model.name || model.id;
+
+  /** 组装 system/user 消息（两通道共用同一份提示词，保证口径一致） */
+  function messagesOf(n) {
+    return [
+      { role: 'system', content: RECOMMEND_SYSTEM_PROMPT },
+      { role: 'user', content: buildRecommendPrompt(n, profile) },
+    ];
+  }
 
   async function askOne(n) {
     let answer = '';
-    try {
-      const stream = cloud.llm.chat.completions.create({
-        model: model.id,
-        messages: [
-          { role: 'system', content: RECOMMEND_SYSTEM_PROMPT },
-          { role: 'user', content: buildRecommendPrompt(n, profile) },
-        ],
-        stream: true,
-        response_format: { type: 'json_object' },
-        temperature: 0.2,
-      });
-      for await (const chunk of stream) {
-        const d = chunk.choices[0] && chunk.choices[0].delta;
-        if (d && d.content) answer += d.content;
+    const msgs = messagesOf(n);
+    if (useOpenAI) {
+      const perMs = o.perItemTimeout || 60000;
+      let r = await openai.chat(msgs, { timeoutMs: perMs });
+      // 部分兼容端点不接受 response_format，去掉后重试一次
+      if (!r.ok && /response_format|unsupported|400/i.test(r.error || '')) {
+        r = await openai.chat(msgs, { timeoutMs: perMs, responseFormat: false });
       }
-    } catch (e) {
-      return { ok: false, error: (e && e.error && e.error.code) || (e && e.message) || String(e) };
+      if (!r.ok) return { ok: false, error: r.error || '自备模型调用失败' };
+      answer = r.text;
+    } else {
+      try {
+        const stream = cloud.llm.chat.completions.create({
+          model: model.id,
+          messages: msgs,
+          stream: true,
+          response_format: { type: 'json_object' },
+          temperature: 0.2,
+        });
+        for await (const chunk of stream) {
+          const d = chunk.choices[0] && chunk.choices[0].delta;
+          if (d && d.content) answer += d.content;
+        }
+      } catch (e) {
+        return { ok: false, error: (e && e.error && e.error.code) || (e && e.message) || String(e) };
+      }
     }
     const parsed = core.extractJson(answer);
     if (!parsed) {
@@ -152,7 +188,9 @@ function writeRunLog(r, profile) {
       history = JSON.parse(fs.readFileSync(RUN_LOG, 'utf8')).history || [];
     } catch (e) { history = []; }
     const entry = {
-      ranAt: r.ranAt, mode: r.mode, model: r.model, modelName: r.modelName,
+      ranAt: r.ranAt, mode: r.mode,
+      channel: r.channel || null, provider: r.provider || null,
+      model: r.model, modelName: r.modelName,
       promptVersion: r.promptVersion, tried: r.tried, okCount: r.okCount,
       failed: r.failed, reason: r.reason, elapsedMs: r.elapsedMs,
       profile: {

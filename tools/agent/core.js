@@ -28,6 +28,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const openai = require('./llm_openai.js');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const MP = path.join(ROOT, 'miniprogram');
@@ -573,20 +574,35 @@ async function understand(notices, opts) {
 
   if (o.enabled === false) { out.reason = '未启用大模型（enabled=false）'; return out; }
 
-  const cloud = cloudClient();
-  if (!cloud) { out.reason = '云服务不可用（SDK 未安装或 publicConfig 缺失）'; return out; }
-
-  let model;
-  try {
-    model = await pickModel(cloud, o.timeout || 20000);
-  } catch (e) {
-    out.reason = '取模型列表失败：' + (e && e.message);
+  /* 双通道：自备 Key（OpenAI 兼容）优先 → WorkBuddy SDK 兜底。
+   * 这样理解层也不再被 WorkBuddy 登录态卡住。 */
+  const useOpenAI = openai.available();
+  const cloud = useOpenAI ? null : cloudClient();
+  if (!useOpenAI && !cloud) {
+    out.reason = '未配置自备 API Key，且云服务不可用（SDK 未安装或 publicConfig 缺失）';
     return out;
   }
-  if (!model) { out.reason = '云端未返回可用模型'; return out; }
 
-  out.model = model.id;
-  out.modelName = model.name || model.id;
+  let model;
+  if (useOpenAI) {
+    const st = openai.publicStatus();
+    out.channel = 'openai-compatible';
+    out.provider = st.provider;
+    out.model = st.model;
+    out.modelName = st.label + ' / ' + st.model;
+  } else {
+    try {
+      model = await pickModel(cloud, o.timeout || 20000);
+    } catch (e) {
+      out.reason = '取模型列表失败：' + (e && e.message);
+      return out;
+    }
+    if (!model) { out.reason = '云端未返回可用模型'; return out; }
+    out.channel = 'workbuddy';
+    out.provider = 'workbuddy';
+    out.model = model.id;
+    out.modelName = model.name || model.id;
+  }
 
   const todo = notices
     .filter((n) => (n.raw || n.digest) && !n.llm_fields)
@@ -602,26 +618,37 @@ async function understand(notices, opts) {
 
   async function askOne(n) {
     let answer = '';
-    try {
-      const stream = cloud.llm.chat.completions.create({
-        model: model.id,
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: buildUserPrompt(n) },
-        ],
-        stream: true,
-        response_format: { type: 'json_object' },
-        temperature: 0.2,
-      });
-      // 整条流的超时（防止模型卡死把服务拖住）
-      const guard = setTimeout(() => { /* 交给外层 withTimeout 的 reject 兜底 */ }, 0);
-      clearTimeout(guard);
-      for await (const chunk of stream) {
-        const d = chunk.choices[0] && chunk.choices[0].delta;
-        if (d && d.content) answer += d.content;
+    const msgs = [
+      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'user', content: buildUserPrompt(n) },
+    ];
+    if (useOpenAI) {
+      const perMs = o.perItemTimeout || 60000;
+      let r = await openai.chat(msgs, { timeoutMs: perMs });
+      if (!r.ok && /response_format|unsupported|400/i.test(r.error || '')) {
+        r = await openai.chat(msgs, { timeoutMs: perMs, responseFormat: false });
       }
-    } catch (e) {
-      return { ok: false, error: (e.error && e.error.code) || e.message || String(e) };
+      if (!r.ok) return { ok: false, error: r.error || '自备模型调用失败' };
+      answer = r.text;
+    } else {
+      try {
+        const stream = cloud.llm.chat.completions.create({
+          model: model.id,
+          messages: msgs,
+          stream: true,
+          response_format: { type: 'json_object' },
+          temperature: 0.2,
+        });
+        // 整条流的超时（防止模型卡死把服务拖住）
+        const guard = setTimeout(() => { /* 交给外层 withTimeout 的 reject 兜底 */ }, 0);
+        clearTimeout(guard);
+        for await (const chunk of stream) {
+          const d = chunk.choices[0] && chunk.choices[0].delta;
+          if (d && d.content) answer += d.content;
+        }
+      } catch (e) {
+        return { ok: false, error: (e.error && e.error.code) || e.message || String(e) };
+      }
     }
     const parsed = extractJson(answer);
     if (!parsed) {
@@ -775,6 +802,8 @@ async function runOnce(opts) {
     : { ok: false, reason: '未启用大模型', results: [], memoryHits: applyMemory(g.passed, o.memory || loadMemory(o.memoryFile)) };
   steps.understand = {
     mode: llm.ok ? 'llm' : 'rule',
+    channel: llm.channel || null,
+    provider: llm.provider || null,
     model: llm.model || null,
     modelName: llm.modelName || null,
     promptVersion: PROMPT_VERSION,
