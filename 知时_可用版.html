@@ -166,6 +166,11 @@ button{font-family:inherit;cursor:pointer}
 .ab.primary{background:linear-gradient(135deg,var(--brand-2),var(--brand));color:#fff;border:none;
   box-shadow:0 4px 14px rgba(0,101,62,.20)}
 .ab.dis{background:var(--border-soft);color:var(--txt-3)}
+/* 汇总时间窗切换（借鉴 ClawFeed 的多频率摘要：3/7/30 天一眼切） */
+.segbar{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 12px}
+.seg{font-size:12px;font-weight:600;padding:5px 12px;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface);color:var(--txt-2);cursor:pointer}
+.seg.on{background:linear-gradient(135deg,var(--brand-2),var(--brand));color:#fff;border-color:transparent}
 
 .bhead{display:flex;align-items:center;gap:11px;padding-bottom:13px;border-bottom:1px solid var(--border);margin-bottom:13px}
 .bhead .lg{width:46px;height:46px;border-radius:50%;position:relative;overflow:hidden;flex-shrink:0;
@@ -577,7 +582,7 @@ button{font-family:inherit;cursor:pointer}
   </div>
   <div class="zrow" style="margin-top:6px">
     <span class="zkpi">真实公开通知 <b>124</b> 条 · 来源单位 <b>11</b> 个 ·
-      带官网链接 <b>124</b> 条 · 当前未过期 <b>6</b> 条 ·
+      带官网链接 <b>124</b> 条 · 当前未过期 <b>3</b> 条 ·
       大模型已理解 <b>46</b> 条 · 最新发布 <b>2026-11-17</b></span>
   </div>
   <div id="zsVerMore">
@@ -589,7 +594,7 @@ button{font-family:inherit;cursor:pointer}
     未覆盖的条目由规则版理解层兜底，两种模式共用同一套字段契约。<br>
     <b>边界（如实说明）</b>：微信订阅消息模板 ID 未配置，站内提醒走演示模式并已标注；
     被校方 WAF 拦截的站点如实标「安全拦截」，不硬闯；教务系统后台永不接入。
-    数据基准日 2026-11-16，有截止的条目中 33 条已过期（保留供回看，不参与主动打扰）。<br>
+    数据基准日 2026-11-20，有截止的条目中 36 条已过期（保留供回看，不参与主动打扰）。<br>
     <b>怎么用</b>：在「我的」里完善身份/学院/关注标签 → 回「通知」看与你有关的推送 →
     点卡片看浓缩、原文出处与大模型理解 → 「汇总」一屏汇总 → 「问答」直接问。
   </div>
@@ -8174,7 +8179,7 @@ function passesIdentity(n, p){
 }
 
 /* ---------- 状态 ---------- */
-var STATE = { tab:'radar', detailId:null, sub:'main', theme: LS.get('theme','light') };
+var STATE = { tab:'radar', detailId:null, sub:'main', theme: LS.get('theme','light'), digestWindow:3 };
 
 /* ★ 智能体状态缓存：远端调用是异步的，而 render() 是同步的。
  * 所以采用"先渲染缓存值 → 异步拉取 → 回来后重渲染"的经典节奏，
@@ -8439,9 +8444,13 @@ function viewTimeline(){
 function viewDigest(){
   var interests = PROFILE.interests || [];
   var items = NOTICES.filter(function(n){ return isRelevant(n, PROFILE); });
-  var must = items.filter(function(n){ return n._cd!==null && n._cd<=3; })
+  var win = STATE.digestWindow || 3;
+  var outer = win===3 ? 7 : (win===7 ? 30 : 60);
+  var mustLabel = win===3 ? '三天内要办' : (win===7 ? '七天内要办' : '三十天内要办');
+  var watchLabel = win===3 ? '本周留意' : (win===7 ? '后续留意' : '更远留意');
+  var must = items.filter(function(n){ return n._cd!==null && n._cd<=win; })
     .sort(function(a,b){return a._cd-b._cd;});
-  var watch = items.filter(function(n){ return n._cd!==null && n._cd>3 && n._cd<=7; })
+  var watch = items.filter(function(n){ return n._cd!==null && n._cd>win && n._cd<=outer; })
     .sort(function(a,b){return a._cd-b._cd;});
   var realCnt = NOTICES.filter(function(n){return n.real;}).length;
   var linked = NOTICES.filter(function(n){return n.real && n.url;}).length;
@@ -8454,10 +8463,16 @@ function viewDigest(){
   var h = '';
   h += '<div class="bhead"><div class="lg"><span class="sun"></span><span class="aa">AAU</span><span class="book"></span><span class="y">1928</span></div>'
     + '<div><div class="t1">今日汇总</div><div class="t2">'+stamp+' 生成 · 知时 · 数字安农信息雷达</div></div></div>';
+  h += '<div class="segbar">'
+    + [3,7,30].map(function(w){
+        return '<span class="seg'+(win===w?' on':'')+'" onclick="APP.setDigestWindow('+w+')">'
+          + (w===3?'3 天':(w===7?'7 天':'30 天')) + '</span>';
+      }).join('')
+    + '<span class="hint" style="font-size:11.5px;align-self:center">切换只看这段时间的截止事项</span></div>';
 
   var sents = [];
-  if(must.length) sents.push('今天起 '+must.length+' 条在三天内截止');
-  if(watch.length) sents.push('另有 '+watch.length+' 条本周到期');
+  if(must.length) sents.push('今天起 '+must.length+' 条在 '+win+' 天内截止');
+  if(watch.length) sents.push('另有 '+watch.length+' 条在 '+outer+' 天内到期');
   sents.push('你关注的 '+interests.length+' 类共命中 '+items.length+' 条');
   var hi = items.filter(function(n){return levelOf(n)==='hi';}).length;
   var score = Math.min(100, hi*14 + items.length*3);
@@ -8469,7 +8484,7 @@ function viewDigest(){
     + '<span class="sil">'+(score>=70?'要抓紧':(score>=40?'有几件要留意':'比较从容'))+'</span></div></div>';
 
   if(must.length){
-    h += '<div class="sec red">⏰ 三天内要办 · '+must.length+' 件</div>';
+    h += '<div class="sec red">⏰ '+mustLabel+' · '+must.length+' 件</div>';
     must.forEach(function(n){
       h += '<div class="icard '+(n._cd<=0?'now':'hi')+'" onclick="APP.openDetail(\''+n.id+'\')">'
         + '<div class="ii"><div class="it">'+esc(n.title)+'</div>'
@@ -8480,7 +8495,7 @@ function viewDigest(){
     });
   }
   if(watch.length){
-    h += '<div class="sec">📅 本周留意 · '+watch.length+' 件</div>';
+    h += '<div class="sec">📅 '+watchLabel+' · '+watch.length+' 件</div>';
     watch.forEach(function(n){
       h += '<div class="icard" onclick="APP.openDetail(\''+n.id+'\')"><div class="ii">'
         + '<div class="it">'+esc(n.title)+'</div>'
@@ -8901,6 +8916,24 @@ function viewSelfcheck(){
   }
   h += '</div>';
 
+  h += '<div class="sec">AI 运行留痕 <span class="secsub">· 构建期真调，端上只读</span></div>';
+  h += '<div class="kv" style="padding:14px"><div style="font-size:13px;line-height:1.95">';
+  var aiSnap = window.ZS_AI || null;
+  var llmCnt = NOTICES.filter(function(n){ return n.llm || n.llm_fields; }).length;
+  if(aiSnap){
+    h += '<div>· 推荐层：<b>'+esc(String(aiSnap.okCount||0))+'/'+esc(String(aiSnap.tried||0))
+      + '</b> 条成功 · 模型 <b>'+esc(aiSnap.model||'—')+'</b> · 提示词 <b>v'+esc(aiSnap.promptVersion||'—')+'</b></div>'
+      + '<div>· 生成时间：'+esc(String(aiSnap.generatedAt||'').slice(0,16).replace('T',' '))
+      + '（构建期预计算，非实时调用）</div>';
+  } else {
+    h += '<div>· 推荐层：本版本未注入 AI 快照，页面使用规则推荐（未启用 AI）</div>';
+  }
+  h += '<div>· 理解层：本批 '+NOTICES.length+' 条中 '+llmCnt+' 条带大模型结构化产物，其余由规则版兜底</div>'
+    + '<div>· 每条 AI 推荐都附模型理由与逐字引文，并与规则分并列展示，不把规则结果冒充 AI</div>'
+    + '<div style="color:var(--txt-3);font-size:11.5px;border-top:1px dashed var(--border);padding-top:7px;margin-top:6px">'
+    + '完整调用留痕见 docs/AI推荐层_接入与验证.md 与 push_out/ai_recommend_run.json。</div>'
+    + '</div></div>';
+
   h += '<div class="acts"><button class="ab primary" onclick="APP.toast(\'重新自查完成 · 无剔除\')">重新自查</button></div>';
   h += '<div class="foot"><div><span class="hl">这一页为什么存在：</span>如果哪条通知不可靠，我们不是偷偷删掉，'
     + '而是把「扔掉了什么、为什么」摊开给你看。你能量、能追问、能复核——这正是「可信」和「看起来可信」的区别。</div></div>';
@@ -9267,6 +9300,7 @@ function viewCalendar(){
   }
 
   h += '<div class="acts"><button class="ab primary" onclick="APP.goSub(\'ask\')">问答 ›</button>'
+    + '<button class="ab" onclick="APP.exportICS()">导出日历(.ics)</button>'
     + '<button class="ab" onclick="APP.goTab(\'radar\')">回通知列表</button></div>';
   h += appFoot();
   return h;
@@ -9441,10 +9475,44 @@ function render(){
   }
 }
 
+/* ---------- 日历导出（.ics，借鉴 LiGHT Conferences Calendar） ---------- */
+function icsEscape(v){
+  return String(v==null?'':v)
+    .replace(/\\/g,'\\\\').replace(/\n/g,'\\n')
+    .replace(/,/g,'\\,').replace(/;/g,'\\;');
+}
+function icsDate(v){
+  var m = String(v||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? m[1]+m[2]+m[3] : null;
+}
+function buildICS(){
+  var lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//知时//ZHISHI//CN',
+    'CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:知时 · 截止日历'];
+  var stamp = new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+  NOTICES.forEach(function(n, i){
+    var d = icsDate(n.deadline);
+    if(!d) return;
+    var uid = 'zhishi-' + String(n.id || i).replace(/[^A-Za-z0-9_-]/g,'') + '@zhishi.local';
+    var desc = [n.digestOne||'', n.source||'', n.entry?('办理入口：'+n.entry):'',
+      n.url?('原文：'+n.url):''].filter(Boolean).join(' | ');
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:' + uid);
+    lines.push('DTSTAMP:' + stamp);
+    lines.push('DTSTART;VALUE=DATE:' + d);
+    lines.push('SUMMARY:' + icsEscape(n.title || '知时提醒'));
+    lines.push('DESCRIPTION:' + icsEscape(desc));
+    if(n.url) lines.push('URL:' + icsEscape(n.url));
+    lines.push('END:VEVENT');
+  });
+  lines.push('END:VCALENDAR');
+  return lines.join('\r\n') + '\r\n';
+}
+
 /* ---------- 交互 API ---------- */
 window.APP = {
   goTab:function(t){ STATE.tab=t; STATE.detailId=null; STATE.sub='main'; render();
     if(t==='digest' && (!AGENT.ready || !AGENT.result)) loadAgentData(); },
+  setDigestWindow:function(w){ STATE.digestWindow = parseInt(w,10) || 3; render(); },
   goSub:function(s){ STATE.sub=s; STATE.detailId=null; render();
     if(s==='push' && !AGENT.status) loadAgentData(); },
   openDetail:function(id){ STATE.detailId=id; render(); },
@@ -9592,6 +9660,19 @@ window.APP = {
     render();
   },
   calPick:function(d){ STATE.calSel = d; render(); },
+  exportICS:function(){
+    try{
+      var text = buildICS();
+      var count = (text.match(/BEGIN:VEVENT/g) || []).length;
+      var blob = new Blob(['\ufeff'+text], {type:'text/calendar;charset=utf-8'});
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = '知时_截止日历.ics';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+      toast('已导出 '+count+' 条截止事项到日历文件');
+    }catch(e){ toast('导出失败：'+(e && e.message ? e.message : '浏览器不支持')); }
+  },
   copy:function(text){
     try{
       var ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';

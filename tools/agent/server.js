@@ -75,6 +75,20 @@ const CONFIG = {
 const START_AT = new Date().toISOString();
 const VERSION = '1.0.0';
 
+/* 安全提示（借鉴 Augur）：默认只绑回环地址；一旦对外暴露且未开鉴权，
+ * 必须显式警告，而不是默默把画像读写 / 模型调用接口开放到局域网。 */
+function isLoopbackHost(h){
+  return h === '127.0.0.1' || h === 'localhost' || h === '::1' || h === '[::1]';
+}
+const EXPOSED_WITHOUT_AUTH = !isLoopbackHost(CONFIG.host) && !CONFIG.token;
+if (EXPOSED_WITHOUT_AUTH) {
+  process.stderr.write(JSON.stringify({
+    t: new Date().toISOString(), level: 'warn',
+    msg: '安全警告：服务绑定非本机地址且未开启鉴权，局域网内任何人可读写画像并触发模型调用。请设置 AGENT_TOKEN 或改回 127.0.0.1。',
+    extra: { host: CONFIG.host, port: CONFIG.port }
+  }) + '\n');
+}
+
 /* ══════════════════════════════════════════════════════════
  * 日志（结构化，带请求 ID）
  * ══════════════════════════════════════════════════════════ */
@@ -845,7 +859,7 @@ server.listen(CONFIG.port, CONFIG.host, () => {
       '  健康    http://' + CONFIG.host + ':' + CONFIG.port + '/healthz\n' +
       '  就绪    http://' + CONFIG.host + ':' + CONFIG.port + '/readyz\n' +
       '  云端    ' + (core.cloudAvailable() ? '可用' : '不可用（降级本地池）') + '\n' +
-      '  鉴权    ' + (CONFIG.token ? 'Bearer（已开启）' : '未开启（本地模式）') + '\n' +
+      '  鉴权    ' + (CONFIG.token ? 'Bearer（已开启）' : (EXPOSED_WITHOUT_AUTH ? '未开启（⚠ 对外暴露）' : '未开启（本地模式）')) + '\n' +
       '  ─────────────────────────────────────\n' +
       '  Ctrl+C 优雅退出\n\n'
     );
