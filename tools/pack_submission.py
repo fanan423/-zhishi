@@ -260,12 +260,14 @@ def main():
     doc_note = ("（未发现导出的 Word/PDF 说明文档；请先跑 "
                 "`python tools/export_docx.py --pdf` 再打包）")
     doc_found = []
+    seen_suffix = set()   # 同名同格式只取一次：优先官方命名版，避免重复复制成 DOCX + DOCX
     for cand in doc_candidates:
-        if cand.exists():
+        if cand.exists() and cand.suffix not in seen_suffix:
             dst = outdir / f"{prefix}+项目说明文档{cand.suffix}"
             shutil.copy2(cand, dst)
             print(f"[OK] 已复制说明文档：{dst.name}  （{human(dst.stat().st_size)}）")
             doc_found.append(dst.suffix)
+            seen_suffix.add(cand.suffix)
             doc_note = ""
     if doc_found:
         print(f"[i] 本作品说明文档交付格式：{' + '.join(s.lstrip('.').upper() for s in doc_found)}")
