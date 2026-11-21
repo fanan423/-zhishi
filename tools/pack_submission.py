@@ -68,6 +68,7 @@ DOC_ITEMS = [
     "docs/项目说明文档_知时.md",
     "docs/参赛作品说明.md",
     "docs/大赛提交要求.md",
+    "docs/农芯智_提交总表.md",         # 权威一页纸：官方要求↔三件套↔状态↔待办
     "docs/演示视频脚本.md",
     "docs/小程序运行说明.md",
     "docs/信息源接入与推送测试.md",
@@ -93,6 +94,8 @@ TOOL_ITEMS = [
     "tools/README.md",
     "tools/export_docx.py",
     "tools/pack_submission.py",
+    "tools/make_submission.py",         # 一键交互式生成官方三件套
+    "一键生成_提交包.bat",              # 上面脚本的双击入口
     # ── 智能体实现集（核心引擎 / CLI / HTTP 服务 / 两端客户端）──
     "tools/agent.js",
     "tools/agent",                     # core.js + server.js + prompt.js + 回流器（目录整体带走）

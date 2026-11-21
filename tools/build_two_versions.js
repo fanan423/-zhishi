@@ -147,7 +147,7 @@ function main() {
   const TOP_FILES = [
     '知时_可用版.html', '知时_演示版.html', '知时_在线版.html', '知时.html', '交互Demo.html',
     '知时门户.html', '小程序预览.html', '打开总览.html', '打开小程序预览.html',
-    '一键运行.bat', '一键启动_AI版.bat', 'package.json', '.gitignore', 'CHANGELOG.md', 'README.md',
+    '一键运行.bat', '一键启动_AI版.bat', '一键生成_提交包.bat', 'package.json', '.gitignore', 'CHANGELOG.md', 'README.md',
   ];
   TOP_FILES.forEach((f) => { if (fs.existsSync(R(f))) full.push({ abs: R(f), rel: f }); });
   ['web', 'miniprogram', 'tools', 'docs', 'data', 'config'].forEach((d) => {
