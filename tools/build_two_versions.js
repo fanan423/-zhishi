@@ -188,6 +188,19 @@ function main() {
   console.log('=== 两版交付打包完成 ===');
   console.log('① 演示版  dist/知时_演示版.zip  ' + kb(demoSize) + '  （' + demoFiles.length + ' 个内容文件 + 说明）');
   console.log('② 可用版  dist/知时_可用版.zip  ' + kb(usableSize) + '  （' + fullFiles.length + ' 个文件）');
+
+  // 为 dist 下所有 zip 写入「文件编名索引」（序号+功能名，不改原文件名）
+  try {
+    const { spawnSync } = require('child_process');
+    const gen = path.join(__dirname, 'gen_zip_index.py');
+    if (fs.existsSync(gen)) {
+      const py = process.platform === 'win32' ? 'python' : 'python3';
+      const r = spawnSync(py, [gen], { cwd: ROOT, encoding: 'utf8' });
+      if (r && r.status === 0) console.log('③ 文件编名索引已写入各 zip（00_文件编名索引.md）');
+      else console.log('[提示] 编名索引跳过（python 不可用）：见 tools/gen_zip_index.py');
+    }
+  } catch (e) { /* 编名失败不影响主交付 */ }
+
   console.log('注意：均为通用命名。正式提交请用 pack_submission.py 按官方格式命名，');
   console.log('      演示视频 / 学号 / 队名 / 电话 / 云盘上传 / 群内回复 仍需人工完成（不伪造）。');
 }

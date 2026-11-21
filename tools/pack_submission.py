@@ -95,6 +95,7 @@ TOOL_ITEMS = [
     "tools/export_docx.py",
     "tools/pack_submission.py",
     "tools/make_submission.py",         # 一键交互式生成官方三件套
+    "tools/gen_zip_index.py",           # zip 文件编名索引生成器（序号+功能名）
     "一键生成_提交包.bat",              # 上面脚本的双击入口
     # ── 智能体实现集（核心引擎 / CLI / HTTP 服务 / 两端客户端）──
     "tools/agent.js",
@@ -347,6 +348,15 @@ def main():
             lines.append(f"- [ ] `{m}`")
     (outdir / "提交清单.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"[OK] 已写提交清单：提交清单.md")
+
+    # 为 dist 下所有 zip 写入文件编名索引（序号+功能名，不改原文件名）
+    try:
+        import subprocess as _sp
+        gen = ROOT / "tools" / "gen_zip_index.py"
+        if gen.exists():
+            _sp.run([sys.executable, str(gen)], cwd=str(ROOT), check=False)
+    except Exception as _e:  # 编名失败不影响主交付
+        print(f"[!] 文件编名索引生成跳过：{_e}")
 
     print("=" * 62)
     print(f"产出目录：{outdir}")
