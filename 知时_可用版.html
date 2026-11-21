@@ -13,6 +13,11 @@
   --alert:#E77844; --alert-soft:rgba(231,120,68,.12); --alert-ink:#B04A1C;
   --txt:#1B2A22; --txt-2:#5C6B62; --txt-3:#93A096;
   --shadow:0 1px 3px rgba(27,42,34,.06); --card-shadow:0 2px 8px rgba(27,42,34,.06);
+  /* 视觉打磨层 token：仅阴影/高光，颜色主体沿用上面既有变量，配色不变 */
+  --shadow-lift:0 1px 2px rgba(27,42,34,.05),0 6px 18px rgba(27,42,34,.08);
+  --shadow-hover:0 2px 6px rgba(27,42,34,.07),0 12px 26px rgba(27,42,34,.11);
+  --brand-glow:0 6px 18px rgba(0,101,62,.22);
+  --hair:0 1px 0 rgba(255,255,255,.55) inset;
 }
 .theme-dark{
   --bg:#0C1A14; --surface:#122A20; --border:#23473A; --border-soft:#1B3A2E;
@@ -21,6 +26,10 @@
   --alert:#F0854F; --alert-soft:rgba(240,133,79,.16); --alert-ink:#F6A87C;
   --txt:#E8F1EC; --txt-2:#A7BCB1; --txt-3:#7E968A;
   --shadow:0 1px 4px rgba(0,0,0,.30); --card-shadow:0 2px 10px rgba(0,0,0,.34);
+  --shadow-lift:0 1px 2px rgba(0,0,0,.38),0 8px 20px rgba(0,0,0,.30);
+  --shadow-hover:0 2px 8px rgba(0,0,0,.44),0 14px 30px rgba(0,0,0,.38);
+  --brand-glow:0 6px 20px rgba(0,0,0,.45);
+  --hair:0 1px 0 rgba(255,255,255,.06) inset;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:linear-gradient(160deg,#E9EFE9,#F4F7F4 60%,#E6EDE6);
@@ -544,6 +553,55 @@ button{font-family:inherit;cursor:pointer}
   body{padding:0}
   .phone{height:100vh;max-height:100vh;border-radius:0;box-shadow:none;width:100%}
   .notch{display:none} .navbar{padding-top:14px}
+}
+
+/* ============================================================
+   视觉打磨层 · 配色不变（借鉴 Geist / Brain.md 设计系统规范）
+   原则：① 只用既有色变量，不引入新色相 ② 不用任何外链/图片
+        ③ 不改任何数字与文案 ④ 动效克制、可访问性降级
+   ============================================================ */
+
+/* ① 排印：标题负字距收紧，正文渲染更细腻（字号/颜色零改动） */
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.nb-t,.bhead .t1,.mhead .bt .t1,.dhead .dt,.ovc .ovv,.stat .n,
+.sumtx,.trl,.trv,.airecs{letter-spacing:-.35px}
+
+/* ② 卡片层次：统一升级为分层柔和阴影（token 已在主题块定义，明暗自适应） */
+.ncard,.icard,.kv,.pt,.rawbox,.relcard,.trust,.sumcard-wrap{box-shadow:var(--shadow-lift)}
+.ncard:hover,.icard:hover,.airecitem:hover{box-shadow:var(--shadow-hover)}
+.ovc,.sumcard,.bhead .lg,.mhead .ava{box-shadow:var(--brand-glow)}
+.ncard,.icard,.kv,.pt,.rawbox,.relcard,.trust,.airecbox,.airecitem,
+.bin,.userbin,.chip,.frow,.sumcard-wrap{transition:box-shadow .16s cubic-bezier(.2,.7,.3,1),transform .16s cubic-bezier(.2,.7,.3,1)}
+
+/* ③ 顶部高光细线：材质感，让卡片顶面更立体，不改背景色 */
+.ncard,.icard,.trust,.airecbox,.kv,.pt,.rawbox{box-shadow:var(--shadow-lift),var(--hair)}
+
+/* ④ 主按钮/标签按下与悬浮的轻微反馈（位移 1px，无缩放抖动） */
+.ab.primary,.kwadd,.tbtn,.agbtn.primary,.seg.on{transition:filter .16s ease,transform .16s cubic-bezier(.2,.7,.3,1),box-shadow .16s ease}
+@media (hover:hover){
+  .ab.primary:hover,.kwadd:hover,.agbtn.primary:hover,.tbtn:hover{filter:brightness(1.06)}
+  .ncard:hover,.icard:hover,.airecitem:hover{transform:translateY(-1px)}
+  .ab.primary:active,.kwadd:active,.agbtn.primary:active,.chip:active,.tb:active{transform:translateY(1px)}
+}
+
+/* ⑤ 分区标题：左侧色条加圆润端点，标题与内容间距形成 8/16 节奏 */
+.sec::before{border-radius:3px;box-shadow:0 0 0 3px var(--brand-soft)}
+.sec{margin-top:20px;margin-bottom:11px}
+
+/* ⑥ 进度条/填充条：加一层极淡内高光，厚度感更强 */
+.trbar,.stepbar,.trfill,.stepfill{box-shadow:var(--hair)}
+
+/* ⑦ 键盘可达性：清晰的双层焦点环（跟随品牌色，明暗自适应） */
+button:focus-visible,[role=button]:focus-visible,select:focus-visible,input:focus-visible,
+.chip:focus-visible,.seg:focus-visible,.tb:focus-visible,.ab:focus-visible{
+  outline:2px solid var(--brand);outline-offset:2px}
+
+/* ⑧ 可访问性降级：系统要求减少动效时关闭全部过渡 */
+@media (prefers-reduced-motion:reduce){
+  *,.ncard,.icard,.ab.primary,.kwadd,.tbtn,.agbtn.primary,.seg.on{
+    animation-duration:.001ms!important;transition-duration:.001ms!important}
+  .ncard:hover,.icard:hover,.airecitem:hover,
+  .ab.primary:active,.kwadd:active,.agbtn.primary:active,.chip:active,.tb:active{transform:none!important}
 }
 </style>
 </head>
