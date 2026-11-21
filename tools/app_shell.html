@@ -766,14 +766,36 @@ function loadAgentData(){
   });
 }
 
-/* AI 推荐：与 digest 解耦，单独取、单独渲染，失败不影响主动送达清单。 */
+/* AI 推荐：与 digest 解耦，单独取、单独渲染，失败不影响主动送达清单。
+ * 在线版（ZS_CLOUD 已就绪）优先走云端免密钥大模型真调；
+ * 云端不可达（本地 file:// / 离线 / Origin 不匹配）→ 自动回退原有的
+ * ZS_AGENT 路径（远端智能体服务或构建期快照），页面来源标注随之变化。
+ * 演示版构建链根本不含 ZS_CLOUD，因此这里永远走原路径，行为零改动。 */
 function loadRecommendData(){
   if(!window.ZS_AGENT || !window.ZS_AGENT.recommend || AGENT.recLoading) return;
   AGENT.recLoading = true; AGENT.recErr = '';
-  window.ZS_AGENT.recommend({ useLLM:true, limit:12, profile:PROFILE }).then(function(r){
+  var cloud = window.ZS_CLOUD;
+  var useCloud = cloud && typeof cloud.available==='function' && cloud.available();
+  var p = useCloud
+    ? cloud.recommend({ limit:12, profile:PROFILE })
+    : window.ZS_AGENT.recommend({ useLLM:true, limit:12, profile:PROFILE });
+  p.then(function(r){
     AGENT.recommend = r; AGENT.recLoading = false;
+    if(useCloud && r && r.channel==='workbuddy-cloud') try{ cloud.saveProfile(PROFILE); }catch(e){}
     if(STATE.tab==='digest' || STATE.sub==='push') render();
   }).catch(function(e){
+    /* 云端真调失败 → 如实降级回原路径，并在结果里标注原因，不假装 AI 成功 */
+    if(useCloud){
+      return window.ZS_AGENT.recommend({ useLLM:true, limit:12, profile:PROFILE }).then(function(r){
+        if(r) { r.degraded = true; r.degradeReason = '云端不可用：'+((e&&e.message)||'未知'); }
+        AGENT.recommend = r; AGENT.recLoading = false;
+        if(STATE.tab==='digest' || STATE.sub==='push') render();
+      }).catch(function(e2){
+        AGENT.recErr = (e2 && e2.message) || 'AI 推荐获取失败';
+        AGENT.recLoading = false;
+        if(STATE.tab==='digest' || STATE.sub==='push') render();
+      });
+    }
     AGENT.recErr = (e && e.message) || 'AI 推荐获取失败';
     AGENT.recLoading = false;
     if(STATE.tab==='digest' || STATE.sub==='push') render();
@@ -1192,7 +1214,9 @@ function viewAIRecommendBlock(){
   var channel = rec.channel || '';
   var chanName = channel === 'openai-compatible'
     ? (rec.provider ? '自备模型 '+rec.provider : '自备模型')
-    : (channel === 'workbuddy' ? 'WorkBuddy 大模型' : '');
+    : (channel === 'workbuddy-cloud' ? '云端免密钥大模型'
+       : (channel === 'workbuddy' ? 'WorkBuddy 大模型' : ''));
+  var liveCloud = (channel === 'workbuddy-cloud' && !rec.offline);
   var label = isAI
     ? (rec.offline ? 'AI 推荐 · 构建期预计算（非实时调用）'
        : ('AI 推荐 · 实时大模型' + (chanName ? ' · '+chanName : '')))
@@ -1203,6 +1227,7 @@ function viewAIRecommendBlock(){
 
   var meta = rec.meta || {};
   h += '<div class="airecmeta">'
+    + (liveCloud ? '<span>实时调用 · 非快照</span>' : '')
     + (rec.model ? '<span>模型 '+esc(rec.model)+'</span>' : '')
     + (rec.promptVersion ? '<span>提示词 v'+esc(rec.promptVersion)+'</span>' : '')
     + (rec.generatedAt ? '<span>生成于 '+esc(String(rec.generatedAt).slice(0,16).replace('T',' '))+'</span>' : '')
@@ -2075,6 +2100,9 @@ function buildICS(){
 window.APP = {
   goTab:function(t){ STATE.tab=t; STATE.detailId=null; STATE.sub='main'; render();
     if(t==='digest' && (!AGENT.ready || !AGENT.result)) loadAgentData(); },
+  /* 在线版专用：CDN SDK 异步加载完成后重新拉一次 AI 推荐（首屏可能早于 SDK 就绪）。
+   * 本地/演示版无人调用，行为零改动。 */
+  refreshRecommend:function(){ AGENT.recLoading=false; loadRecommendData(); },
   setDigestWindow:function(w){ STATE.digestWindow = parseInt(w,10) || 3; render(); },
   goSub:function(s){ STATE.sub=s; STATE.detailId=null; render();
     if(s==='push' && !AGENT.status) loadAgentData(); },

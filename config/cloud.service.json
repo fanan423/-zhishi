@@ -1,0 +1,8 @@
+{
+  "_note": "在线可用版的云服务公开配置。仅含可公开字段（endpoint / publishableKey / oauthRelayBaseUrl），真正权限由服务端精确 Origin 校验约束；不含任何密钥。由 tools/build_online.js 注入在线版 HTML。",
+  "endpoint": "https://zhishi-06927.app.workbuddy.host",
+  "oauthRelayBaseUrl": "https://www.workbuddy.cn/v2/as/genie-baas/oauth",
+  "publishableKey": "wbpk_fFoXXzFE9id8qgQ2Y3I1tQ_xy5Cl60DoYteTWaTETWNLSVI6i4WMiV3",
+  "applicationId": "wbapp_fFoXXzFE9id8qgQ2Y3I1tQ",
+  "appName": "知时"
+}

@@ -8,6 +8,8 @@
 
 GitHub 仓库：<https://github.com/fanan423/-zhishi> · 更新日志：[CHANGELOG.md](CHANGELOG.md)
 
+在线真后端入口：<https://zhishi-06927.app.workbuddy.host/?sharecode=F7FFH6SCQF> · 在线说明：[docs/在线真后端_使用说明.md](docs/在线真后端_使用说明.md)
+
 ---
 
 ## 一眼看懂
@@ -18,9 +20,16 @@ GitHub 仓库：<https://github.com/fanan423/-zhishi> · 更新日志：[CHANGEL
 | 真实采集 | **121 条**（注册表 20 个源：11 成功 / 8 被 WAF 拦截并如实记录 / 1 保留） |
 | 大模型理解层 | 构建期真调 **36/36**，提示词 v1.1.0，46 条结构化产物回流 |
 | AI 推荐层 | 构建期真调 **22/22**，提示词 v1.0.0，注入实用版；**双击一键启动即可实时真调** |
+| 在线真后端 | 免密钥云端大模型实时推荐 + 云数据库画像/留痕；浏览器实测 `workbuddy-cloud`、`ok_count=3/3` |
 | 自检 | `run_all.js` **27/27** · 交叉校验 **73/73** · 接口自检 **91/91** |
 
-**架构边界（答辩务必说清）**：理解层与推荐层都真调了大模型。交付物内置**构建期离线快照**（端上只读、断网可完整演示）；同时提供**实时通道**——双击 `一键启动_AI版.bat` 起本机服务后，实用版直连服务端、按你的画像实时真调大模型。实时通道支持两种凭证：**自备 API Key（OpenAI 兼容，优先、不依赖登录态）** 与 **WorkBuddy 云 SDK（兜底、需登录态）**，都没有则如实降级规则，**绝不把规则结果冒充 AI**。详见 [实用版实时 AI 使用说明](docs/实用版实时AI_使用说明.md)。
+**架构边界（答辩务必说清）**：理解层与推荐层都真调了大模型，但有三条互不污染的形态——
+
+1. **演示版 / 参赛可用版**：内置构建期离线快照，端上只读、断网可完整演示；可用版页面如实标注「非实时调用」。
+2. **本机实时通道**：双击 `一键启动_AI版.bat` 起 `127.0.0.1:8787` 服务，可用版直连服务端实时真调；支持自备 API Key（优先）与 WorkBuddy SDK（兜底），都没有则如实降级规则。
+3. **在线真后端**：在线链接走 WorkBuddy 云服务的免密钥大模型与云数据库，不需要密钥、不需要本机服务；`?selftest=1` 可现场核验真调。
+
+三条链路都**不把规则结果冒充 AI**。详见 [实用版实时 AI 使用说明](docs/实用版实时AI_使用说明.md) 与 [在线真后端使用说明](docs/在线真后端_使用说明.md)。
 
 ---
 
@@ -31,7 +40,8 @@ GitHub 仓库：<https://github.com/fanan423/-zhishi> · 更新日志：[CHANGEL
 - **AI 运行留痕面板**：数据自查页直接显示构建期模型、提示词版本、成功条数与「非实时调用」标注。
 - **服务安全警告**：智能体服务对外暴露且未开鉴权时启动即警告，默认仍只绑回环地址。
 - **诚实成熟度表**：[`docs/功能成熟度.md`](docs/功能成熟度.md) 区分「稳定 / 有边界 / 未接入 / 明确不做」。
-- **实用版实时 AI（本次新增）**：一键启动 + 自备 API Key（OpenAI 兼容）优先 / WorkBuddy SDK 兜底 / 规则降级三通道，服务端代理、密钥不下发浏览器、来源如实标注。用法见 [`docs/实用版实时AI_使用说明.md`](docs/实用版实时AI_使用说明.md)。
+- **实用版实时 AI**：一键启动 + 自备 API Key（OpenAI 兼容）优先 / WorkBuddy SDK 兜底 / 规则降级三通道，服务端代理、密钥不下发浏览器、来源如实标注。用法见 [`docs/实用版实时AI_使用说明.md`](docs/实用版实时AI_使用说明.md)。
+- **在线真后端（本次新增）**：独立 `知时_在线版.html` 接入免密钥云大模型 + 云数据库，部署于保留域名；演示版与参赛可用版零污染，继续断网可演。用法见 [`docs/在线真后端_使用说明.md`](docs/在线真后端_使用说明.md)。
 
 调研对象、借鉴点与不采纳理由见 [`docs/GitHub借鉴与优化说明.md`](docs/GitHub借鉴与优化说明.md)；逐次变更见 [`CHANGELOG.md`](CHANGELOG.md)。全部改动后 `npm run checks` 仍为 **27/27**。
 
@@ -47,7 +57,10 @@ GitHub 仓库：<https://github.com/fanan423/-zhishi> · 更新日志：[CHANGEL
 
 或使用 Windows 一键脚本：`一键运行.bat`。
 
-**要实时调用大模型**：双击 **`一键启动_AI版.bat`**（配置见 [实用版实时 AI 使用说明](docs/实用版实时AI_使用说明.md)），网页会自动连本机服务，AI 推荐由服务端实时真调。
+**要实时调用大模型**：
+
+- **不想配环境**：直接打开 [在线真后端入口](https://zhishi-06927.app.workbuddy.host/?sharecode=F7FFH6SCQF)，云端免密钥大模型实时推荐，页面自动写画像与留痕。
+- **想在本机跑**：双击 **`一键启动_AI版.bat`**（配置见 [实用版实时 AI 使用说明](docs/实用版实时AI_使用说明.md)），网页会自动连本机服务，AI 推荐由服务端实时真调。
 
 小程序：`miniprogram/` 目录用微信开发者工具「导入项目」即可；`小程序预览.html` 可在浏览器看十页预览。
 
@@ -60,7 +73,7 @@ GitHub 仓库：<https://github.com/fanan423/-zhishi> · 更新日志：[CHANGEL
 → 匹配（AI 推荐重排 + 规则保底）→ 提醒（三问式卡片 + 双向溯源）
 ```
 
-紫色两层（理解、匹配）才真调大模型，且都在构建期。详见 [`docs/答辩速讲稿.md`](docs/答辩速讲稿.md) 的架构图与 [`docs/参赛作品说明.md`](docs/参赛作品说明.md)。
+紫色两层（理解、匹配）才真调大模型：构建期产出可离线复核的快照，实时形态则由本机服务或云端免密钥模型重排。详见 [`docs/答辩速讲稿.md`](docs/答辩速讲稿.md) 的架构图与 [`docs/参赛作品说明.md`](docs/参赛作品说明.md)。
 
 ---
 
@@ -83,6 +96,7 @@ node tools/build_usable.js         # 生成 知时_可用版.html（注入 AI �
 node tools/build_presentation.js   # 生成 知时_演示版.html
 node tools/build_portal.js         # 生成 知时门户.html
 node tools/build_two_versions.js   # 重打 dist/ 两版交付 zip
+node tools/build_online.js         # 生成 知时_在线版.html（真后端入口，不污染前两版）
 node tools/agent/build_ai_snapshot.js  # 构建期真调模型产出 AI 推荐快照
 ```
 
@@ -94,11 +108,13 @@ node tools/agent/build_ai_snapshot.js  # 构建期真调模型产出 AI 推荐�
 |---|---|
 | `知时*.html` / `知时门户.html` | 各形态单文件应用与统一门户（唯一真源产物） |
 | `miniprogram/` | 微信小程序源码（十页 + utils） |
-| `web/` | 数据层与逻辑层（`zhishi-data.js` / `zhishi-core.js` / `zhishi-agent.js` / `zhishi-ai.js`） |
+| `web/` | 数据层与逻辑层（`zhishi-data.js` / `zhishi-core.js` / `zhishi-agent.js` / `zhishi-ai.js` / `zhishi-cloud.js`） |
 | `tools/` | 采集、理解、导出、打包工具集，见 [`tools/README.md`](tools/README.md) |
 | `tools/checks/` | 27 个校验脚本，`run_all.js` 一键总账 |
 | `tools/agent/` | 智能体服务端（`/api/recommend` 等）、提示词、推荐引擎 |
 | `config/cloud.example.json` | 云端配置模板（真实凭证 `cloud.local.json` **不入库**） |
+| `config/cloud.service.json` | 在线真后端的公开配置（endpoint / publishableKey，不含密钥） |
+| `deploy_online/` | 在线版部署目录，由 `知时_在线版.html` 复制而来 |
 | `data/` | 真实采集结果 `notices_real.json` 与源健康度 |
 | `docs/` | 参赛说明、答辩讲稿、AI 举证、提交行动卡、功能成熟度、GitHub 借鉴说明 |
 | `dist/` | 两版交付 zip（本地构建产物，不入库） |
@@ -108,6 +124,7 @@ node tools/agent/build_ai_snapshot.js  # 构建期真调模型产出 AI 推荐�
 ## 交付与参赛
 
 - 两版交付包：`dist/知时_可用版.zip`、`dist/知时_演示版.zip`
+- 在线补充入口：[在线真后端](https://zhishi-06927.app.workbuddy.host/?sharecode=F7FFH6SCQF)（`?selftest=1` 可在答辩现场核验实时大模型调用）
 - 八章说明文档：`docs/项目说明文档_知时.docx`
 - 答辩材料：`docs/答辩速讲稿.md`、`docs/参赛提交行动卡.md`
 - 官方要求：`docs/大赛提交要求.md`

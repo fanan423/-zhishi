@@ -145,7 +145,7 @@ function main() {
   /* ---------- ② 可用版包（全量可运行程序） ---------- */
   const full = [];
   const TOP_FILES = [
-    '知时_可用版.html', '知时_演示版.html', '知时.html', '交互Demo.html',
+    '知时_可用版.html', '知时_演示版.html', '知时_在线版.html', '知时.html', '交互Demo.html',
     '知时门户.html', '小程序预览.html', '打开总览.html', '打开小程序预览.html',
     '一键运行.bat', '一键启动_AI版.bat', 'package.json', '.gitignore', 'CHANGELOG.md', 'README.md',
   ];
@@ -176,6 +176,9 @@ function main() {
       '  · 交互 Demo：双击「交互Demo.html」',
       '  · 统一门户：双击「知时门户.html」',
       '  · 演示版：双击「知时_演示版.html」（答辩/录视频用）',
+      '  · 在线真后端：知时_在线版.html，部署于保留域名，免密钥云大模型 + 云数据库（补充入口）',
+      '    在线访问：https://zhishi-06927.app.workbuddy.host/?sharecode=F7FFH6SCQF',
+      '    现场自检：在上面链接后加 &selftest=1',
       '',
       '重建与自检：见 docs/两版交付说明.md 第五节、docs/数据血缘与单一事实来源.md。',
       '官方提交命名：tools/pack_submission.py --sid <学号> --team <队名>',

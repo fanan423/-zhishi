@@ -27,6 +27,10 @@ const ROOT = path.resolve(__dirname, '..');
 const SRC = path.join(ROOT, '知时.html');
 const OUT = path.join(ROOT, '知时_可用版.html');
 const DATA = path.join(ROOT, 'web', 'zhishi-data.js');
+/* 注意：交付的「知时_可用版.html」必须自包含（无外链 script/css），
+ * 这是 check_kpi_sync.js 守的产品红线（断网可演）。
+ * 真正后端（云大模型 + 云数据库）走独立的「知时_在线版.html」，
+ * 由 tools/build_online.js 生成并部署到保留域名，二者互不污染。 */
 
 function computeStat() {
   const src = fs.readFileSync(DATA, 'utf8');
@@ -138,7 +142,7 @@ function main() {
   const openEnd = app.indexOf('>', bodyAt) + 1;
   const out = app.slice(0, openEnd) + banner(s) + app.slice(openEnd);
   fs.writeFileSync(OUT, out, 'utf8');
-  console.log('[OK] 已生成 知时_可用版.html · ' + Math.round(out.length / 1024) + ' KB');
+  console.log('[OK] 已生成 知时_可用版.html · ' + Math.round(out.length / 1024) + ' KB（自包含·断网可演）');
   console.log('     真实 ' + s.real + ' / 来源 ' + s.units + ' / 带链接 ' + s.linked +
     ' / 未过期 ' + s.valid + ' / AI理解 ' + s.llm + ' / 最新 ' + s.newest);
 }

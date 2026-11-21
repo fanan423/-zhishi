@@ -50,6 +50,7 @@ PROGRAM_ITEMS = [
     # 两版交付：演示版（评委/录视频）与 可用版（真正能用）
     "知时_演示版.html",
     "知时_可用版.html",
+    "知时_在线版.html",
     "知时门户.html",
     "知时.html",
     "交互Demo.html",
@@ -77,6 +78,7 @@ DOC_ITEMS = [
     "docs/数据血缘与单一事实来源.md",
     "docs/两版交付说明.md",
     "docs/实用版实时AI_使用说明.md",
+    "docs/在线真后端_使用说明.md",
     "docs/GitHub借鉴与优化说明.md",
     "docs/功能成熟度.md",
 ]
@@ -99,10 +101,12 @@ TOOL_ITEMS = [
     "tools/sync_promo_kpi.js",
     "tools/build_presentation.js",
     "tools/build_usable.js",
+    "tools/build_online.js",           # 在线真后端构建器（独立产物，不污染前两版）
     "tools/build_two_versions.js",     # 两版通用命名 zip 打包器
     "tools/lib",                       # zip_writer.js（纯 Node 零依赖 ZIP 写入器）
     "tools/checks",                    # 全量自检 + 两版 zip 交叉守卫（可复跑举证）
     "config/cloud.example.json",       # 只带模板，不带 cloud.local.json
+    "config/cloud.service.json",       # 在线真后端公开配置（endpoint / publishableKey，无密钥）
     "config/llm.example.json",         # 自备模型配置模板（不带 llm.local.json）
     "CHANGELOG.md",
     "README.md",
